@@ -30,62 +30,91 @@ class Flags(Enum):
 LinkType = Type(np.dtype([("Track1", "<u4"), ("Track2", "<u4")]))
 SegmentData = Type(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 
+TrackType = Type(np.dtype("<3f4"))
+
 
 class Track:
     def __init__(self, label, trackData):
         self.label = label
-        # self.data = trackData.astype(VEC3F.btype).reshape(-1, 3)
-        self.data = np.recarray(trackData.shape, dtype=VEC3F.btype)
-        print(self.data.shape)
-        self.data = trackData[:]
+        self.data = trackData
+
+    @property
+    def X(self):
+        return self.data[:, 0]
+
+    @property
+    def Y(self):
+        return self.data[:, 1]
+
+    @property
+    def Z(self):
+        return self.data[:, 2]
+
+    @X.setter
+    def X(self, value):
+        self.data[:, 0] = value
+
+    @Y.setter
+    def Y(self, value):
+        self.data[:, 1] = value
+
+    @Z.setter
+    def Z(self, value):
+        self.data[:, 2] = value
+
+    @property
+    def nFrames(self):
+        return self.data.shape[0]
 
     @property
     def _segments(self):
-        maskedTrackData = np.ma.masked_invalid(self.data["X"].astype(np.float32))
-        return np.ma.clump_unmasked(maskedTrackData)
+        maskedTrackData = np.ma.masked_invalid(self.data)
+        return np.ma.clump_unmasked(maskedTrackData.T[0])
 
-    def write(self):
-        data = b""
+    def write(self, file):
 
         # label
-        data += BTSString.write(256, self.label)
+        BTSString.bwrite(file, 256, self.label)
 
         segments = self._segments
+
         # nSegments
-        data += Int32.write(np.array(len(segments)))
+        Int32.bwrite(file, np.array(len(segments)))
+
         # padding
-        data += Int32.pad(1)
+        Int32.bpad(file, 1)
 
         for segment in segments:
             # startFrame
-            data += Int32.write(np.array(segment.start))
+            Int32.bwrite(file, np.array(segment.start))
             # nFrames
-            data += Int32.write(np.array(segment.stop - segment.start))
+            Int32.bwrite(file, np.array(segment.stop - segment.start))
             # trackData
-            data += VEC3F.write(self.data[segment])
-
-        return data
+            TrackType.bwrite(file, self.data[segment])
 
     def __repr__(self):
-        return "Track(label={})".format(self.label)
+        return f"Track(label={self.label}, nFrames={self.nFrames})"
 
 
 class Data3D(Block):
     def __init__(self, entry, block_data):
         super().__init__(entry, block_data)
         self.format = Data3dBlockFormat(entry["format"])
-        self.nFrames = Int32.read(self.data, 1)[0]
-        self.frequency = Int32.read(self.data, 1)[0]
-        self.startTime = Float32.read(self.data, 1)[0]
-        self.nTracks = Uint32.read(self.data, 1)[0]
-        self.volume = Volume.read(self.data, 1)[0]
-        self.rotationMatrix = Matrix.read(self.data, 1)[0]
-        self.translationVector = VEC3F.read(self.data, 1)[0]
-        self.flags = Flags(Uint32.read(self.data, 1)[0])
+        self.build()
+
+    def build(self):
+        self.nFrames = Int32.read(self.data)[0]
+        self.frequency = Int32.read(self.data)[0]
+        self.startTime = Float32.read(self.data)[0]
+        self.nTracks = Uint32.read(self.data)[0]
+        self.volume = Volume.read(self.data)[0]
+        self.rotationMatrix = Matrix.read(self.data)[0]
+        self.translationVector = VEC3F.read(self.data)[0]
+        self.flags = Flags(Uint32.read(self.data)[0])
 
         if self.format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
-            self.nLinks = Int32.read(self.data, 1)[0]
-            self.data.seek(4, 1)
+            self.nLinks = Int32.read(self.data)[0]
+            Int32.skip(self.data, 1)
             self.links = LinkType.read(self.data, self.nLinks)
 
         self.tracks = []
@@ -96,12 +125,12 @@ class Data3D(Block):
             for _ in range(self.nTracks):
                 label = BTSString.read(256, self.data.read(256))
                 nSegments = Int32.read(self.data, 1)[0]
-                Int32.skip(self.data, 1)
+                Int32.skip(self.data)
                 segmentData = SegmentData.read(self.data, nSegments)
-                trackData = np.empty(self.nFrames, dtype=VEC3F.btype)
+                trackData = np.empty(self.nFrames, dtype=TrackType.btype)
                 trackData[:] = np.NaN
                 for startFrame, nFrames in segmentData:
-                    trackData[startFrame : startFrame + nFrames] = VEC3F.read(
+                    trackData[startFrame : startFrame + nFrames] = TrackType.read(
                         self.data, nFrames
                     )
                 self.tracks.append(Track(label, trackData))
@@ -110,46 +139,62 @@ class Data3D(Block):
                 f"Data3D format {self.format} not implemented yet"
             )
 
-    def write(self):
-        data = b""
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.tracks[key]
+        elif isinstance(key, str):
+            try:
+                return next(track for track in self.tracks if track.label == key)
+            except StopIteration:
+                raise KeyError(f"Track with label {key} not found")
+        raise TypeError(f"Invalid key type {type(key)}")
+
+    def __iter__(self):
+        return iter(self.tracks)
+
+    def __len__(self):
+        return len(self.tracks)
+
+    def write(self, file):
+        # data = b""
 
         # nFrames
-        data += Int32.write(self.nFrames)
+        Int32.bwrite(file, self.nFrames)
         # frequency
-        data += Int32.write(self.frequency)
+        Int32.bwrite(file, self.frequency)
         # startTime
-        data += Float32.write(self.startTime)
+        Float32.bwrite(file, self.startTime)
         # nTracks
-        data += Uint32.write(np.array(len(self.tracks)))
+        Uint32.bwrite(file, np.array(len(self.tracks)))
+
         # volume
-        data += Volume.write(self.volume)
+        Volume.bwrite(file, self.volume)
         # rotationMatrix
-        data += Matrix.write(self.rotationMatrix)
+        Matrix.bwrite(file, self.rotationMatrix)
         # translationVector
-        data += VEC3F.write(self.translationVector)
+        VEC3F.bwrite(file, self.translationVector)
         # flags
-        data += Uint32.write(np.array(self.flags.value))
+        Uint32.bwrite(file, np.array(self.flags.value))
 
         if self.nLinks and self.links.size:
             # nLinks
-            data += Int32.write(np.array(len(self.links)))
+            Int32.bwrite(file, np.array(len(self.links)))
             # padding
-            data += Int32.pad(1)
+            Int32.bpad(file)
             # links
-            data += LinkType.write(self.links)
+            LinkType.bwrite(file, self.links)
 
         if self.format in [
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
         ]:
             for track in self.tracks:
-                data += track.write()
+                track.write(file)
 
         else:
             raise NotImplementedError(
                 f"Data3D format {self.format} not implemented yet"
             )
-        return data
 
     def __repr__(self):
-        return f"<Data3D: {self.nFrames} frames, {self.nTracks} tracks, tracks={self.tracks}>"
+        return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self.tracks]}>"
