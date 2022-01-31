@@ -16,16 +16,19 @@ class EventsDataType(Enum):
 
 
 class Event:
-    def __init__(self, label, values):
+    def __init__(self, label, values, type=None):
         self.label = label
         self.values = values
         if not is_iterable(values):
             raise TypeError("Values must be iterable")
 
-        if len(values) == 1:
-            self.type = EventsDataType.singleEvent
+        if not type:
+            if len(values) == 1:
+                self.type = EventsDataType.singleEvent
+            else:
+                self.type = EventsDataType.eventSequence
         else:
-            self.type = EventsDataType.eventSequence
+            self.type = type
 
     def write(self):
         data = b""
@@ -51,10 +54,10 @@ class TemporalEventsData(Block):
         self.events = []
         for i in range(self.nEvents):
             label = BTSString.read(256, self.data.read(256))
-            self.data.seek(4, 1)
+            type = EventsDataType(struct.unpack("<I", self.data.read(4))[0])
             nItems = struct.unpack("<i", self.data.read(4))[0]
             items = [struct.unpack("<f", self.data.read(4))[0] for _ in range(nItems)]
-            self.events.append(Event(label, items))
+            self.events.append(Event(label, items, type))
 
     def write(self):
         data = b""
