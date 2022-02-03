@@ -1,6 +1,7 @@
-from tdfBlock import Block
+from io import BytesIO
+from tdfBlock import Block, BlockType
 from enum import Enum
-from tdfUtils import (
+from tdfTypes import (
     BTSString,
     Int32,
     Uint32,
@@ -8,10 +9,10 @@ from tdfUtils import (
     VEC3F,
     Matrix,
     Float32,
-    Int16,
     Type,
 )
 import numpy as np
+from tdfUtils import is_iterable
 
 
 class Data3dBlockFormat(Enum):
@@ -71,6 +72,19 @@ class Track:
         maskedTrackData = np.ma.masked_invalid(self.data)
         return np.ma.clump_unmasked(maskedTrackData.T[0])
 
+    @staticmethod
+    def build(stream, nFrames):
+        label = BTSString.bread(stream, 256)
+        nSegments = Int32.bread(stream)
+        Int32.skip(stream)
+        segmentData = SegmentData.bread(stream, nSegments)
+        trackData = np.empty(nFrames, dtype=TrackType.btype)
+        trackData[:] = np.NaN
+        for startFrame, nFrames in segmentData:
+            dat = TrackType.bread(stream, nFrames)
+            trackData[startFrame : startFrame + nFrames] = dat
+        return Track(label, trackData)
+
     def write(self, file):
 
         # label
@@ -79,7 +93,7 @@ class Track:
         segments = self._segments
 
         # nSegments
-        Int32.bwrite(file, np.array(len(segments)))
+        Int32.bwrite(file, len(segments))
 
         # padding
         Int32.bpad(file, 1)
@@ -92,68 +106,152 @@ class Track:
             # trackData
             TrackType.bwrite(file, self.data[segment])
 
+    @property
+    def nBytes(self):
+        base = 256 + 4 + 4
+        for segment in self._segments:
+            base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
+        return base
+
     def __repr__(self):
         return f"Track(label={self.label}, nFrames={self.nFrames})"
 
+    def __eq__(self, other):
+        return self.label == other.label and np.all(self.data == other.data)
+
 
 class Data3D(Block):
-    def __init__(self, entry, block_data):
-        super().__init__(entry, block_data)
-        self.format = Data3dBlockFormat(entry["format"])
-        self.build()
+    def __init__(
+        self,
+        frequency,
+        nFrames,
+        volume,
+        rotationMatrix,
+        translationVector,
+        startTime=0.0,
+        flag=Flags.rawData,
+        format=Data3dBlockFormat.byTrack,
+    ):
+        super().__init__(BlockType.data3D)
+        self.format = format
+        self.frequency = frequency
+        self.startTime = startTime
 
-    def build(self):
-        self.nFrames = Int32.read(self.data)[0]
-        self.frequency = Int32.read(self.data)[0]
-        self.startTime = Float32.read(self.data)[0]
-        self.nTracks = Uint32.read(self.data)[0]
-        self.volume = Volume.read(self.data)[0]
-        self.rotationMatrix = Matrix.read(self.data)[0]
-        self.translationVector = VEC3F.read(self.data)[0]
-        self.flags = Flags(Uint32.read(self.data)[0])
+        if not (
+            isinstance(rotationMatrix, np.ndarray)
+            and rotationMatrix.shape == Matrix.btype.shape
+        ):
+            raise ValueError(
+                f"rotationMatrix must be a numpy array of shape {Matrix.btype.shape}"
+            )
+        self.rotationMatrix = rotationMatrix
 
-        if self.format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
-            self.nLinks = Int32.read(self.data)[0]
-            Int32.skip(self.data, 1)
-            self.links = LinkType.read(self.data, self.nLinks)
+        if not (
+            isinstance(translationVector, np.ndarray)
+            and translationVector.shape == VEC3F.btype.shape
+        ):
+            raise ValueError(
+                f"translationVector must be a numpy array of shape {VEC3F.btype}"
+            )
+        self.translationVector = translationVector
 
-        self.tracks = []
-        if self.format in [
+        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+            raise ValueError(
+                f"volume must be a numpy array of shape {Volume.btype.shape}"
+            )
+
+        self.volume = volume
+
+        self.flag = flag
+        self.nFrames = nFrames
+
+        self._tracks = []
+
+    def add_track(self, track: Track):
+        if not isinstance(track, Track):
+            raise TypeError(f"Track must be of type Track")
+        if track.nFrames != self.nFrames:
+            raise ValueError(f"Track must have the same number of frames as the Data3D")
+        self._tracks.append(track)
+
+    @property
+    def tracks(self):
+        return self._tracks
+
+    @tracks.setter
+    def tracks(self, values):
+        oldTracks = self._tracks
+        self._tracks = []
+        try:
+            for value in values:
+                self.add_track(value)
+        except Exception:
+            self._tracks = oldTracks
+            raise
+
+    @staticmethod
+    def build(stream, format):
+        format = Data3dBlockFormat(format)
+        nFrames = Int32.bread(stream)
+        frequency = Int32.bread(stream)
+        startTime = Float32.bread(stream)
+        nTracks = Uint32.bread(stream)
+        volume = Volume.bread(stream)
+        rotationMatrix = Matrix.bread(stream)
+        translationVector = VEC3F.bread(stream)
+        flag = Flags(Uint32.bread(stream))
+
+        d = Data3D(
+            frequency,
+            nFrames,
+            volume,
+            rotationMatrix,
+            translationVector,
+            startTime,
+            flag,
+            format,
+        )
+
+        if format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
+            nLinks = Int32.bread(stream)
+            Int32.skip(stream, 1)
+            d.links = LinkType.bread(stream, nLinks)
+
+        if format in [
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
         ]:
-            for _ in range(self.nTracks):
-                label = BTSString.read(256, self.data.read(256))
-                nSegments = Int32.read(self.data, 1)[0]
-                Int32.skip(self.data)
-                segmentData = SegmentData.read(self.data, nSegments)
-                trackData = np.empty(self.nFrames, dtype=TrackType.btype)
-                trackData[:] = np.NaN
-                for startFrame, nFrames in segmentData:
-                    trackData[startFrame : startFrame + nFrames] = TrackType.read(
-                        self.data, nFrames
-                    )
-                self.tracks.append(Track(label, trackData))
+            d._tracks = [Track.build(stream, nFrames) for _ in range(nTracks)]
         else:
-            raise NotImplementedError(
-                f"Data3D format {self.format} not implemented yet"
-            )
+            raise NotImplementedError(f"Data3D format {format} not implemented yet")
+        return d
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return self.tracks[key]
+            return self._tracks[key]
         elif isinstance(key, str):
             try:
-                return next(track for track in self.tracks if track.label == key)
+                return next(track for track in self._tracks if track.label == key)
             except StopIteration:
                 raise KeyError(f"Track with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
 
     def __iter__(self):
-        return iter(self.tracks)
+        return iter(self._tracks)
 
     def __len__(self):
-        return len(self.tracks)
+        return len(self._tracks)
+
+    def __eq__(self, other):
+        buff1 = BytesIO()
+        buff2 = BytesIO()
+        self.write(buff1)
+        other.write(buff2)
+        return buff1.getvalue() == buff2.getvalue()
+
+    @property
+    def nTracks(self):
+        return len(self._tracks)
 
     def write(self, file):
         # data = b""
@@ -165,7 +263,7 @@ class Data3D(Block):
         # startTime
         Float32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, np.array(len(self.tracks)))
+        Uint32.bwrite(file, np.array(len(self._tracks)))
 
         # volume
         Volume.bwrite(file, self.volume)
@@ -174,21 +272,28 @@ class Data3D(Block):
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
         # flags
-        Uint32.bwrite(file, np.array(self.flags.value))
+        Uint32.bwrite(file, np.array(self.flag.value))
 
-        if self.nLinks and self.links.size:
+        if self.format in [
+            Data3dBlockFormat.byFrame,
+            Data3dBlockFormat.byTrack,
+        ]:
+
+            links = self.links if hasattr(self, "links") else []
+            nLinks = len(links)
+
             # nLinks
-            Int32.bwrite(file, np.array(len(self.links)))
+            Int32.bwrite(file, nLinks)
             # padding
             Int32.bpad(file)
             # links
-            LinkType.bwrite(file, self.links)
+            LinkType.bwrite(file, links)
 
         if self.format in [
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
         ]:
-            for track in self.tracks:
+            for track in self._tracks:
                 track.write(file)
 
         else:
@@ -197,4 +302,4 @@ class Data3D(Block):
             )
 
     def __repr__(self):
-        return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self.tracks]}>"
+        return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"
