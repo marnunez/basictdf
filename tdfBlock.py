@@ -1,5 +1,6 @@
 from enum import Enum
 from io import BytesIO
+from datetime import datetime
 
 
 class BlockType(Enum):
@@ -23,17 +24,17 @@ class BlockType(Enum):
 
 
 class Block:
-    def __init__(self, entry, block_data):
-        self.type = entry["type"]
-        self.creation_date = entry["creation_date"]
-        self.last_modification_date = entry["last_modification_date"]
-        self.last_access_date = entry["last_access_date"]
-        self.block_data = block_data
-        self.data = BytesIO(block_data)
-
-    @property
-    def size(self):
-        return len(self)
+    def __init__(
+        self,
+        blockType,
+        creation_date=datetime.now(),
+        last_modification_date=datetime.now(),
+        last_access_date=datetime.now(),
+    ):
+        self.type = blockType
+        self.creation_date = creation_date
+        self.last_modification_date = last_modification_date
+        self.last_access_date = last_access_date
 
     def __repr__(self):
         return self.__class__.__name__ + "(" + str(self.type) + ")"
