@@ -1,8 +1,10 @@
 from enum import Enum
 from tdfBlock import Block
 from io import BytesIO
-import struct
-from tdfUtils import BTSString, is_iterable
+from tdfTypes import BTSString, Uint32, Int32, Float32
+from tdfUtils import is_iterable
+from tdfBlock import BlockType
+import numpy as np
 
 
 class TemporalEventsDataFormat(Enum):
@@ -16,29 +18,38 @@ class EventsDataType(Enum):
 
 
 class Event:
-    def __init__(self, label, values, type=None):
+    def __init__(self, label, values=[], type=EventsDataType.singleEvent):
         self.label = label
-        self.values = values
+        self.type = type
         if not is_iterable(values):
             raise TypeError("Values must be iterable")
-
-        if not type:
-            if len(values) == 1:
-                self.type = EventsDataType.singleEvent
-            else:
-                self.type = EventsDataType.eventSequence
+        if isinstance(values, np.ndarray) and values.dtype == np.dtype("<f4"):
+            self.values = values
         else:
-            self.type = type
+            self.values = np.array(values, dtype="<f4")
 
-    def write(self):
-        data = b""
-        data += BTSString.write(256, self.label)  # label
-        data += struct.pack("<I", self.type.value)  # type
-        data += struct.pack("<I", len(self.values))  # number of values
-        data += struct.pack(f"<{len(self.values)}f", *self.values)  # values
-        return data
+        if len(values) > 1 and type == EventsDataType.singleEvent:
+            raise TypeError("Values must be a single value for singleEvent")
+
+    def write(self, stream):
+        BTSString.bwrite(stream, 256, self.label)
+        Uint32.bwrite(stream, self.type.value)  # type
+        Uint32.bwrite(stream, len(self.values))  # nItems
+        Float32.bwrite(stream, self.values)
+
+    @staticmethod
+    def build(stream):
+        label = BTSString.bread(stream, 256)
+        type_ = EventsDataType(Uint32.bread(stream))
+        nItems = Int32.bread(stream)
+        values = np.array([Float32.bread(stream) for _ in range(nItems)])
+        return Event(label, values, type_)
 
     def __len__(self):
+        return len(self.values)
+
+    @property
+    def nBytes(self):
         return 256 + 4 + 4 + len(self.values) * 4
 
     def __repr__(self):
@@ -46,30 +57,42 @@ class Event:
 
 
 class TemporalEventsData(Block):
-    def __init__(self, entry, block_data):
-        super().__init__(entry, block_data)
-        self.format = TemporalEventsDataFormat(entry["format"])
-        self.nEvents = struct.unpack("<i", self.data.read(4))[0]
-        self.start_time = struct.unpack("<f", self.data.read(4))[0]
+    def __init__(self, format=TemporalEventsDataFormat.standard, start_time=0.0):
+        super().__init__(BlockType.temporalEventsData)
+        self.format = format
+        self.start_time = start_time
         self.events = []
-        for i in range(self.nEvents):
-            label = BTSString.read(256, self.data.read(256))
-            type = EventsDataType(struct.unpack("<I", self.data.read(4))[0])
-            nItems = struct.unpack("<i", self.data.read(4))[0]
-            items = [struct.unpack("<f", self.data.read(4))[0] for _ in range(nItems)]
-            self.events.append(Event(label, items, type))
 
-    def write(self):
-        data = b""
-        data += struct.pack("<I", self.format.value)
-        data += struct.pack("<i", self.nEvents)
-        data += struct.pack("<f", self.start_time)
+    @staticmethod
+    def build(stream, format):
+
+        format = TemporalEventsDataFormat(format)
+        nEvents = Int32.bread(stream)
+        start_time = Float32.bread(stream)
+
+        t = TemporalEventsData(format, start_time)
+        t.events = [Event.build(stream) for _ in range(nEvents)]
+
+        return t
+
+    def write(self, stream):
+        Int32.bwrite(stream, len(self.events))
+        Float32.bwrite(stream, self.start_time)
         for event in self.events:
-            data += event.write()
-        return data
+            event.write(stream)
+
+    @property
+    def nBytes(self):
+        return 4 + 4 + sum(i.nBytes for i in self.events)
 
     def __len__(self):
-        return 4 + 4 + sum(len(i) for i in self.events)
+        return len(self.events)
+
+    def __getitem__(self, item):
+        return self.events[item]
+
+    def __iter__(self):
+        return iter(self.events)
 
     def __repr__(self):
-        return f"TemporalEventsData(format={self.format}, nEvents={self.nEvents}, start_time={self.start_time}, events={self.events}) size={self.size}"
+        return f"TemporalEventsData(format={self.format}, nEvents={len(self.events)}, start_time={self.start_time}, events={self.events}) size={self.nBytes}"
