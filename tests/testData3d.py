@@ -2,7 +2,7 @@ from io import BytesIO
 from unittest import TestCase
 
 import numpy as np
-from tdfData3D import Data3D, Data3dBlockFormat, Track, TrackType
+from basictdf.tdfData3D import Data3D, Data3dBlockFormat, Track, TrackType
 
 
 class TestTrack(TestCase):

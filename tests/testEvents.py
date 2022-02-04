@@ -1,5 +1,5 @@
 from unittest import TestCase
-from tdfEvents import (
+from basictdf.tdfEvents import (
     Event,
     EventsDataType,
     TemporalEventsData,

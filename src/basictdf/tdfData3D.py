@@ -1,7 +1,7 @@
 from io import BytesIO
-from tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
-from tdfTypes import (
+from basictdf.tdfTypes import (
     BTSString,
     Int32,
     Uint32,
@@ -12,7 +12,7 @@ from tdfTypes import (
     Type,
 )
 import numpy as np
-from tdfUtils import is_iterable
+from basictdf.tdfUtils import is_iterable
 
 
 class Data3dBlockFormat(Enum):

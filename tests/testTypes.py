@@ -1,5 +1,5 @@
 from unittest import TestCase
-from tdfTypes import Type
+from basictdf.tdfTypes import Type
 import numpy as np
 
 
