@@ -3,14 +3,15 @@ from io import BytesIO
 from pathlib import Path
 from unittest import TestCase
 
-from basictdf import BlockType, Tdf, TdfEntry
+from basictdf.basictdf import TdfEntry, Tdf
+from basictdf.tdfBlock import BlockType
 from basictdf.tdfEvents import (
     Event,
     EventsDataType,
     TemporalEventsData,
     TemporalEventsDataFormat,
 )
-from tdfTypes import BTSDate, BTSString, Int32, Uint32
+from basictdf.tdfTypes import BTSDate, BTSString, Int32, Uint32
 import numpy as np
 
 

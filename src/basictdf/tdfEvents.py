@@ -1,9 +1,8 @@
 from enum import Enum
-from tdfBlock import Block
-from io import BytesIO
-from tdfTypes import BTSString, Uint32, Int32, Float32
-from tdfUtils import is_iterable
-from tdfBlock import BlockType
+from basictdf.tdfBlock import Block
+from basictdf.tdfTypes import BTSString, Uint32, Int32, Float32
+from basictdf.tdfUtils import is_iterable
+from basictdf.tdfBlock import BlockType
 import numpy as np
 
 

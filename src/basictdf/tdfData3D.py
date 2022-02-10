@@ -254,7 +254,6 @@ class Data3D(Block):
         return len(self._tracks)
 
     def write(self, file):
-        # data = b""
 
         # nFrames
         Int32.bwrite(file, self.nFrames)
