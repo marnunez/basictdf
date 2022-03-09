@@ -34,7 +34,7 @@ SegmentData = Type(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 TrackType = Type(np.dtype("<3f4"))
 
 
-class Track:
+class MarkerTrack:
     def __init__(self, label, trackData):
         self.label = label
         self.data = trackData
@@ -83,7 +83,7 @@ class Track:
         for startFrame, nFrames in segmentData:
             dat = TrackType.bread(stream, nFrames)
             trackData[startFrame : startFrame + nFrames] = dat
-        return Track(label, trackData)
+        return MarkerTrack(label, trackData)
 
     def write(self, file):
 
@@ -167,8 +167,8 @@ class Data3D(Block):
 
         self._tracks = []
 
-    def add_track(self, track: Track):
-        if not isinstance(track, Track):
+    def add_track(self, track: MarkerTrack):
+        if not isinstance(track, MarkerTrack):
             raise TypeError(f"Track must be of type Track")
         if track.nFrames != self.nFrames:
             raise ValueError(f"Track must have the same number of frames as the Data3D")
@@ -221,7 +221,7 @@ class Data3D(Block):
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
         ]:
-            d._tracks = [Track.build(stream, nFrames) for _ in range(nTracks)]
+            d._tracks = [MarkerTrack.build(stream, nFrames) for _ in range(nTracks)]
         else:
             raise NotImplementedError(f"Data3D format {format} not implemented yet")
         return d
@@ -254,6 +254,14 @@ class Data3D(Block):
         return len(self._tracks)
 
     def write(self, file):
+
+        if self.format not in [
+            Data3dBlockFormat.byTrack,
+            Data3dBlockFormat.byTrackWithoutLinks,
+        ]:
+            raise NotImplementedError(
+                f"Data3D format {self.format} not implemented yet"
+            )
 
         # nFrames
         Int32.bwrite(file, self.nFrames)
@@ -288,17 +296,8 @@ class Data3D(Block):
             # links
             LinkType.bwrite(file, links)
 
-        if self.format in [
-            Data3dBlockFormat.byTrack,
-            Data3dBlockFormat.byTrackWithoutLinks,
-        ]:
-            for track in self._tracks:
-                track.write(file)
-
-        else:
-            raise NotImplementedError(
-                f"Data3D format {self.format} not implemented yet"
-            )
+        for track in self._tracks:
+            track.write(file)
 
     def __repr__(self):
         return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"

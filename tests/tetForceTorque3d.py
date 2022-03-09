@@ -2,19 +2,27 @@ from io import BytesIO
 from unittest import TestCase
 
 import numpy as np
-from basictdf.tdfData3D import Data3D, Data3dBlockFormat, MarkerTrack, TrackType
+from basictdf.tdfForce3D import (
+    ForceTorque3D,
+    ForceTorque3dBlockFormat,
+    ForceTorqueTrack,
+    ApplicationPointType,
+    ForceType,
+    TorqueType,
+)
 
 
-class TestMarkerTrack(TestCase):
+class TestForceTorqueTrack(TestCase):
     def test_creation(self):
-        a = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
-        self.assertEqual(a.label, "marker")
-        np.testing.assert_equal(a.data, np.array([[1, 2, 3], [4, 5, 6]]))
-        self.assertEqual(a._segments, [slice(0, 2)])
-        self.assertEqual(a.nFrames, 2)
+        a = ForceTorqueTrack(
+            "test_force_track",
+            applicationPoint=np.array([[1, 2, 3], [4, 5, 6]]),
+            force=np.array([[1, 2, 3], [4, 5, 6]]),
+            torque=np.array([[1, 2, 3], [4, 5, 6]]),
+        )
 
     def test_track_properties(self):
-        a = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
+        a = ForceTorqueTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
         np.testing.assert_equal(a.X, np.array([1, 4]))
         np.testing.assert_equal(a.Y, np.array([2, 5]))
         np.testing.assert_equal(a.Z, np.array([3, 6]))
@@ -41,7 +49,7 @@ class TestMarkerTrack(TestCase):
         # trackData
         b += TrackType.write(np.array([[1, 2, 3], [4, 5, 6]]))
         c = BytesIO(b)
-        a = MarkerTrack.build(c, 2)
+        a = ForceTorqueTrack.build(c, 2)
         self.assertEqual(a.label, "marker")
         self.assertEqual(a.nFrames, 2)
         self.assertEqual(a.nBytes, len(b))
@@ -52,7 +60,7 @@ class TestMarkerTrack(TestCase):
         self.assertEqual(d.getvalue(), b)
 
     def test_write(self):
-        a = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
+        a = ForceTorqueTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
         self.assertEqual(len(a._segments), 1)
         self.assertEqual(a._segments[0], slice(0, 2))
 
@@ -76,9 +84,9 @@ class TestMarkerTrack(TestCase):
         self.assertEqual(a.nBytes, len(b))
 
 
-class TestData3D(TestCase):
+class TestForceTorque3D(TestCase):
     def test_creation(self):
-        t = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
+        t = ForceTorqueTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
 
         a = Data3D(
             frequency=100,
@@ -92,7 +100,7 @@ class TestData3D(TestCase):
         self.assertEqual(a.nTracks, 0)
 
         # different nFrames
-        t2 = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
+        t2 = ForceTorqueTrack("marker", np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
         with self.assertRaises(ValueError):
             a.add_track(t2)
 
@@ -110,8 +118,8 @@ class TestData3D(TestCase):
         self.assertEqual(a.nTracks, 2)
 
     def test_build(self):
-        t = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
-        t2 = MarkerTrack("marker2", np.array([[4, 5, 6], [7, 8, 9]]))
+        t = ForceTorqueTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
+        t2 = ForceTorqueTrack("marker2", np.array([[4, 5, 6], [7, 8, 9]]))
 
         dataBlock1 = Data3D(
             frequency=100,
