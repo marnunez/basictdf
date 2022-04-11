@@ -26,14 +26,23 @@ class Block:
     def __init__(
         self,
         blockType,
-        creation_date=datetime.now(),
-        last_modification_date=datetime.now(),
-        last_access_date=datetime.now(),
+        creation_date=None,
+        last_modification_date=None,
+        last_access_date=None,
     ):
+        self.creation_date = (
+            creation_date if creation_date is not None else datetime.now()
+        )
+        self.last_modification_date = (
+            last_modification_date
+            if last_modification_date is not None
+            else datetime.now()
+        )
+        self.last_access_date = (
+            last_access_date if last_access_date is not None else datetime.now()
+        )
+        self.blockType = blockType
         self.type = blockType
-        self.creation_date = creation_date
-        self.last_modification_date = last_modification_date
-        self.last_access_date = last_access_date
 
     def __repr__(self):
         return self.__class__.__name__ + "(" + str(self.type) + ")"
@@ -71,14 +80,6 @@ class ForcePlatformsData(Block):
 
 
 class AnthropometricData(Block):
-    pass
-
-
-class ElectromyographicData(Block):
-    pass
-
-
-class ForceAndTorqueData(Block):
     pass
 
 
