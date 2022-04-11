@@ -90,7 +90,7 @@ class EMG(Block):
         super().__init__(BlockType.electromyographicData)
 
     @staticmethod
-    def build(stream, format):
+    def _build(stream, format):
         format = EMGBlockFormat(format)
         nSignals = Int32.bread(stream)
         frequency = Int32.bread(stream)
@@ -108,7 +108,7 @@ class EMG(Block):
             raise NotImplementedError(f"EMG format {format} not implemented yet")
         return d
 
-    def write(self, file):
+    def _write(self, file):
         if self.format != EMGBlockFormat.byTrack:
             raise NotImplementedError(f"EMG format {self.format} not implemented yet")
 
