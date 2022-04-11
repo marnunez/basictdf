@@ -1,4 +1,8 @@
+__doc__ = """
+Marker data module.
+"""
 from io import BytesIO
+from typing import List
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfTypes import (
@@ -16,6 +20,10 @@ from basictdf.tdfUtils import is_iterable
 
 
 class Data3dBlockFormat(Enum):
+    """
+    Available formats for a Data3D block.
+    """
+
     unknownFormat = 0
     byTrack = 1
     byTrackWithoutLinks = 2
@@ -24,6 +32,10 @@ class Data3dBlockFormat(Enum):
 
 
 class Flags(Enum):
+    """
+    Available data flags for a Data3D block.
+    """
+
     rawData = 0
     filtered = 1
 
@@ -35,20 +47,35 @@ TrackType = Type(np.dtype("<3f4"))
 
 
 class MarkerTrack:
+    """
+    A track that collects all the data of a physical marker, such as name and position.
+    """
+
     def __init__(self, label, trackData):
         self.label = label
-        self.data = trackData
+        "The name of the marker"
+        self.data: np.ndarray = trackData
+        "The actual marker data"
 
     @property
     def X(self):
+        """
+        Convenience property that returns or sets the X component of the marker position.
+        """
         return self.data[:, 0]
 
     @property
     def Y(self):
+        """
+        Convenience property that returns or sets the Y component of the marker position.
+        """
         return self.data[:, 1]
 
     @property
     def Z(self):
+        """
+        Convenience property that returns or sets the Z component of the marker position.
+        """
         return self.data[:, 2]
 
     @X.setter
@@ -65,6 +92,9 @@ class MarkerTrack:
 
     @property
     def nFrames(self):
+        """
+        Number of frames of the track.
+        """
         return self.data.shape[0]
 
     @property
@@ -73,7 +103,7 @@ class MarkerTrack:
         return np.ma.clump_unmasked(maskedTrackData.T[0])
 
     @staticmethod
-    def build(stream, nFrames):
+    def _build(stream, nFrames):
         label = BTSString.bread(stream, 256)
         nSegments = Int32.bread(stream)
         Int32.skip(stream)
@@ -85,7 +115,7 @@ class MarkerTrack:
             trackData[startFrame : startFrame + nFrames] = dat
         return MarkerTrack(label, trackData)
 
-    def write(self, file):
+    def _write(self, file):
 
         # label
         BTSString.bwrite(file, 256, self.label)
@@ -108,6 +138,9 @@ class MarkerTrack:
 
     @property
     def nBytes(self):
+        """
+        Space in bytes used by the track.
+        """
         base = 256 + 4 + 4
         for segment in self._segments:
             base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
@@ -121,6 +154,10 @@ class MarkerTrack:
 
 
 class Data3D(Block):
+    """
+    Data block for the reconstructed marker data.
+    """
+
     def __init__(
         self,
         frequency,
@@ -171,15 +208,23 @@ class Data3D(Block):
         if not isinstance(track, MarkerTrack):
             raise TypeError(f"Track must be of type Track")
         if track.nFrames != self.nFrames:
-            raise ValueError(f"Track must have the same number of frames as the Data3D")
+            raise ValueError(
+                f"Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames"
+            )
         self._tracks.append(track)
 
     @property
     def tracks(self):
+        """
+        List of tracks in the data block.
+        """
         return self._tracks
 
     @tracks.setter
-    def tracks(self, values):
+    def tracks(self, values: List[MarkerTrack]):
+        """
+        Sets the tracks in the data block.
+        """
         oldTracks = self._tracks
         self._tracks = []
         try:
@@ -190,7 +235,7 @@ class Data3D(Block):
             raise
 
     @staticmethod
-    def build(stream, format):
+    def _build(stream, format):
         format = Data3dBlockFormat(format)
         nFrames = Int32.bread(stream)
         frequency = Int32.bread(stream)
@@ -221,7 +266,7 @@ class Data3D(Block):
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
         ]:
-            d._tracks = [MarkerTrack.build(stream, nFrames) for _ in range(nTracks)]
+            d._tracks = [MarkerTrack._build(stream, nFrames) for _ in range(nTracks)]
         else:
             raise NotImplementedError(f"Data3D format {format} not implemented yet")
         return d
@@ -245,15 +290,15 @@ class Data3D(Block):
     def __eq__(self, other):
         buff1 = BytesIO()
         buff2 = BytesIO()
-        self.write(buff1)
-        other.write(buff2)
+        self._write(buff1)
+        other._write(buff2)
         return buff1.getvalue() == buff2.getvalue()
 
     @property
     def nTracks(self):
         return len(self._tracks)
 
-    def write(self, file):
+    def _write(self, file):
 
         if self.format not in [
             Data3dBlockFormat.byTrack,
@@ -297,7 +342,7 @@ class Data3D(Block):
             LinkType.bwrite(file, links)
 
         for track in self._tracks:
-            track.write(file)
+            track._write(file)
 
     def __repr__(self):
         return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"
