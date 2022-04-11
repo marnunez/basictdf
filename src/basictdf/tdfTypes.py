@@ -1,3 +1,5 @@
+__doc__ = "Shared classes and types for basictdf."
+
 from datetime import datetime
 import struct
 import numpy as np

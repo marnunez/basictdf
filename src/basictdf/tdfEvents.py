@@ -1,3 +1,5 @@
+__doc__ = "Events data module."
+
 from enum import Enum
 from basictdf.tdfBlock import Block
 from basictdf.tdfTypes import BTSString, Uint32, Int32, Float32
@@ -30,14 +32,14 @@ class Event:
         if len(values) > 1 and type == EventsDataType.singleEvent:
             raise TypeError("Values must be a single value for singleEvent")
 
-    def write(self, stream):
+    def _write(self, stream):
         BTSString.bwrite(stream, 256, self.label)
         Uint32.bwrite(stream, self.type.value)  # type
         Uint32.bwrite(stream, len(self.values))  # nItems
         Float32.bwrite(stream, self.values)
 
     @staticmethod
-    def build(stream):
+    def _build(stream):
         label = BTSString.bread(stream, 256)
         type_ = EventsDataType(Uint32.bread(stream))
         nItems = Int32.bread(stream)
@@ -63,22 +65,22 @@ class TemporalEventsData(Block):
         self.events = []
 
     @staticmethod
-    def build(stream, format):
+    def _build(stream, format):
 
         format = TemporalEventsDataFormat(format)
         nEvents = Int32.bread(stream)
         start_time = Float32.bread(stream)
 
         t = TemporalEventsData(format, start_time)
-        t.events = [Event.build(stream) for _ in range(nEvents)]
+        t.events = [Event._build(stream) for _ in range(nEvents)]
 
         return t
 
-    def write(self, stream):
+    def _write(self, stream):
         Int32.bwrite(stream, len(self.events))
         Float32.bwrite(stream, self.start_time)
         for event in self.events:
-            event.write(stream)
+            event._write(stream)
 
     @property
     def nBytes(self):

@@ -1,3 +1,5 @@
+__doc__ = "Force, torque and acceleration data module."
+
 from io import BytesIO
 from re import I
 from basictdf.tdfBlock import Block, BlockType
