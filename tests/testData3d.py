@@ -41,14 +41,14 @@ class TestMarkerTrack(TestCase):
         # trackData
         b += TrackType.write(np.array([[1, 2, 3], [4, 5, 6]]))
         c = BytesIO(b)
-        a = MarkerTrack.build(c, 2)
+        a = MarkerTrack._build(c, 2)
         self.assertEqual(a.label, "marker")
         self.assertEqual(a.nFrames, 2)
         self.assertEqual(a.nBytes, len(b))
         self.assertEqual(a._segments, [slice(0, 2)])
         self.assertEqual(a.data.shape, (2, 3))
         d = BytesIO()
-        a.write(d)
+        a._write(d)
         self.assertEqual(d.getvalue(), b)
 
     def test_write(self):
@@ -71,7 +71,7 @@ class TestMarkerTrack(TestCase):
         b += TrackType.write(a.data)
         i = BytesIO(b)
         other = BytesIO()
-        a.write(other)
+        a._write(other)
         self.assertEqual(i.getvalue(), other.getvalue())
         self.assertEqual(a.nBytes, len(b))
 
@@ -124,14 +124,14 @@ class TestData3D(TestCase):
         dataBlock1.tracks = [t, t2]
 
         buff1 = BytesIO()
-        dataBlock1.write(buff1)
+        dataBlock1._write(buff1)
         buff1.seek(0, 0)
-        dataBlock2 = Data3D.build(
+        dataBlock2 = Data3D._build(
             buff1,
             Data3dBlockFormat.byTrack,
         )
         buff2 = BytesIO()
-        dataBlock2.write(buff2)
+        dataBlock2._write(buff2)
         self.assertEqual(dataBlock2.format, Data3dBlockFormat.byTrack)
         self.assertEqual(dataBlock1, dataBlock2)
         self.assertEqual(buff1.getvalue(), buff2.getvalue())

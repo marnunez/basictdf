@@ -59,7 +59,7 @@ class TestEntry(TestCase):
         # comment
         BTSString.bwrite(b, 256, "comment")
         b.seek(0, 0)
-        a = TdfEntry.build(b)
+        a = TdfEntry._build(b)
 
         self.assertEqual(a.type, BlockType.temporalEventsData)
         self.assertEqual(a.format, 1)
@@ -73,7 +73,7 @@ class TestEntry(TestCase):
         self.assertEqual(a.nBytes, len(b.getvalue()))
 
         c = BytesIO()
-        a.write(c)
+        a._write(c)
         self.assertEqual(b.getvalue(), c.getvalue())
 
 

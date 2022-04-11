@@ -25,7 +25,7 @@ class TestEvent(TestCase):
         b += b"\x01\x00\x00\x00"  # type
         b += b"\x02\x00\x00\x00"  # nValues
         b += np.array([3, 4], dtype="<f4").tobytes()
-        e = Event.build(BytesIO(b))
+        e = Event._build(BytesIO(b))
         self.assertEqual(e.label, "hola")
         self.assertEqual(e.type, EventsDataType.eventSequence)
         self.assertEqual(len(e.values), 2)
@@ -35,7 +35,7 @@ class TestEvent(TestCase):
     def test_write(self):
         e = Event("hola", values=[3, 4], type=EventsDataType.eventSequence)
         a = BytesIO()
-        e.write(a)
+        e._write(a)
 
         b = b"hola" + b"\x00" * 252
         b += b"\x01\x00\x00\x00"  # type
@@ -63,10 +63,10 @@ class TestTemporalEventsDataBlock(TestCase):
         b = BytesIO()
         b.write(b"\x02\x00\x00\x00")  # nEvents
         b.write(b"\x00\x00\x00\x00")  # start_time
-        Event("hola", values=[3, 4], type=EventsDataType.eventSequence).write(b)
-        Event("hola2", values=[5, 6], type=EventsDataType.eventSequence).write(b)
+        Event("hola", values=[3, 4], type=EventsDataType.eventSequence)._write(b)
+        Event("hola2", values=[5, 6], type=EventsDataType.eventSequence)._write(b)
         b.seek(0, 0)
-        d = TemporalEventsData.build(b, format=TemporalEventsDataFormat.standard)
+        d = TemporalEventsData._build(b, format=TemporalEventsDataFormat.standard)
         self.assertEqual(d.format, TemporalEventsDataFormat.standard)
         self.assertEqual(d.start_time, 0.0)
         self.assertEqual(len(d), 2)
@@ -77,8 +77,8 @@ class TestTemporalEventsDataBlock(TestCase):
         b = BytesIO()
         b.write(b"\x02\x00\x00\x00")  # nEvents
         b.write(b"\x00\x00\x00\x00")  # start_time
-        Event("hola", values=[3, 4], type=EventsDataType.eventSequence).write(b)
-        Event("hola2", values=[5, 6], type=EventsDataType.eventSequence).write(b)
+        Event("hola", values=[3, 4], type=EventsDataType.eventSequence)._write(b)
+        Event("hola2", values=[5, 6], type=EventsDataType.eventSequence)._write(b)
 
         c = TemporalEventsData(format=TemporalEventsDataFormat.standard, start_time=0.0)
         c.events = [
@@ -86,7 +86,7 @@ class TestTemporalEventsDataBlock(TestCase):
             Event("hola2", values=[5, 6], type=EventsDataType.eventSequence),
         ]
         d = BytesIO()
-        c.write(d)
+        c._write(d)
 
         self.assertEqual(d.getvalue(), b.getvalue())
         self.assertEqual(len(d.getvalue()), c.nBytes)
