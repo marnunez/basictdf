@@ -1,6 +1,8 @@
 __doc__ = "Electromyography data module."
 
 from io import BytesIO
+from typing import Union
+
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfTypes import BTSString, Int32, Float32, Type, Int16
@@ -141,13 +143,20 @@ class EMG(Block):
                 raise KeyError(f"EMG signal with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
 
-    def __iter__(self):
+    def __contains__(self, value: Union[EMGTrack, str]) -> bool:
+        if isinstance(value, str):
+            return any(signal.label == value for signal in self._signals)
+        elif isinstance(value, EMGTrack):
+            return value in self._signals
+        raise TypeError(f"Invalid value type {type(value)}")
+
+    def __iter__(self) -> Iterator[EMGTrack]:
         return iter(self._signals)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._signals)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         buff1 = BytesIO()
         buff2 = BytesIO()
         self.write(buff1)
@@ -166,7 +175,11 @@ class EMG(Block):
             )
 
         if channel is None:
-            self._emgMap.append(len(self._signals) - 1)
+            if len(self._emgMap) == 0:
+                next_channel = 0
+            else:
+                next_channel = max(self._emgMap) + 1
+            self._emgMap.append(next_channel)
         else:
             if channel in self.emgMap:
                 raise ValueError(f"Channel {channel} already in use")
@@ -183,14 +196,14 @@ class EMG(Block):
         del self._emgMap[pos]
 
     @property
-    def nBytes(self):
+    def nBytes(self) -> int:
         base = 4 + 4 + 4 + 2 * len(self._signals) + 4
         for signal in self._signals:
             base += signal.nBytes
         return base
 
     @property
-    def nSignals(self):
+    def nSignals(self) -> int:
         return len(self._signals)
 
     def __repr__(self):

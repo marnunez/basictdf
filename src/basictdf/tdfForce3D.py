@@ -215,6 +215,13 @@ class ForceTorque3D(Block):
                 raise KeyError(f"Track with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
 
+    def __contains__(self, key):
+        if isinstance(key, str):
+            return any(track.label == key for track in self._tracks)
+        elif isinstance(key, ForceTorqueTrack):
+            return key in self._tracks
+        raise TypeError(f"Invalid key type {type(key)}")
+
     def __iter__(self):
         return iter(self._tracks)
 

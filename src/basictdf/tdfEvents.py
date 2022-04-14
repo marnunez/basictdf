@@ -1,6 +1,7 @@
 __doc__ = "Events data module."
 
 from enum import Enum
+from typing import Iterator, Union
 from basictdf.tdfBlock import Block
 from basictdf.tdfTypes import BTSString, Uint32, Int32, Float32
 from basictdf.tdfUtils import is_iterable
@@ -86,14 +87,21 @@ class TemporalEventsData(Block):
     def nBytes(self):
         return 4 + 4 + sum(i.nBytes for i in self.events)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.events)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int) -> Event:
         return self.events[item]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Event]:
         return iter(self.events)
+
+    def __contains__(self, value: Union[Event, str]) -> bool:
+        if isinstance(value, Event):
+            return value in self.events
+        elif isinstance(value, str):
+            return any(value == event.label for event in self.events)
+        raise TypeError(f"Invalid key type: {type(value)}")
 
     def __repr__(self):
         return f"TemporalEventsData(format={self.format}, nEvents={len(self.events)}, start_time={self.start_time}, events={self.events}) size={self.nBytes}"

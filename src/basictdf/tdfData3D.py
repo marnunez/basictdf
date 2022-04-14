@@ -294,6 +294,13 @@ class Data3D(Block):
         other._write(buff2)
         return buff1.getvalue() == buff2.getvalue()
 
+    def __contains__(self, value):
+        if isinstance(value, MarkerTrack):
+            return value in self._tracks
+        elif isinstance(value, str):
+            return any(track.label == value for track in self._tracks)
+        raise TypeError(f"Invalid value type {type(value)}")
+
     @property
     def nTracks(self):
         return len(self._tracks)
