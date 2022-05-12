@@ -21,10 +21,13 @@ class TestMarkerTrack(TestCase):
 
         a.X = np.array([10, 20])
         np.testing.assert_equal(a.X, np.array([10, 20]))
+        np.testing.assert_equal(a.data, np.array([[10, 2, 3], [20, 5, 6]]))
         a.Y = np.array([10, 20])
+        np.testing.assert_equal(a.data, np.array([[10, 10, 3], [20, 20, 6]]))
         np.testing.assert_equal(a.Y, np.array([10, 20]))
         a.Z = np.array([10, 20])
         np.testing.assert_equal(a.Z, np.array([10, 20]))
+        np.testing.assert_equal(a.data, np.array([[10, 10, 10], [20, 20, 20]]))
 
     def test_build(self):
         b = b""
@@ -134,4 +137,6 @@ class TestData3D(TestCase):
         dataBlock2._write(buff2)
         self.assertEqual(dataBlock2.format, Data3dBlockFormat.byTrack)
         self.assertEqual(dataBlock1, dataBlock2)
+        self.assertEqual(dataBlock1.tracks, dataBlock2.tracks)
         self.assertEqual(buff1.getvalue(), buff2.getvalue())
+        self.assertEqual(dataBlock1.nBytes, len(buff2.getvalue()))

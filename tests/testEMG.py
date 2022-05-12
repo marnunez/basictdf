@@ -88,7 +88,7 @@ class TestEMG(TestCase):
         # different nSamples
         with self.assertRaises(ValueError):
             less_samples = EMGTrack(
-                "fasdf",
+                "I have less samples",
                 np.array(
                     [
                         1,
@@ -102,7 +102,33 @@ class TestEMG(TestCase):
         # different type
         with self.assertRaises(TypeError):
             a.addSignal("Not a EMGTrack")
-            
+
+    def test_addSignal(self):
+        t1 = EMGTrack(
+            "Right Rectus Femoris", np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+        )
+        t2 = EMGTrack(
+            "Left Rectus Femoris",
+            np.array([1.2, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11]),
+        )
+        a = EMG(frequency=1000, nSamples=11)
+        a.addSignal(t1)
+        self.assertEqual(a._signals, [t1])
+        self.assertEqual(a._emgMap, [0])
+        a.addSignal(t2)
+        self.assertEqual(a._signals, [t1, t2])
+        self.assertEqual(a._emgMap, [0, 1])
+
+        a._signals = []
+        a._emgMap = []
+
+        a.addSignal(t1, 5)
+        self.assertEqual(a._signals, [t1])
+        self.assertEqual(a._emgMap, [5])
+
+        a.addSignal(t2)
+        self.assertEqual(a._signals, [t1, t2])
+        self.assertEqual(a._emgMap, [5, 6])
 
 
 # class TestData3D(TestCase):
