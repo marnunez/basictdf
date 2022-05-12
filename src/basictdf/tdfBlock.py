@@ -1,5 +1,10 @@
-from enum import Enum
+from abc import ABC, abstractmethod
 from datetime import datetime
+from enum import Enum
+from typing import IO, Optional
+
+__all__ = ["Block", "BlockType"]
+__doc__ = "Block and block type classes."
 
 
 class BlockType(Enum):
@@ -22,13 +27,13 @@ class BlockType(Enum):
     temporalEventsData = 16  # TDF_DATABLOCK_EVENTS
 
 
-class Block:
+class Block(ABC):
     def __init__(
         self,
-        blockType,
-        creation_date=None,
-        last_modification_date=None,
-        last_access_date=None,
+        blockType: BlockType,
+        creation_date: Optional[datetime] = None,
+        last_modification_date: Optional[datetime] = None,
+        last_access_date: Optional[datetime] = None,
     ):
         self.creation_date = (
             creation_date if creation_date is not None else datetime.now()
@@ -44,11 +49,20 @@ class Block:
         self.blockType = blockType
         self.type = blockType
 
+    @abstractmethod
+    def nBytes(self) -> int:
+        pass
+
+    @abstractmethod
+    def _build(self, file: IO[bytes], format: int):
+        pass
+
+    @abstractmethod
+    def _write(self, file: IO[bytes]):
+        pass
+
     def __repr__(self):
         return self.__class__.__name__ + "(" + str(self.type) + ")"
-
-    def __len__(self):
-        return len(self.block_data)
 
 
 class CalibrationData(Block):
@@ -92,4 +106,12 @@ class AnalogData(Block):
 
 
 class GeneralCalibrationData(Block):
+    pass
+
+
+class UnusedBlock(Block):
+    pass
+
+
+class NotDefinedBlock(Block):
     pass
