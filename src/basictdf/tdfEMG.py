@@ -1,16 +1,16 @@
 __doc__ = "Electromyography data module."
 
 from io import BytesIO
-from typing import Union
+from typing import Iterator, Union
 
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
-from basictdf.tdfTypes import BTSString, Int32, Float32, Type, Int16
+from basictdf.tdfTypes import BTSString, Int32, Float32, TdfType, Int16
 
 import numpy as np
 
 
-SegmentData = Type(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
+SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 
 
 class EMGBlockFormat(Enum):
@@ -20,12 +20,16 @@ class EMGBlockFormat(Enum):
 
 
 class EMGTrack:
-    def __init__(self, label, trackData):
+    def __init__(self, label: str, trackData: np.ndarray):
         self.label = label
         self.data = trackData
 
     @property
-    def nSamples(self):
+    def nSamples(self) -> int:
+        """
+        Returns:
+            int: number of samples of the track
+        """
         return self.data.shape[0]
 
     @property
@@ -65,6 +69,8 @@ class EMGTrack:
             Int32.bwrite(file, segment.start)
             # nFrames
             Int32.bwrite(file, segment.stop - segment.start)
+
+        for segment in segments:
             # data
             Float32.bwrite(file, self.data[segment])
 
@@ -133,7 +139,7 @@ class EMG(Block):
         for signal in self._signals:
             signal.write(file)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> EMGTrack:
         if isinstance(key, int):
             return self._signals[key]
         elif isinstance(key, str):
@@ -181,7 +187,7 @@ class EMG(Block):
                 next_channel = max(self._emgMap) + 1
             self._emgMap.append(next_channel)
         else:
-            if channel in self.emgMap:
+            if channel in self._emgMap:
                 raise ValueError(f"Channel {channel} already in use")
             self._emgMap.append(channel)
         self._signals.append(signal)
