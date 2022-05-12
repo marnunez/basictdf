@@ -2,7 +2,7 @@ __doc__ = """
 Marker data module.
 """
 from io import BytesIO
-from typing import List
+from typing import BinaryIO, Iterable, Iterator, List, Union
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfTypes import (
@@ -13,7 +13,7 @@ from basictdf.tdfTypes import (
     VEC3F,
     Matrix,
     Float32,
-    Type,
+    TdfType,
 )
 import numpy as np
 from basictdf.tdfUtils import is_iterable
@@ -40,10 +40,10 @@ class Flags(Enum):
     filtered = 1
 
 
-LinkType = Type(np.dtype([("Track1", "<u4"), ("Track2", "<u4")]))
-SegmentData = Type(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
+LinkType = TdfType(np.dtype([("Track1", "<u4"), ("Track2", "<u4")]))
+SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 
-TrackType = Type(np.dtype("<3f4"))
+TrackType = TdfType(np.dtype("<3f4"))
 
 
 class MarkerTrack:
@@ -51,10 +51,10 @@ class MarkerTrack:
     A track that collects all the data of a physical marker, such as name and position.
     """
 
-    def __init__(self, label, trackData):
+    def __init__(self, label: str, track_data: np.ndarray):
         self.label = label
         "The name of the marker"
-        self.data: np.ndarray = trackData
+        self.data = track_data
         "The actual marker data"
 
     @property
@@ -91,9 +91,10 @@ class MarkerTrack:
         self.data[:, 2] = value
 
     @property
-    def nFrames(self):
+    def nFrames(self) -> int:
         """
-        Number of frames of the track.
+        Returns:
+            int: number of frames in the track
         """
         return self.data.shape[0]
 
@@ -103,13 +104,15 @@ class MarkerTrack:
         return np.ma.clump_unmasked(maskedTrackData.T[0])
 
     @staticmethod
-    def _build(stream, nFrames):
+    def _build(stream, nFrames: int) -> "MarkerTrack":
+
+        trackData = np.empty(nFrames, dtype=TrackType.btype)
+        trackData[:] = np.NaN
+
         label = BTSString.bread(stream, 256)
         nSegments = Int32.bread(stream)
         Int32.skip(stream)
         segmentData = SegmentData.bread(stream, nSegments)
-        trackData = np.empty(nFrames, dtype=TrackType.btype)
-        trackData[:] = np.NaN
         for startFrame, nFrames in segmentData:
             dat = TrackType.bread(stream, nFrames)
             trackData[startFrame : startFrame + nFrames] = dat
@@ -133,13 +136,17 @@ class MarkerTrack:
             Int32.bwrite(file, np.array(segment.start))
             # nFrames
             Int32.bwrite(file, np.array(segment.stop - segment.start))
+
+        for segment in segments:
+
             # trackData
             TrackType.bwrite(file, self.data[segment])
 
     @property
-    def nBytes(self):
+    def nBytes(self) -> int:
         """
-        Space in bytes used by the track.
+        Returns:
+            int: size of the track in bytes
         """
         base = 256 + 4 + 4
         for segment in self._segments:
@@ -154,21 +161,34 @@ class MarkerTrack:
 
 
 class Data3D(Block):
-    """
-    Data block for the reconstructed marker data.
-    """
-
     def __init__(
         self,
-        frequency,
-        nFrames,
-        volume,
-        rotationMatrix,
-        translationVector,
-        startTime=0.0,
-        flag=Flags.rawData,
-        format=Data3dBlockFormat.byTrack,
+        frequency: float,
+        nFrames: int,
+        volume: np.ndarray,
+        rotationMatrix: np.ndarray,
+        translationVector: np.ndarray,
+        startTime: float = 0.0,
+        flag: Flags = Flags.rawData,
+        format: Data3dBlockFormat = Data3dBlockFormat.byTrack,
     ):
+        """A data block that contains marker tracks.
+
+        Args:
+            frequency (float): data frequency in Hz
+            nFrames (int): number of frames in the data block
+            volume (Union[Volume,np.ndarray]): acquisition volume
+            rotationMatrix (np.ndarray): rotation matrix
+            translationVector (np.ndarray): tralslation vector
+            startTime (float, optional): Acquisition start time. Defaults to 0.0.
+            flag (Flags, optional): Data 3D block flags. Defaults to Flags.rawData.
+            format (Data3dBlockFormat, optional): Data3D format. Defaults to Data3dBlockFormat.byTrack.
+
+        Raises:
+            ValueError: the volume is not an array of 3 floats
+            ValueError: the rotation matrix is not an array of 3x3 floats
+            ValueError: the translation vector is not an array of 3 floats
+        """
         super().__init__(BlockType.data3D)
         self.format = format
         self.frequency = frequency
@@ -205,6 +225,15 @@ class Data3D(Block):
         self._tracks = []
 
     def add_track(self, track: MarkerTrack):
+        """Adds a track to the data block
+
+        Args:
+            track (MarkerTrack): track to add
+
+        Raises:
+            TypeError: Track is not of type MarkerTrack
+            ValueError: Track has a different number of frames than the data block
+        """
         if not isinstance(track, MarkerTrack):
             raise TypeError(f"Track must be of type Track")
         if track.nFrames != self.nFrames:
@@ -214,14 +243,16 @@ class Data3D(Block):
         self._tracks.append(track)
 
     @property
-    def tracks(self):
-        """
-        List of tracks in the data block.
+    def tracks(self) -> List[MarkerTrack]:
+        """Returns a list of all tracks in the data block
+
+        Returns:
+            List[MarkerTrack]: list of all tracks in the data block
         """
         return self._tracks
 
     @tracks.setter
-    def tracks(self, values: List[MarkerTrack]):
+    def tracks(self, values: Iterable[MarkerTrack]):
         """
         Sets the tracks in the data block.
         """
@@ -230,12 +261,12 @@ class Data3D(Block):
         try:
             for value in values:
                 self.add_track(value)
-        except Exception:
+        except Exception as e:
             self._tracks = oldTracks
-            raise
+            raise e
 
     @staticmethod
-    def _build(stream, format):
+    def _build(stream, format) -> "Data3D":
         format = Data3dBlockFormat(format)
         nFrames = Int32.bread(stream)
         frequency = Int32.bread(stream)
@@ -271,7 +302,7 @@ class Data3D(Block):
             raise NotImplementedError(f"Data3D format {format} not implemented yet")
         return d
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union[int, str]) -> MarkerTrack:
         if isinstance(key, int):
             return self._tracks[key]
         elif isinstance(key, str):
@@ -281,20 +312,20 @@ class Data3D(Block):
                 raise KeyError(f"Track with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[MarkerTrack]:
         return iter(self._tracks)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._tracks)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         buff1 = BytesIO()
         buff2 = BytesIO()
         self._write(buff1)
         other._write(buff2)
         return buff1.getvalue() == buff2.getvalue()
 
-    def __contains__(self, value):
+    def __contains__(self, value: Union[MarkerTrack, str]) -> bool:
         if isinstance(value, MarkerTrack):
             return value in self._tracks
         elif isinstance(value, str):
@@ -302,10 +333,15 @@ class Data3D(Block):
         raise TypeError(f"Invalid value type {type(value)}")
 
     @property
-    def nTracks(self):
+    def nTracks(self) -> int:
+        """Number of tracks in the data block
+
+        Returns:
+            int: number of tracks
+        """
         return len(self._tracks)
 
-    def _write(self, file):
+    def _write(self, file: BinaryIO):
 
         if self.format not in [
             Data3dBlockFormat.byTrack,
@@ -322,7 +358,7 @@ class Data3D(Block):
         # startTime
         Float32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, np.array(len(self._tracks)))
+        Uint32.bwrite(file, len(self._tracks))
 
         # volume
         Volume.bwrite(file, self.volume)
@@ -331,7 +367,7 @@ class Data3D(Block):
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
         # flags
-        Uint32.bwrite(file, np.array(self.flag.value))
+        Uint32.bwrite(file, self.flag.value)
 
         if self.format in [
             Data3dBlockFormat.byFrame,
@@ -350,6 +386,36 @@ class Data3D(Block):
 
         for track in self._tracks:
             track._write(file)
+
+    @property
+    def nBytes(self) -> int:
+        base = (
+            4  # nFrames
+            + 4  # frequency
+            + 4  # startTime
+            + 4  # nTracks
+            + Volume.btype.itemsize  # volume
+            + Matrix.btype.itemsize  # rotationMatrix
+            + VEC3F.btype.itemsize  # translationVector
+            + 4  # flags
+        )
+
+        if self.format in [Data3dBlockFormat.byFrame, Data3dBlockFormat.byTrack]:
+            links_size = (
+                4
+                + 4
+                + (
+                    LinkType.btype.itemsize * len(self.links)
+                    if hasattr(self, "links")
+                    else 0
+                )
+            )
+            base += links_size
+
+        for track in self._tracks:
+            base += track.nBytes
+
+        return base
 
     def __repr__(self):
         return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"
