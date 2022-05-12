@@ -31,7 +31,7 @@ class Event:
             self.values = np.array(values, dtype="<f4")
 
         if len(values) > 1 and type == EventsDataType.singleEvent:
-            raise TypeError("Values must be a single value for singleEvent")
+            raise TypeError("Can't have more than one value for a single event")
 
     def _write(self, stream):
         BTSString.bwrite(stream, 256, self.label)
@@ -90,8 +90,15 @@ class TemporalEventsData(Block):
     def __len__(self) -> int:
         return len(self.events)
 
-    def __getitem__(self, item: int) -> Event:
-        return self.events[item]
+    def __getitem__(self, item: Union[int, str]) -> Event:
+        if isinstance(item, int):
+            return self.events[item]
+        elif isinstance(item, str):
+            try:
+                return next(e for e in self.events if e.label == item)
+            except StopIteration:
+                raise KeyError(f"Event with label {item} not found")
+        raise TypeError(f"Invalid key type: {type(item)}")
 
     def __iter__(self) -> Iterator[Event]:
         return iter(self.events)
