@@ -46,16 +46,3 @@ class TestTypes(TestCase):
         bio.seek(0, 0)
         read = s.bread(bio, 1)
         self.assertEqual(read, np.array([(1, 1)], dtype=dtype))
-        # self.assertEqual(read.shape, (0,))
-        # self.assertEqual(read.dtype, dtype)
-        # assert_array_equal(read["startFrame"], np.array([1]))
-        # assert_array_equal(read["nFrames"], np.array([1]))
-
-        # b += b"\x02\x00\x00\x00\x03\x00\x00\x00"
-        # bio = BytesIO(b)
-
-        # read = s.bread(b, 2)
-        # self.assertEqual(read.shape, (2,))
-        # self.assertEqual(type(read), np.ndarray)
-        # assert_array_equal(read["startFrame"], np.array([1, 2]))
-        # assert_array_equal(read["nFrames"], np.array([1, 3]))
