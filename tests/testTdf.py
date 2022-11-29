@@ -214,10 +214,8 @@ class TestTdf(TestCase):
                 tdf.entries[0].format, TemporalEventsDataFormat.standard.value
             )
 
-            # when using setters, the comment is not preserved.
-            # Might want to change this
-
-            self.assertEqual(tdf.entries[0].comment, "")
+            # when using setters, the comment from the original block is kept
+            self.assertEqual(tdf.entries[0].comment, "My favourite event block")
             self.assertEqual(tdf.entries[0].offset, 64 + 288 * len(tdf.entries))
             self.assertEqual(tdf.entries[0].size, eventBlock.nBytes)
             event = tdf.events[0]

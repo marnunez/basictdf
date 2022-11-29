@@ -58,21 +58,21 @@ class MarkerTrack:
         "The actual marker data"
 
     @property
-    def X(self):
+    def X(self) -> np.ndarray:
         """
         Convenience property that returns or sets the X component of the marker position.
         """
         return self.data[:, 0]
 
     @property
-    def Y(self):
+    def Y(self) -> np.ndarray:
         """
         Convenience property that returns or sets the Y component of the marker position.
         """
         return self.data[:, 1]
 
     @property
-    def Z(self):
+    def Z(self) -> np.ndarray:
         """
         Convenience property that returns or sets the Z component of the marker position.
         """

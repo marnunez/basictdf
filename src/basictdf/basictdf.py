@@ -436,9 +436,17 @@ class Tdf:
 
         return Tdf(filePath, mode="r+b")
 
-    def replace_block(self, newBlock: Block, comment: str = "") -> None:
+    def replace_block(self, newBlock: Block, comment: Optional[str] = None) -> None:
         """Replace a block of the same type with a new one. This is done by
         removing the old block and adding the new one."""
+
+        old_entry = next((i for i in self.entries if i.type == newBlock.type), None)
+
+        if old_entry is None:
+            raise ValueError(f"No block of type {newBlock.type} found")
+
+        comment = comment if comment is not None else old_entry.comment
+
         self.remove_block(newBlock.type)
         self.add_block(newBlock, comment)
 
