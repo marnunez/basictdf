@@ -21,8 +21,8 @@ data3D = Tdf("path/to/file.tdf").data3D
 
 The propper way to modify a TDF file is through a context manager.
 This way, the file is guaranteed to be closed properly.
-Specifying the mode as "r+b" (read and write) is also mandatory
-using the `open` method.
+Specifying the mode as "r+b" (read and write) is also required
+using the `basictdf.Tdf.allow_write` method.
 
 
 You **can't** write to a tdf file like this.
@@ -35,7 +35,7 @@ Use a context manager instead
 
 ```python
 # Do this instead
-with Tdf("path/to/file.tdf").open("r+b") as tdf:
+with Tdf("path/to/file.tdf").allow_write() as tdf:
     oldData3D = tdf.data3D
 
     # Let's add 1 to the X coordinate of the c7 marker
@@ -46,7 +46,7 @@ with Tdf("path/to/file.tdf").open("r+b") as tdf:
 # This is fine too
 tdf = Tdf("path/to/file.tdf")
 
-with tdf.open("r+b") as tdf:
+with tdf.allow_write() as tdf:
     tdf.data3D = oldData3D
 ```
 
@@ -78,12 +78,12 @@ c7 = MarkerTrack("c7", np.random.rand(1000, 3))
 data3D.add_track(c7)
 
 # Write it to a new TDF file
-with Tdf.new("my_file.tdf").open("r+b") as tdf:
+with Tdf.new("my_file.tdf").allow_write() as tdf:
     tdf.data3D = data3D
 
 # This works too
 tdf = Tdf.new("my_file.tdf")
-with tdf.open("r+b") as tdf:
+with tdf.allow_write() as tdf:
     tdf.data3D = data3D
 ```
 """

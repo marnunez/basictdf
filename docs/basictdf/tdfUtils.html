@@ -51,6 +51,19 @@ def raise_if_outside_context(method):
     return decorator
 
 
+def raise_if_outside_write_context(method):
+    &#34;&#34;&#34;Raise an exception if the method is called outside of a write context manager&#34;&#34;&#34;
+
+    def decorator(self, *args, **kwargs):
+        if not self._inside_context and self._mode != &#34;r+b&#34;:
+            raise OutsideOfContextError(
+                &#34;This method should be called inside a write context manager&#34;
+            )
+        return method(self, *args, **kwargs)
+
+    return decorator
+
+
 def provide_context_if_needed(method):
     &#34;&#34;&#34;If the method is called outside of a context manager, provide one&#34;&#34;&#34;
 
@@ -130,6 +143,28 @@ def provide_context_if_needed(method):
     return decorator</code></pre>
 </details>
 </dd>
+<dt id="basictdf.tdfUtils.raise_if_outside_write_context"><code class="name flex">
+<span>def <span class="ident">raise_if_outside_write_context</span></span>(<span>method)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Raise an exception if the method is called outside of a write context manager</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def raise_if_outside_write_context(method):
+    &#34;&#34;&#34;Raise an exception if the method is called outside of a write context manager&#34;&#34;&#34;
+
+    def decorator(self, *args, **kwargs):
+        if not self._inside_context and self._mode != &#34;r+b&#34;:
+            raise OutsideOfContextError(
+                &#34;This method should be called inside a write context manager&#34;
+            )
+        return method(self, *args, **kwargs)
+
+    return decorator</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -173,6 +208,7 @@ def provide_context_if_needed(method):
 <li><code><a title="basictdf.tdfUtils.is_iterable" href="#basictdf.tdfUtils.is_iterable">is_iterable</a></code></li>
 <li><code><a title="basictdf.tdfUtils.provide_context_if_needed" href="#basictdf.tdfUtils.provide_context_if_needed">provide_context_if_needed</a></code></li>
 <li><code><a title="basictdf.tdfUtils.raise_if_outside_context" href="#basictdf.tdfUtils.raise_if_outside_context">raise_if_outside_context</a></code></li>
+<li><code><a title="basictdf.tdfUtils.raise_if_outside_write_context" href="#basictdf.tdfUtils.raise_if_outside_write_context">raise_if_outside_write_context</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

@@ -84,7 +84,7 @@ class TestTdf(TestCase):
             tdf.unlink()
 
     def test_creation(self):
-        with Tdf.new("tests/test.tdf").open("r+b") as tdf:
+        with Tdf.new("tests/test.tdf").allow_write() as tdf:
             self.assertEqual(tdf.filePath.name, "test.tdf")
             self.assertEqual(len(tdf.entries), 14)
             for entry in tdf.entries:
@@ -109,7 +109,7 @@ class TestTdf(TestCase):
 
         tdf_file = Tdf.new("tests/add_test.tdf")
 
-        with tdf_file.open("r+b") as tdf:
+        with tdf_file.allow_write() as tdf:
             tdf.add_block(eventBlock, "My favourite event block")
 
         with tdf_file as tdf:
@@ -143,7 +143,7 @@ class TestTdf(TestCase):
 
         tdf_file = Tdf.new("tests/remove_test.tdf")
 
-        with tdf_file.open("r+b") as tdf:
+        with tdf_file.allow_write() as tdf:
             tdf.add_block(eventBlock, "My favourite event block")
             oldSize = tdf.nBytes
 
@@ -152,7 +152,7 @@ class TestTdf(TestCase):
             with tdf_file as tdf:
                 tdf.remove_block(BlockType.temporalEventsData)
 
-        with tdf_file.open("r+b") as tdf:
+        with tdf_file.allow_write() as tdf:
             tdf.remove_block(BlockType.temporalEventsData)
             self.assertEqual(len(tdf.entries), 14)
             for entry in tdf.entries:
@@ -173,13 +173,13 @@ class TestTdf(TestCase):
 
         tdf_file = Tdf.new("tests/test.tdf")
 
-        with tdf_file.open("r+b") as tdf:
+        with tdf_file.allow_write() as tdf:
             tdf.add_block(eventBlock, "My favourite event block")
 
         event.values = [4, 5, 6]
         self.assertEqual(event.values, eventBlock.events[0].values)
 
-        with tdf_file.open("r+b") as tdf:
+        with tdf_file.allow_write() as tdf:
             oldSize = tdf.nBytes
             tdf.replace_block(eventBlock, "My modified favourite event block")
 
@@ -205,13 +205,13 @@ class TestTdf(TestCase):
 
         tdf_file = Tdf.new("tests/replace_test.tdf")
 
-        with tdf_file.open("r+b") as tdf:
+        with tdf_file.allow_write() as tdf:
             tdf.add_block(eventBlock, "My favourite event block")
 
         event.values = [4, 5, 6]
         self.assertEqual(event.values, eventBlock.events[0].values)
 
-        with tdf_file.open("r+b") as tdf:
+        with tdf_file.allow_write() as tdf:
             oldSize = tdf.nBytes
             tdf.events = eventBlock
 

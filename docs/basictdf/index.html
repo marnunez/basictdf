@@ -40,15 +40,15 @@ data3D = Tdf(&quot;path/to/file.tdf&quot;).data3D
 <h2 id="how-to-modify-a-tdf-file">How to modify a TDF file?</h2>
 <p>The propper way to modify a TDF file is through a context manager.
 This way, the file is guaranteed to be closed properly.
-Specifying the mode as "r+b" (read and write) is also mandatory
-using the <code>open</code> method.</p>
+Specifying the mode as "r+b" (read and write) is also required
+using the <code><a title="basictdf.basictdf.Tdf.allow_write" href="basictdf.html#basictdf.basictdf.Tdf.allow_write">Tdf.allow_write()</a></code> method.</p>
 <p>You <strong>can't</strong> write to a tdf file like this.</p>
 <pre><code class="language-python"># Don't do this. This will fail
 Tdf(&quot;path/to/file.tdf&quot;).data3D = oldData3D
 </code></pre>
 <p>Use a context manager instead</p>
 <pre><code class="language-python"># Do this instead
-with Tdf(&quot;path/to/file.tdf&quot;).open(&quot;r+b&quot;) as tdf:
+with Tdf(&quot;path/to/file.tdf&quot;).allow_write() as tdf:
     oldData3D = tdf.data3D
 
     # Let's add 1 to the X coordinate of the c7 marker
@@ -59,7 +59,7 @@ with Tdf(&quot;path/to/file.tdf&quot;).open(&quot;r+b&quot;) as tdf:
 # This is fine too
 tdf = Tdf(&quot;path/to/file.tdf&quot;)
 
-with tdf.open(&quot;r+b&quot;) as tdf:
+with tdf.allow_write() as tdf:
     tdf.data3D = oldData3D
 </code></pre>
 <h2 id="how-to-add-a-new-block-to-a-tdf-file">How to add a new block to a TDF file?</h2>
@@ -86,12 +86,12 @@ c7 = MarkerTrack(&quot;c7&quot;, np.random.rand(1000, 3))
 data3D.add_track(c7)
 
 # Write it to a new TDF file
-with Tdf.new(&quot;my_file.tdf&quot;).open(&quot;r+b&quot;) as tdf:
+with Tdf.new(&quot;my_file.tdf&quot;).allow_write() as tdf:
     tdf.data3D = data3D
 
 # This works too
 tdf = Tdf.new(&quot;my_file.tdf&quot;)
-with tdf.open(&quot;r+b&quot;) as tdf:
+with tdf.allow_write() as tdf:
     tdf.data3D = data3D
 </code></pre>
 <details class="source">
@@ -121,8 +121,8 @@ data3D = Tdf(&#34;path/to/file.tdf&#34;).data3D
 
 The propper way to modify a TDF file is through a context manager.
 This way, the file is guaranteed to be closed properly.
-Specifying the mode as &#34;r+b&#34; (read and write) is also mandatory
-using the `open` method.
+Specifying the mode as &#34;r+b&#34; (read and write) is also required
+using the `basictdf.Tdf.allow_write` method.
 
 
 You **can&#39;t** write to a tdf file like this.
@@ -135,7 +135,7 @@ Use a context manager instead
 
 ```python
 # Do this instead
-with Tdf(&#34;path/to/file.tdf&#34;).open(&#34;r+b&#34;) as tdf:
+with Tdf(&#34;path/to/file.tdf&#34;).allow_write() as tdf:
     oldData3D = tdf.data3D
 
     # Let&#39;s add 1 to the X coordinate of the c7 marker
@@ -146,7 +146,7 @@ with Tdf(&#34;path/to/file.tdf&#34;).open(&#34;r+b&#34;) as tdf:
 # This is fine too
 tdf = Tdf(&#34;path/to/file.tdf&#34;)
 
-with tdf.open(&#34;r+b&#34;) as tdf:
+with tdf.allow_write() as tdf:
     tdf.data3D = oldData3D
 ```
 
@@ -178,12 +178,12 @@ c7 = MarkerTrack(&#34;c7&#34;, np.random.rand(1000, 3))
 data3D.add_track(c7)
 
 # Write it to a new TDF file
-with Tdf.new(&#34;my_file.tdf&#34;).open(&#34;r+b&#34;) as tdf:
+with Tdf.new(&#34;my_file.tdf&#34;).allow_write() as tdf:
     tdf.data3D = data3D
 
 # This works too
 tdf = Tdf.new(&#34;my_file.tdf&#34;)
-with tdf.open(&#34;r+b&#34;) as tdf:
+with tdf.allow_write() as tdf:
     tdf.data3D = data3D
 ```
 &#34;&#34;&#34;
