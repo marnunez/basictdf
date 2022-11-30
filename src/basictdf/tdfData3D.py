@@ -51,7 +51,7 @@ class MarkerTrack:
     A track that collects all the data of a physical marker, such as name and position.
     """
 
-    def __init__(self, label: str, track_data: np.ndarray):
+    def __init__(self, label: str, track_data: np.ndarray) -> None:
         self.label = label
         "The name of the marker"
         self.data = track_data
@@ -79,15 +79,15 @@ class MarkerTrack:
         return self.data[:, 2]
 
     @X.setter
-    def X(self, value):
+    def X(self, value) -> None:
         self.data[:, 0] = value
 
     @Y.setter
-    def Y(self, value):
+    def Y(self, value) -> None:
         self.data[:, 1] = value
 
     @Z.setter
-    def Z(self, value):
+    def Z(self, value) -> None:
         self.data[:, 2] = value
 
     @property
@@ -118,7 +118,7 @@ class MarkerTrack:
             trackData[startFrame : startFrame + nFrames] = dat
         return MarkerTrack(label, trackData)
 
-    def _write(self, file):
+    def _write(self, file) -> None:
 
         # label
         BTSString.bwrite(file, 256, self.label)
@@ -153,7 +153,7 @@ class MarkerTrack:
             base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
         return base
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Track(label={self.label}, nFrames={self.nFrames})"
 
     def __eq__(self, other):
@@ -171,7 +171,7 @@ class Data3D(Block):
         startTime: float = 0.0,
         flag: Flags = Flags.rawData,
         format: Data3dBlockFormat = Data3dBlockFormat.byTrack,
-    ):
+    ) -> None:
         """A data block that contains marker tracks.
 
         Args:
@@ -224,7 +224,7 @@ class Data3D(Block):
 
         self._tracks = []
 
-    def add_track(self, track: MarkerTrack):
+    def add_track(self, track: MarkerTrack) -> None:
         """Adds a track to the data block
 
         Args:
@@ -252,7 +252,7 @@ class Data3D(Block):
         return self._tracks
 
     @tracks.setter
-    def tracks(self, values: Iterable[MarkerTrack]):
+    def tracks(self, values: Iterable[MarkerTrack]) -> None:
         """
         Sets the tracks in the data block.
         """
@@ -341,7 +341,7 @@ class Data3D(Block):
         """
         return len(self._tracks)
 
-    def _write(self, file: BinaryIO):
+    def _write(self, file: BinaryIO) -> None:
 
         if self.format not in [
             Data3dBlockFormat.byTrack,
@@ -417,5 +417,5 @@ class Data3D(Block):
 
         return base
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"

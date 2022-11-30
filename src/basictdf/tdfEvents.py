@@ -20,7 +20,11 @@ class EventsDataType(Enum):
 
 
 class Event:
-    def __init__(self, label, values=[], type=EventsDataType.singleEvent):
+    """
+    A class representing a single event or a sequence of events.
+    """
+
+    def __init__(self, label, values=[], type=EventsDataType.singleEvent) -> None:
         self.label = label
         self.type = type
         if not is_iterable(values):
@@ -33,32 +37,36 @@ class Event:
         if len(values) > 1 and type == EventsDataType.singleEvent:
             raise TypeError("Can't have more than one value for a single event")
 
-    def _write(self, stream):
+    def _write(self, stream) -> None:
         BTSString.bwrite(stream, 256, self.label)
         Uint32.bwrite(stream, self.type.value)  # type
         Uint32.bwrite(stream, len(self.values))  # nItems
         Float32.bwrite(stream, self.values)
 
     @staticmethod
-    def _build(stream):
+    def _build(stream) -> "Event":
         label = BTSString.bread(stream, 256)
         type_ = EventsDataType(Uint32.bread(stream))
         nItems = Int32.bread(stream)
         values = np.array([Float32.bread(stream) for _ in range(nItems)])
         return Event(label, values, type_)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.values)
 
     @property
-    def nBytes(self):
+    def nBytes(self) -> int:
         return 256 + 4 + 4 + len(self.values) * 4
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Event(label={self.label}, type={self.type}, items={self.values})"
 
 
 class TemporalEventsData(Block):
+    """
+    A class to represent a TDF temporal events data block.
+    """
+
     def __init__(self, format=TemporalEventsDataFormat.standard, start_time=0.0):
         super().__init__(BlockType.temporalEventsData)
         self.format = format
@@ -66,7 +74,7 @@ class TemporalEventsData(Block):
         self.events = []
 
     @staticmethod
-    def _build(stream, format):
+    def _build(stream, format) -> "TemporalEventsData":
 
         format = TemporalEventsDataFormat(format)
         nEvents = Int32.bread(stream)
@@ -77,14 +85,14 @@ class TemporalEventsData(Block):
 
         return t
 
-    def _write(self, stream):
+    def _write(self, stream) -> None:
         Int32.bwrite(stream, len(self.events))
         Float32.bwrite(stream, self.start_time)
         for event in self.events:
             event._write(stream)
 
     @property
-    def nBytes(self):
+    def nBytes(self) -> int:
         return 4 + 4 + sum(i.nBytes for i in self.events)
 
     def __len__(self) -> int:
@@ -110,5 +118,5 @@ class TemporalEventsData(Block):
             return any(value == event.label for event in self.events)
         raise TypeError(f"Invalid key type: {type(value)}")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"TemporalEventsData(format={self.format}, nEvents={len(self.events)}, start_time={self.start_time}, events={self.events}) size={self.nBytes}"

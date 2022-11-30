@@ -25,6 +25,7 @@ from basictdf.tdfEMG import EMG
 from basictdf.tdfEvents import TemporalEventsData
 from basictdf.tdfForce3D import ForceTorque3D
 from basictdf.tdfTypes import BTSDate, BTSString, Int32, Uint32
+from basictdf.tdfUtils import raise_if_outside_context, provide_context_if_needed
 
 
 def _get_block_class(block_type: BlockType) -> Type[Block]:
@@ -79,7 +80,7 @@ class TdfEntry:
         last_modification_date: datetime,
         last_access_date: datetime,
         comment: str,
-    ):
+    ) -> None:
         self.type = type
         self.format = format
         self.offset = offset
@@ -128,23 +129,28 @@ class Tdf:
     SIGNATURE = b"\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08"
     "The magic number at the beginning of the file"
 
-    def __init__(self, filename: Union[Path, str], mode="rb"):
+    def __init__(self, filename: Union[Path, str]) -> None:
         self.filePath = Path(filename)
-
-        if "b" not in mode:
-            mode += "b"
-
-        assert mode in ["rb", "r+b"], ValueError(
-            f"Invalid mode {mode}. Must be 'rb' or 'r+b'"
-        )
-
-        self.mode = mode
 
         if not self.filePath.exists():
             raise FileNotFoundError(f"File {self.filePath} not found")
+        self._inside_context = False
 
-    def __enter__(self):
-        self.handler: IO[bytes] = self.filePath.open(self.mode)
+    def open(self, mode="rb"):
+        mode = mode + "b" if "b" not in mode else mode
+        if mode not in ["rb", "r+b"]:
+            raise Exception("Mode must be either 'rb' or 'r+b'")
+
+        self._mode = mode
+
+        return self
+
+    def __enter__(self) -> "Tdf":
+
+        self._mode = self._mode if hasattr(self, "_mode") else "rb"
+
+        self._inside_context = True
+        self.handler: IO[bytes] = self.filePath.open(self._mode)
 
         self.signature = self.handler.read(len(self.SIGNATURE))
 
@@ -168,9 +174,12 @@ class Tdf:
 
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self._inside_context = False
+        self._mode = "rb"
         self.handler.close()
 
+    @raise_if_outside_context
     def get_block(self, type: BlockType) -> Optional[Type[Block]]:
         for entry in self.entries:
             if entry.type == type:
@@ -180,82 +189,74 @@ class Tdf:
         return None
 
     @property
-    def data3D(self) -> Optional[Type[Block]]:
+    @provide_context_if_needed
+    def data3D(self) -> Optional[Data3D]:
+        """
+        Convenience property to get the 3D data block.
+        """
         return self.get_block(BlockType.data3D)
 
     @data3D.setter
+    @raise_if_outside_context
     def data3D(self, data: Data3D) -> None:
         self.replace_block(data) if self.has_data3D else self.add_block(data)
 
     @property
+    @provide_context_if_needed
     def has_data3D(self) -> bool:
-        if self.inside_context_manager:
-            return any(entry.type == BlockType.data3D for entry in self.entries)
-        with self:
-            return any(entry.type == BlockType.data3D for entry in self.entries)
+        return any(entry.type == BlockType.data3D for entry in self.entries)
 
     @property
+    @provide_context_if_needed
     def force_and_torque(self) -> Optional[ForceTorque3D]:
         return self.get_block(BlockType.forceAndTorqueData)
 
     @force_and_torque.setter
+    @raise_if_outside_context
     def force_and_torque(self, data: ForceTorque3D) -> None:
         self.replace_block(data) if self.has_force_and_torque else self.add_block(data)
 
     @property
+    @provide_context_if_needed
     def has_force_and_torque(self) -> bool:
-        if self.inside_context_manager:
-            return any(
-                entry.type == BlockType.forceAndTorqueData for entry in self.entries
-            )
-        with self:
-            return any(
-                entry.type == BlockType.forceAndTorqueData for entry in self.entries
-            )
+        return any(entry.type == BlockType.forceAndTorqueData for entry in self.entries)
 
     @property
+    @provide_context_if_needed
     def events(self) -> Optional[TemporalEventsData]:
         return self.get_block(BlockType.temporalEventsData)
 
     @events.setter
+    @raise_if_outside_context
     def events(self, data: TemporalEventsData) -> None:
         self.replace_block(data) if self.has_events else self.add_block(data)
 
     @property
+    @provide_context_if_needed
     def has_events(self) -> bool:
-        if self.inside_context_manager:
-            return any(
-                i for i in self.entries if i.type == BlockType.temporalEventsData
-            )
-        with self:
-            return any(
-                i for i in self.entries if i.type == BlockType.temporalEventsData
-            )
+        return any(i for i in self.entries if i.type == BlockType.temporalEventsData)
 
     @property
+    @provide_context_if_needed
     def emg(self) -> Optional[EMG]:
         return self.get_block(BlockType.electromyographicData)
 
     @emg.setter
+    @raise_if_outside_context
     def emg(self, data: EMG) -> None:
         self.replace_block(data) if self.has_emg else self.add_block(data)
 
     @property
-    def inside_context_manager(self) -> bool:
-        return hasattr(self, "handler") and not self.handler.closed
-
-    @property
+    @provide_context_if_needed
     def has_emg(self) -> bool:
-        if self.inside_context_manager:
-            return any(
-                i for i in self.entries if i.type == BlockType.electromyographicData
-            )
-        with self:
-            return any(
-                i for i in self.entries if i.type == BlockType.electromyographicData
-            )
+        return any(
+            entry.type == BlockType.electromyographicData for entry in self.entries
+        )
 
-    def add_block(self, newBlock: Block, comment: str = "Generated by basicTDF"):
+    @raise_if_outside_context
+    def add_block(
+        self, newBlock: Block, comment: str = "Generated by basicTDF"
+    ) -> None:
         """Adds a block to the TDF file
 
         Args:
@@ -268,7 +269,7 @@ class Tdf:
             ValueError: block limit reached (14 as per BTS's implementation)
             IOError: unused empty blocks in the middle of the file
         """
-        if self.mode == "rb":
+        if self._mode == "rb":
             raise PermissionError(
                 "Can't add blocks, this file was opened in read-only mode"
             )
@@ -324,7 +325,8 @@ class Tdf:
         # and that the changes are written to disk
         self.handler.flush()
 
-    def remove_block(self, type: Block):
+    @raise_if_outside_context
+    def remove_block(self, type: Block) -> None:
         """Remove a block of the given type from the file. Removing a block implies:
 
         - Removing the entry
@@ -333,8 +335,7 @@ class Tdf:
         - If there is info after the block, move it block_to_remove.size up
 
         """
-
-        if self.mode == "rb":
+        if "+" not in self._mode:
             raise ValueError(
                 "Can't remove blocks, this file was opened in read-only mode"
             )
@@ -383,7 +384,7 @@ class Tdf:
         self.handler.flush()
 
     @staticmethod
-    def new(filename: str):
+    def new(filename: str) -> "Tdf":
         filePath = Path(filename)
         if filePath.exists():
             raise FileExistsError("File already exists")
@@ -434,8 +435,9 @@ class Tdf:
                 # comment
                 BTSString.bwrite(f, 256, "Generated by basicTDF")
 
-        return Tdf(filePath, mode="r+b")
+        return Tdf(filePath).open("rb")
 
+    @raise_if_outside_context
     def replace_block(self, newBlock: Block, comment: Optional[str] = None) -> None:
         """Replace a block of the same type with a new one. This is done by
         removing the old block and adding the new one."""
@@ -451,8 +453,10 @@ class Tdf:
         self.add_block(newBlock, comment)
 
     @property
-    def nBytes(self):
+    def nBytes(self) -> int:
         return self.filePath.stat().st_size
 
-    def __repr__(self):
-        return f"Tdf({self.filePath}),{self.nEntries} entries"
+    def __repr__(self) -> str:
+        if self._inside_context:
+            return f"Tdf({self.filePath}, mode={self._mode}), nEntries={self.nEntries}, nBytes={self.nBytes}"
+        return f"Tdf({self.filePath}, mode={self._mode})"

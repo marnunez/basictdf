@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>basictdf.basictdf API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>basictdf.basictdf</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import IO, Optional, Type, Union
+
+from basictdf.tdfBlock import (
+    AnalogData,
+    AnthropometricData,
+    Block,
+    BlockType,
+    CalibrationData,
+    CalibrationData2D,
+    Data2D,
+    ForcePlatformsCalibrationData,
+    ForcePlatformsCalibrationData2D,
+    ForcePlatformsData,
+    GeneralCalibrationData,
+    NotDefinedBlock,
+    OpticalSystemConfiguration,
+    UnusedBlock,
+    VolumetricData,
+)
+from basictdf.tdfData3D import Data3D
+from basictdf.tdfEMG import EMG
+from basictdf.tdfEvents import TemporalEventsData
+from basictdf.tdfForce3D import ForceTorque3D
+from basictdf.tdfTypes import BTSDate, BTSString, Int32, Uint32
+from basictdf.tdfUtils import raise_if_outside_context, provide_context_if_needed
+
+
+def _get_block_class(block_type: BlockType) -&gt; Type[Block]:
+    if block_type == BlockType.unusedSlot:
+        return UnusedBlock
+    elif block_type == BlockType.notDefined:
+        return NotDefinedBlock
+    elif block_type == BlockType.calibrationData:
+        return CalibrationData
+    elif block_type == BlockType.calibrationData2D:
+        return CalibrationData2D
+    elif block_type == BlockType.data2D:
+        return Data2D
+    elif block_type == BlockType.data3D:
+        return Data3D
+    elif block_type == BlockType.opticalSystemConfiguration:
+        return OpticalSystemConfiguration
+    elif block_type == BlockType.forcePlatformsCalibrationData:
+        return ForcePlatformsCalibrationData
+    elif block_type == BlockType.forcePlatformsCalibrationData2D:
+        return ForcePlatformsCalibrationData2D
+    elif block_type == BlockType.forcePlatformsData:
+        return ForcePlatformsData
+    elif block_type == BlockType.anthropometricData:
+        return AnthropometricData
+    elif block_type == BlockType.electromyographicData:
+        return EMG
+    elif block_type == BlockType.forceAndTorqueData:
+        return ForceTorque3D
+    elif block_type == BlockType.volumetricData:
+        return VolumetricData
+    elif block_type == BlockType.analogData:
+        return AnalogData
+    elif block_type == BlockType.generalCalibrationData:
+        return GeneralCalibrationData
+    elif block_type == BlockType.temporalEventsData:
+        return TemporalEventsData
+    else:
+        raise Exception(&#34;Unknown block type&#34;)
+
+
+class TdfEntry:
+    &#34;&#34;&#34;A jumptable type entry for a data block.&#34;&#34;&#34;
+
+    def __init__(
+        self,
+        type: BlockType,
+        format: int,
+        offset: int,
+        size: int,
+        creation_date: datetime,
+        last_modification_date: datetime,
+        last_access_date: datetime,
+        comment: str,
+    ) -&gt; None:
+        self.type = type
+        self.format = format
+        self.offset = offset
+        self.size = size
+        self.creation_date = creation_date
+        self.last_modification_date = last_modification_date
+        self.last_access_date = last_access_date
+        self.comment = comment
+        self.nBytes = 8 * 4 + 256
+
+    def _write(self, file):
+        Uint32.bwrite(file, self.type.value)
+        Uint32.bwrite(file, self.format)
+        Int32.bwrite(file, self.offset)
+        Int32.bwrite(file, self.size)
+        BTSDate.bwrite(file, self.creation_date)
+        BTSDate.bwrite(file, self.last_modification_date)
+        BTSDate.bwrite(file, self.last_access_date)
+        Int32.bpad(file)
+        BTSString.bwrite(file, 256, self.comment)
+
+    @staticmethod
+    def _build(file):
+        type_ = BlockType(Uint32.bread(file))
+        format = Uint32.bread(file)
+        offset = Int32.bread(file)
+        size = Int32.bread(file)
+        creation_date = BTSDate.bread(file)
+        last_modification_date = BTSDate.bread(file)
+        last_access_date = BTSDate.bread(file)
+        Int32.skip(file)
+        comment = BTSString.bread(file, 256)
+        return TdfEntry(
+            type_,
+            format,
+            offset,
+            size,
+            creation_date,
+            last_modification_date,
+            last_access_date,
+            comment,
+        )
+
+
+class Tdf:
+    SIGNATURE = b&#34;\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08&#34;
+    &#34;The magic number at the beginning of the file&#34;
+
+    def __init__(self, filename: Union[Path, str]) -&gt; None:
+        self.filePath = Path(filename)
+
+        if not self.filePath.exists():
+            raise FileNotFoundError(f&#34;File {self.filePath} not found&#34;)
+        self._inside_context = False
+
+    def open(self, mode=&#34;rb&#34;):
+        mode = mode + &#34;b&#34; if &#34;b&#34; not in mode else mode
+        if mode not in [&#34;rb&#34;, &#34;r+b&#34;]:
+            raise Exception(&#34;Mode must be either &#39;rb&#39; or &#39;r+b&#39;&#34;)
+
+        self._mode = mode
+
+        return self
+
+    def __enter__(self) -&gt; &#34;Tdf&#34;:
+
+        self._mode = self._mode if hasattr(self, &#34;_mode&#34;) else &#34;rb&#34;
+
+        self._inside_context = True
+        self.handler: IO[bytes] = self.filePath.open(self._mode)
+
+        self.signature = self.handler.read(len(self.SIGNATURE))
+
+        if self.signature != self.SIGNATURE:
+            raise Exception(&#34;Invalid TDF file&#34;)
+
+        self.version = Uint32.bread(self.handler)
+        self.nEntries = Int32.bread(self.handler)
+
+        # pad 8 bytes
+        Int32.skip(self.handler, 2)
+
+        self.creation_date = BTSDate.bread(self.handler)
+        self.last_modification_date = BTSDate.bread(self.handler)
+        self.last_access_date = BTSDate.bread(self.handler)
+
+        # pad 20 bytes
+        Int32.skip(self.handler, 5)
+
+        self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -&gt; None:
+        self._inside_context = False
+        self.handler.close()
+
+    @raise_if_outside_context
+    def get_block(self, type: BlockType) -&gt; Optional[Type[Block]]:
+        for entry in self.entries:
+            if entry.type == type:
+                self.handler.seek(entry.offset, 0)
+                block_class = _get_block_class(entry.type)
+                return block_class._build(self.handler, entry.format)
+        return None
+
+    @property
+    @provide_context_if_needed
+    def data3D(self) -&gt; Optional[Data3D]:
+        &#34;&#34;&#34;
+        Convenience property to get the 3D data block.
+        &#34;&#34;&#34;
+        return self.get_block(BlockType.data3D)
+
+    @data3D.setter
+    @raise_if_outside_context
+    def data3D(self, data: Data3D) -&gt; None:
+        self.replace_block(data) if self.has_data3D else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_data3D(self) -&gt; bool:
+        return any(entry.type == BlockType.data3D for entry in self.entries)
+
+    @property
+    @provide_context_if_needed
+    def force_and_torque(self) -&gt; Optional[ForceTorque3D]:
+        return self.get_block(BlockType.forceAndTorqueData)
+
+    @force_and_torque.setter
+    @raise_if_outside_context
+    def force_and_torque(self, data: ForceTorque3D) -&gt; None:
+        self.replace_block(data) if self.has_force_and_torque else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_force_and_torque(self) -&gt; bool:
+        return any(entry.type == BlockType.forceAndTorqueData for entry in self.entries)
+
+    @property
+    @provide_context_if_needed
+    def events(self) -&gt; Optional[TemporalEventsData]:
+        return self.get_block(BlockType.temporalEventsData)
+
+    @events.setter
+    @raise_if_outside_context
+    def events(self, data: TemporalEventsData) -&gt; None:
+        self.replace_block(data) if self.has_events else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_events(self) -&gt; bool:
+        return any(i for i in self.entries if i.type == BlockType.temporalEventsData)
+
+    @property
+    @provide_context_if_needed
+    def emg(self) -&gt; Optional[EMG]:
+        return self.get_block(BlockType.electromyographicData)
+
+    @emg.setter
+    @raise_if_outside_context
+    def emg(self, data: EMG) -&gt; None:
+        self.replace_block(data) if self.has_emg else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_emg(self) -&gt; bool:
+        return any(
+            entry.type == BlockType.electromyographicData for entry in self.entries
+        )
+
+    @raise_if_outside_context
+    def add_block(
+        self, newBlock: Block, comment: str = &#34;Generated by basicTDF&#34;
+    ) -&gt; None:
+        &#34;&#34;&#34;Adds a block to the TDF file
+
+        Args:
+            newBlock (Block): the block to be added.
+            comment (str, optional): A description for the block entry. Defaults to &#34;Generated by basicTDF&#34;.
+
+        Raises:
+            PermissionError: the TDF is read only
+            ValueError: there&#39;s already a block of the same type
+            ValueError: block limit reached (14 as per BTS&#39;s implementation)
+            IOError: unused empty blocks in the middle of the file
+        &#34;&#34;&#34;
+        if self._mode == &#34;rb&#34;:
+            raise PermissionError(
+                &#34;Can&#39;t add blocks, this file was opened in read-only mode&#34;
+            )
+
+        if self.get_block(newBlock.type):
+            raise ValueError(
+                f&#34;There&#39;s already a block of this type {newBlock.type}. Remove it first&#34;
+            )
+
+        # find first unused slot
+        try:
+            unusedBlockPos = next(
+                n for n, i in enumerate(self.entries) if i.type == BlockType.unusedSlot
+            )
+        except StopIteration:
+            raise ValueError(f&#34;Block limit reached ({len(self.entries)})&#34;)
+
+        # write new entry with the offset of that unused slot
+        new_entry = TdfEntry(
+            type=newBlock.type,
+            format=newBlock.format.value,
+            offset=self.entries[unusedBlockPos].offset,
+            size=newBlock.nBytes,
+            creation_date=newBlock.creation_date,
+            last_modification_date=newBlock.last_modification_date,
+            last_access_date=datetime.now(),
+            comment=comment,
+        )
+
+        # replace the entry
+        self.entries[unusedBlockPos] = new_entry
+
+        # write new entry
+        self.handler.seek(64 + 288 * unusedBlockPos, 0)
+        new_entry._write(self.handler)
+
+        # update all unused slots&#39;s offset
+        for n, entry in enumerate(
+            self.entries[unusedBlockPos + 1 :], start=unusedBlockPos + 1
+        ):
+            if entry.type == BlockType.unusedSlot:
+                entry.offset = new_entry.offset + new_entry.size
+                self.handler.seek(64 + 288 * n, 0)
+                entry._write(self.handler)
+            else:
+                raise IOError(&#34;All unused slots must be at the end of the file&#34;)
+
+        # write new block
+        self.handler.seek(new_entry.offset, 0)
+        newBlock._write(self.handler)
+
+        # ensure the file is the correct size
+        # and that the changes are written to disk
+        self.handler.flush()
+
+    @raise_if_outside_context
+    def remove_block(self, type: Block) -&gt; None:
+        &#34;&#34;&#34;Remove a block of the given type from the file. Removing a block implies:
+
+        - Removing the entry
+        - Updating all subsequent unused slots&#39;s offset (subtracting the size of the removed block)
+        - Inserting a new unused slot entry at the end (with the previous slot offset + size as offset)
+        - If there is info after the block, move it block_to_remove.size up
+
+        &#34;&#34;&#34;
+        print(self._mode)
+        if self._mode == &#34;rb&#34;:
+            raise ValueError(
+                &#34;Can&#39;t remove blocks, this file was opened in read-only mode&#34;
+            )
+
+        # find block
+        try:
+            oldEntryPos, oldEntry = next(
+                (n, i) for n, i in enumerate(self.entries) if i.type == type
+            )
+        except StopIteration:
+            raise ValueError(f&#34;No block of type {type} found&#34;)
+
+        # calculate new offset for the next unused slot
+        newOffset = (
+            self.entries[-1].offset if oldEntryPos != 0 else (64 + 288 * self.nEntries)
+        )
+
+        # delete entry
+        self.entries.remove(oldEntry)
+        self.handler.seek(64 + 288 * oldEntryPos, 0)
+        # update all the offsets of the entries preceding the removed one
+        for entry in self.entries[oldEntryPos:]:
+            entry.offset -= oldEntry.size
+            entry._write(self.handler)
+
+        # add new unused slot at the end
+        date = datetime.now()
+        newEntry = TdfEntry(
+            type=BlockType.unusedSlot,
+            format=0,
+            offset=newOffset,
+            size=0,
+            creation_date=date,
+            last_modification_date=date,
+            last_access_date=date,
+            comment=&#34;Generated by basicTDF&#34;,
+        )
+        self.entries.append(newEntry)
+        newEntry._write(self.handler)
+
+        self.handler.seek(oldEntry.offset + oldEntry.size, 0)
+        temp = self.handler.read()
+        self.handler.seek(oldEntry.offset, 0)
+        self.handler.write(temp)
+        self.handler.truncate()
+        self.handler.flush()
+
+    @staticmethod
+    def new(filename: str) -&gt; &#34;Tdf&#34;:
+        filePath = Path(filename)
+        if filePath.exists():
+            raise FileExistsError(&#34;File already exists&#34;)
+
+        nEntries = 14
+        date = datetime.now()
+        with filePath.open(&#34;wb&#34;) as f:
+            # signature
+            f.write(Tdf.SIGNATURE)
+            # version
+            Int32.bwrite(f, 1)
+            # nEntries
+            Int32.bwrite(f, nEntries)
+            # reserved
+            Int32.bpad(f, 2)
+            # creation date
+            BTSDate.bwrite(f, date)
+            # last modification date
+            BTSDate.bwrite(f, date)
+            # last access date
+            BTSDate.bwrite(f, date)
+            # reserved
+            Int32.bpad(f, 5)
+
+            # start entries
+            entryOffset = 64
+
+            # all entries start with offset to the where entries stop
+            blockOffset = entryOffset + nEntries * 288
+
+            for _ in range(nEntries):
+                # type
+                Uint32.bwrite(f, 0)
+                # format
+                Uint32.bwrite(f, 0)
+                # offset
+                Int32.bwrite(f, blockOffset)
+                # size
+                Int32.bwrite(f, 0)
+                # creation date
+                BTSDate.bwrite(f, date)
+                # last modification date
+                BTSDate.bwrite(f, date)
+                # last access date
+                BTSDate.bwrite(f, date)
+                # reserved
+                Int32.bpad(f, 1)
+                # comment
+                BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
+
+        return Tdf(filePath)
+
+    @raise_if_outside_context
+    def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; None:
+        &#34;&#34;&#34;Replace a block of the same type with a new one. This is done by
+        removing the old block and adding the new one.&#34;&#34;&#34;
+
+        old_entry = next((i for i in self.entries if i.type == newBlock.type), None)
+
+        if old_entry is None:
+            raise ValueError(f&#34;No block of type {newBlock.type} found&#34;)
+
+        comment = comment if comment is not None else old_entry.comment
+
+        self.remove_block(newBlock.type)
+        self.add_block(newBlock, comment)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return self.filePath.stat().st_size
+
+    def __repr__(self) -&gt; str:
+        if self._inside_context:
+            return f&#34;Tdf({self.filePath}, mode={self._mode}), nEntries={self.nEntries}, nBytes={self.nBytes}&#34;
+        return f&#34;Tdf({self.filePath}, mode={self._mode})&#34;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="basictdf.basictdf.Tdf"><code class="flex name class">
+<span>class <span class="ident">Tdf</span></span>
+<span>(</span><span>filename: Union[pathlib.Path, str])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Tdf:
+    SIGNATURE = b&#34;\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08&#34;
+    &#34;The magic number at the beginning of the file&#34;
+
+    def __init__(self, filename: Union[Path, str]) -&gt; None:
+        self.filePath = Path(filename)
+
+        if not self.filePath.exists():
+            raise FileNotFoundError(f&#34;File {self.filePath} not found&#34;)
+        self._inside_context = False
+
+    def open(self, mode=&#34;rb&#34;):
+        mode = mode + &#34;b&#34; if &#34;b&#34; not in mode else mode
+        if mode not in [&#34;rb&#34;, &#34;r+b&#34;]:
+            raise Exception(&#34;Mode must be either &#39;rb&#39; or &#39;r+b&#39;&#34;)
+
+        self._mode = mode
+
+        return self
+
+    def __enter__(self) -&gt; &#34;Tdf&#34;:
+
+        self._mode = self._mode if hasattr(self, &#34;_mode&#34;) else &#34;rb&#34;
+
+        self._inside_context = True
+        self.handler: IO[bytes] = self.filePath.open(self._mode)
+
+        self.signature = self.handler.read(len(self.SIGNATURE))
+
+        if self.signature != self.SIGNATURE:
+            raise Exception(&#34;Invalid TDF file&#34;)
+
+        self.version = Uint32.bread(self.handler)
+        self.nEntries = Int32.bread(self.handler)
+
+        # pad 8 bytes
+        Int32.skip(self.handler, 2)
+
+        self.creation_date = BTSDate.bread(self.handler)
+        self.last_modification_date = BTSDate.bread(self.handler)
+        self.last_access_date = BTSDate.bread(self.handler)
+
+        # pad 20 bytes
+        Int32.skip(self.handler, 5)
+
+        self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -&gt; None:
+        self._inside_context = False
+        self.handler.close()
+
+    @raise_if_outside_context
+    def get_block(self, type: BlockType) -&gt; Optional[Type[Block]]:
+        for entry in self.entries:
+            if entry.type == type:
+                self.handler.seek(entry.offset, 0)
+                block_class = _get_block_class(entry.type)
+                return block_class._build(self.handler, entry.format)
+        return None
+
+    @property
+    @provide_context_if_needed
+    def data3D(self) -&gt; Optional[Data3D]:
+        &#34;&#34;&#34;
+        Convenience property to get the 3D data block.
+        &#34;&#34;&#34;
+        return self.get_block(BlockType.data3D)
+
+    @data3D.setter
+    @raise_if_outside_context
+    def data3D(self, data: Data3D) -&gt; None:
+        self.replace_block(data) if self.has_data3D else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_data3D(self) -&gt; bool:
+        return any(entry.type == BlockType.data3D for entry in self.entries)
+
+    @property
+    @provide_context_if_needed
+    def force_and_torque(self) -&gt; Optional[ForceTorque3D]:
+        return self.get_block(BlockType.forceAndTorqueData)
+
+    @force_and_torque.setter
+    @raise_if_outside_context
+    def force_and_torque(self, data: ForceTorque3D) -&gt; None:
+        self.replace_block(data) if self.has_force_and_torque else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_force_and_torque(self) -&gt; bool:
+        return any(entry.type == BlockType.forceAndTorqueData for entry in self.entries)
+
+    @property
+    @provide_context_if_needed
+    def events(self) -&gt; Optional[TemporalEventsData]:
+        return self.get_block(BlockType.temporalEventsData)
+
+    @events.setter
+    @raise_if_outside_context
+    def events(self, data: TemporalEventsData) -&gt; None:
+        self.replace_block(data) if self.has_events else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_events(self) -&gt; bool:
+        return any(i for i in self.entries if i.type == BlockType.temporalEventsData)
+
+    @property
+    @provide_context_if_needed
+    def emg(self) -&gt; Optional[EMG]:
+        return self.get_block(BlockType.electromyographicData)
+
+    @emg.setter
+    @raise_if_outside_context
+    def emg(self, data: EMG) -&gt; None:
+        self.replace_block(data) if self.has_emg else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_emg(self) -&gt; bool:
+        return any(
+            entry.type == BlockType.electromyographicData for entry in self.entries
+        )
+
+    @raise_if_outside_context
+    def add_block(
+        self, newBlock: Block, comment: str = &#34;Generated by basicTDF&#34;
+    ) -&gt; None:
+        &#34;&#34;&#34;Adds a block to the TDF file
+
+        Args:
+            newBlock (Block): the block to be added.
+            comment (str, optional): A description for the block entry. Defaults to &#34;Generated by basicTDF&#34;.
+
+        Raises:
+            PermissionError: the TDF is read only
+            ValueError: there&#39;s already a block of the same type
+            ValueError: block limit reached (14 as per BTS&#39;s implementation)
+            IOError: unused empty blocks in the middle of the file
+        &#34;&#34;&#34;
+        if self._mode == &#34;rb&#34;:
+            raise PermissionError(
+                &#34;Can&#39;t add blocks, this file was opened in read-only mode&#34;
+            )
+
+        if self.get_block(newBlock.type):
+            raise ValueError(
+                f&#34;There&#39;s already a block of this type {newBlock.type}. Remove it first&#34;
+            )
+
+        # find first unused slot
+        try:
+            unusedBlockPos = next(
+                n for n, i in enumerate(self.entries) if i.type == BlockType.unusedSlot
+            )
+        except StopIteration:
+            raise ValueError(f&#34;Block limit reached ({len(self.entries)})&#34;)
+
+        # write new entry with the offset of that unused slot
+        new_entry = TdfEntry(
+            type=newBlock.type,
+            format=newBlock.format.value,
+            offset=self.entries[unusedBlockPos].offset,
+            size=newBlock.nBytes,
+            creation_date=newBlock.creation_date,
+            last_modification_date=newBlock.last_modification_date,
+            last_access_date=datetime.now(),
+            comment=comment,
+        )
+
+        # replace the entry
+        self.entries[unusedBlockPos] = new_entry
+
+        # write new entry
+        self.handler.seek(64 + 288 * unusedBlockPos, 0)
+        new_entry._write(self.handler)
+
+        # update all unused slots&#39;s offset
+        for n, entry in enumerate(
+            self.entries[unusedBlockPos + 1 :], start=unusedBlockPos + 1
+        ):
+            if entry.type == BlockType.unusedSlot:
+                entry.offset = new_entry.offset + new_entry.size
+                self.handler.seek(64 + 288 * n, 0)
+                entry._write(self.handler)
+            else:
+                raise IOError(&#34;All unused slots must be at the end of the file&#34;)
+
+        # write new block
+        self.handler.seek(new_entry.offset, 0)
+        newBlock._write(self.handler)
+
+        # ensure the file is the correct size
+        # and that the changes are written to disk
+        self.handler.flush()
+
+    @raise_if_outside_context
+    def remove_block(self, type: Block) -&gt; None:
+        &#34;&#34;&#34;Remove a block of the given type from the file. Removing a block implies:
+
+        - Removing the entry
+        - Updating all subsequent unused slots&#39;s offset (subtracting the size of the removed block)
+        - Inserting a new unused slot entry at the end (with the previous slot offset + size as offset)
+        - If there is info after the block, move it block_to_remove.size up
+
+        &#34;&#34;&#34;
+        print(self._mode)
+        if self._mode == &#34;rb&#34;:
+            raise ValueError(
+                &#34;Can&#39;t remove blocks, this file was opened in read-only mode&#34;
+            )
+
+        # find block
+        try:
+            oldEntryPos, oldEntry = next(
+                (n, i) for n, i in enumerate(self.entries) if i.type == type
+            )
+        except StopIteration:
+            raise ValueError(f&#34;No block of type {type} found&#34;)
+
+        # calculate new offset for the next unused slot
+        newOffset = (
+            self.entries[-1].offset if oldEntryPos != 0 else (64 + 288 * self.nEntries)
+        )
+
+        # delete entry
+        self.entries.remove(oldEntry)
+        self.handler.seek(64 + 288 * oldEntryPos, 0)
+        # update all the offsets of the entries preceding the removed one
+        for entry in self.entries[oldEntryPos:]:
+            entry.offset -= oldEntry.size
+            entry._write(self.handler)
+
+        # add new unused slot at the end
+        date = datetime.now()
+        newEntry = TdfEntry(
+            type=BlockType.unusedSlot,
+            format=0,
+            offset=newOffset,
+            size=0,
+            creation_date=date,
+            last_modification_date=date,
+            last_access_date=date,
+            comment=&#34;Generated by basicTDF&#34;,
+        )
+        self.entries.append(newEntry)
+        newEntry._write(self.handler)
+
+        self.handler.seek(oldEntry.offset + oldEntry.size, 0)
+        temp = self.handler.read()
+        self.handler.seek(oldEntry.offset, 0)
+        self.handler.write(temp)
+        self.handler.truncate()
+        self.handler.flush()
+
+    @staticmethod
+    def new(filename: str) -&gt; &#34;Tdf&#34;:
+        filePath = Path(filename)
+        if filePath.exists():
+            raise FileExistsError(&#34;File already exists&#34;)
+
+        nEntries = 14
+        date = datetime.now()
+        with filePath.open(&#34;wb&#34;) as f:
+            # signature
+            f.write(Tdf.SIGNATURE)
+            # version
+            Int32.bwrite(f, 1)
+            # nEntries
+            Int32.bwrite(f, nEntries)
+            # reserved
+            Int32.bpad(f, 2)
+            # creation date
+            BTSDate.bwrite(f, date)
+            # last modification date
+            BTSDate.bwrite(f, date)
+            # last access date
+            BTSDate.bwrite(f, date)
+            # reserved
+            Int32.bpad(f, 5)
+
+            # start entries
+            entryOffset = 64
+
+            # all entries start with offset to the where entries stop
+            blockOffset = entryOffset + nEntries * 288
+
+            for _ in range(nEntries):
+                # type
+                Uint32.bwrite(f, 0)
+                # format
+                Uint32.bwrite(f, 0)
+                # offset
+                Int32.bwrite(f, blockOffset)
+                # size
+                Int32.bwrite(f, 0)
+                # creation date
+                BTSDate.bwrite(f, date)
+                # last modification date
+                BTSDate.bwrite(f, date)
+                # last access date
+                BTSDate.bwrite(f, date)
+                # reserved
+                Int32.bpad(f, 1)
+                # comment
+                BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
+
+        return Tdf(filePath)
+
+    @raise_if_outside_context
+    def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; None:
+        &#34;&#34;&#34;Replace a block of the same type with a new one. This is done by
+        removing the old block and adding the new one.&#34;&#34;&#34;
+
+        old_entry = next((i for i in self.entries if i.type == newBlock.type), None)
+
+        if old_entry is None:
+            raise ValueError(f&#34;No block of type {newBlock.type} found&#34;)
+
+        comment = comment if comment is not None else old_entry.comment
+
+        self.remove_block(newBlock.type)
+        self.add_block(newBlock, comment)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return self.filePath.stat().st_size
+
+    def __repr__(self) -&gt; str:
+        if self._inside_context:
+            return f&#34;Tdf({self.filePath}, mode={self._mode}), nEntries={self.nEntries}, nBytes={self.nBytes}&#34;
+        return f&#34;Tdf({self.filePath}, mode={self._mode})&#34;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.basictdf.Tdf.SIGNATURE"><code class="name">var <span class="ident">SIGNATURE</span></code></dt>
+<dd>
+<div class="desc"><p>The magic number at the beginning of the file</p></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="basictdf.basictdf.Tdf.new"><code class="name flex">
+<span>def <span class="ident">new</span></span>(<span>filename: str) ‑> <a title="basictdf.basictdf.Tdf" href="#basictdf.basictdf.Tdf">Tdf</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def new(filename: str) -&gt; &#34;Tdf&#34;:
+    filePath = Path(filename)
+    if filePath.exists():
+        raise FileExistsError(&#34;File already exists&#34;)
+
+    nEntries = 14
+    date = datetime.now()
+    with filePath.open(&#34;wb&#34;) as f:
+        # signature
+        f.write(Tdf.SIGNATURE)
+        # version
+        Int32.bwrite(f, 1)
+        # nEntries
+        Int32.bwrite(f, nEntries)
+        # reserved
+        Int32.bpad(f, 2)
+        # creation date
+        BTSDate.bwrite(f, date)
+        # last modification date
+        BTSDate.bwrite(f, date)
+        # last access date
+        BTSDate.bwrite(f, date)
+        # reserved
+        Int32.bpad(f, 5)
+
+        # start entries
+        entryOffset = 64
+
+        # all entries start with offset to the where entries stop
+        blockOffset = entryOffset + nEntries * 288
+
+        for _ in range(nEntries):
+            # type
+            Uint32.bwrite(f, 0)
+            # format
+            Uint32.bwrite(f, 0)
+            # offset
+            Int32.bwrite(f, blockOffset)
+            # size
+            Int32.bwrite(f, 0)
+            # creation date
+            BTSDate.bwrite(f, date)
+            # last modification date
+            BTSDate.bwrite(f, date)
+            # last access date
+            BTSDate.bwrite(f, date)
+            # reserved
+            Int32.bpad(f, 1)
+            # comment
+            BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
+
+    return Tdf(filePath)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.basictdf.Tdf.data3D"><code class="name">var <span class="ident">data3D</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.emg"><code class="name">var <span class="ident">emg</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.events"><code class="name">var <span class="ident">events</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.force_and_torque"><code class="name">var <span class="ident">force_and_torque</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.has_data3D"><code class="name">var <span class="ident">has_data3D</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.has_emg"><code class="name">var <span class="ident">has_emg</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.has_events"><code class="name">var <span class="ident">has_events</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.has_force_and_torque"><code class="name">var <span class="ident">has_force_and_torque</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    return self.filePath.stat().st_size</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.basictdf.Tdf.add_block"><code class="name flex">
+<span>def <span class="ident">add_block</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        raise OutsideOfContextError(
+            &#34;This method should be called inside a context manager&#34;
+        )
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.get_block"><code class="name flex">
+<span>def <span class="ident">get_block</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        raise OutsideOfContextError(
+            &#34;This method should be called inside a context manager&#34;
+        )
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.open"><code class="name flex">
+<span>def <span class="ident">open</span></span>(<span>self, mode='rb')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def open(self, mode=&#34;rb&#34;):
+    mode = mode + &#34;b&#34; if &#34;b&#34; not in mode else mode
+    if mode not in [&#34;rb&#34;, &#34;r+b&#34;]:
+        raise Exception(&#34;Mode must be either &#39;rb&#39; or &#39;r+b&#39;&#34;)
+
+    self._mode = mode
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.remove_block"><code class="name flex">
+<span>def <span class="ident">remove_block</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        raise OutsideOfContextError(
+            &#34;This method should be called inside a context manager&#34;
+        )
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.replace_block"><code class="name flex">
+<span>def <span class="ident">replace_block</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        raise OutsideOfContextError(
+            &#34;This method should be called inside a context manager&#34;
+        )
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.basictdf.TdfEntry"><code class="flex name class">
+<span>class <span class="ident">TdfEntry</span></span>
+<span>(</span><span>type: <a title="basictdf.tdfBlock.BlockType" href="tdfBlock.html#basictdf.tdfBlock.BlockType">BlockType</a>, format: int, offset: int, size: int, creation_date: datetime.datetime, last_modification_date: datetime.datetime, last_access_date: datetime.datetime, comment: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A jumptable type entry for a data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TdfEntry:
+    &#34;&#34;&#34;A jumptable type entry for a data block.&#34;&#34;&#34;
+
+    def __init__(
+        self,
+        type: BlockType,
+        format: int,
+        offset: int,
+        size: int,
+        creation_date: datetime,
+        last_modification_date: datetime,
+        last_access_date: datetime,
+        comment: str,
+    ) -&gt; None:
+        self.type = type
+        self.format = format
+        self.offset = offset
+        self.size = size
+        self.creation_date = creation_date
+        self.last_modification_date = last_modification_date
+        self.last_access_date = last_access_date
+        self.comment = comment
+        self.nBytes = 8 * 4 + 256
+
+    def _write(self, file):
+        Uint32.bwrite(file, self.type.value)
+        Uint32.bwrite(file, self.format)
+        Int32.bwrite(file, self.offset)
+        Int32.bwrite(file, self.size)
+        BTSDate.bwrite(file, self.creation_date)
+        BTSDate.bwrite(file, self.last_modification_date)
+        BTSDate.bwrite(file, self.last_access_date)
+        Int32.bpad(file)
+        BTSString.bwrite(file, 256, self.comment)
+
+    @staticmethod
+    def _build(file):
+        type_ = BlockType(Uint32.bread(file))
+        format = Uint32.bread(file)
+        offset = Int32.bread(file)
+        size = Int32.bread(file)
+        creation_date = BTSDate.bread(file)
+        last_modification_date = BTSDate.bread(file)
+        last_access_date = BTSDate.bread(file)
+        Int32.skip(file)
+        comment = BTSString.bread(file, 256)
+        return TdfEntry(
+            type_,
+            format,
+            offset,
+            size,
+            creation_date,
+            last_modification_date,
+            last_access_date,
+            comment,
+        )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="basictdf" href="index.html">basictdf</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="basictdf.basictdf.Tdf" href="#basictdf.basictdf.Tdf">Tdf</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.basictdf.Tdf.SIGNATURE" href="#basictdf.basictdf.Tdf.SIGNATURE">SIGNATURE</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.add_block" href="#basictdf.basictdf.Tdf.add_block">add_block</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.data3D" href="#basictdf.basictdf.Tdf.data3D">data3D</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.emg" href="#basictdf.basictdf.Tdf.emg">emg</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.events" href="#basictdf.basictdf.Tdf.events">events</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.force_and_torque" href="#basictdf.basictdf.Tdf.force_and_torque">force_and_torque</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.get_block" href="#basictdf.basictdf.Tdf.get_block">get_block</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.has_data3D" href="#basictdf.basictdf.Tdf.has_data3D">has_data3D</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.has_emg" href="#basictdf.basictdf.Tdf.has_emg">has_emg</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.has_events" href="#basictdf.basictdf.Tdf.has_events">has_events</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.has_force_and_torque" href="#basictdf.basictdf.Tdf.has_force_and_torque">has_force_and_torque</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.nBytes" href="#basictdf.basictdf.Tdf.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.new" href="#basictdf.basictdf.Tdf.new">new</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.open" href="#basictdf.basictdf.Tdf.open">open</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.remove_block" href="#basictdf.basictdf.Tdf.remove_block">remove_block</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.replace_block" href="#basictdf.basictdf.Tdf.replace_block">replace_block</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.basictdf.TdfEntry" href="#basictdf.basictdf.TdfEntry">TdfEntry</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
