@@ -2,7 +2,7 @@ __doc__ = "Force, torque and acceleration data module."
 
 from io import BytesIO
 from re import I
-from typing import BinaryIO, Iterable, Iterator, List, Optional, Type, Union
+from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Optional, Type, Union
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfData3D import TrackType
@@ -49,7 +49,7 @@ class ForceTorqueTrack:
         return np.ma.clump_unmasked(maskedPressureData.T[0])
 
     @_segments.setter
-    def _segments(self, value):
+    def _segments(self, value) -> NoReturn:
         raise AttributeError(
             "Can't set number of segments directly, it's inferred from the data"
         )
@@ -108,7 +108,7 @@ class ForceTorqueTrack:
             torque=torque_data,
         )
 
-    def _write(self, file: BinaryIO):
+    def _write(self, file: BinaryIO) -> None:
 
         # label
         BTSString.bwrite(file, 256, self.label)
@@ -158,6 +158,8 @@ class ForceTorque3DBlockFormat(Enum):
 
 
 class ForceTorque3D(Block):
+    type = BlockType.forceAndTorqueData
+
     def __init__(
         self,
         frequency: Union[int, float],
@@ -167,8 +169,8 @@ class ForceTorque3D(Block):
         translationVector: np.ndarray,
         startTime: float = 0.0,
         format=ForceTorque3DBlockFormat.byTrack,
-    ):
-        super().__init__(BlockType.forceAndTorqueData)
+    ) -> None:
+        super().__init__()
         self.format = format
         self.frequency = frequency
         self.startTime = startTime
@@ -201,7 +203,7 @@ class ForceTorque3D(Block):
         self._tracks = []
 
     @staticmethod
-    def _build(stream, format):
+    def _build(stream, format) -> "ForceTorque3D":
         format = ForceTorque3DBlockFormat(format)
         nTracks = Int32.bread(stream)
         frequency = Int32.bread(stream)
@@ -227,7 +229,7 @@ class ForceTorque3D(Block):
         f._tracks = [ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)]
         return f
 
-    def add_track(self, track: ForceTorqueTrack):
+    def add_track(self, track: ForceTorqueTrack) -> None:
         """Adds a track to the data block
 
         Args:
@@ -255,7 +257,7 @@ class ForceTorque3D(Block):
         return self._tracks
 
     @tracks.setter
-    def tracks(self, values: Iterable[ForceTorqueTrack]):
+    def tracks(self, values: Iterable[ForceTorqueTrack]) -> None:
         """
         Sets the tracks in the data block.
         """

@@ -89,13 +89,17 @@ class EMGTrack:
 
 
 class EMG(Block):
+    """Electromyography data block"""
+
+    type = BlockType.electromyographicData
+
     def __init__(self, frequency, nSamples, startTime=0.0):
+        super().__init__()
         self.frequency = frequency
         self.startTime = startTime
         self.nSamples = nSamples
         self._signals = []
         self._emgMap = []
-        super().__init__(BlockType.electromyographicData)
 
     @staticmethod
     def _build(stream, format):

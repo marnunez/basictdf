@@ -67,8 +67,10 @@ class TemporalEventsData(Block):
     A class to represent a TDF temporal events data block.
     """
 
+    type = BlockType.temporalEventsData
+
     def __init__(self, format=TemporalEventsDataFormat.standard, start_time=0.0):
-        super().__init__(BlockType.temporalEventsData)
+        super().__init__()
         self.format = format
         self.start_time = start_time
         self.events = []

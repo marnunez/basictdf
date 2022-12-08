@@ -247,3 +247,12 @@ class TestTdf(TestCase):
         event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
         eventBlock = TemporalEventsData()
         eventBlock.events.append(event)
+
+
+class TestRealTdf(TestCase):
+    def test_read(self) -> None:
+        file = Path("tests/test_files/2241_aa_Walking 01.tdf")
+        tdf_file = Tdf(file)
+        with tdf_file as tdf:
+            self.assertEqual(tdf.nBytes, file.stat().st_size)
+            self.assertEqual(len(tdf.entries), 14)

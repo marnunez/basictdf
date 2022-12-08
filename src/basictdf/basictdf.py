@@ -1,7 +1,6 @@
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import IO, Optional, Type, Union
+from typing import IO, List, Optional, Type, Union
 
 from basictdf.tdfBlock import (
     AnalogData,
@@ -16,7 +15,6 @@ from basictdf.tdfBlock import (
     ForcePlatformsData,
     GeneralCalibrationData,
     NotDefinedBlock,
-    OpticalSystemConfiguration,
     UnusedBlock,
     VolumetricData,
 )
@@ -24,6 +22,7 @@ from basictdf.tdfData3D import Data3D
 from basictdf.tdfEMG import EMG
 from basictdf.tdfEvents import TemporalEventsData
 from basictdf.tdfForce3D import ForceTorque3D
+from basictdf.tdfOpticalSystem import OpticalSetupBlock
 from basictdf.tdfTypes import BTSDate, BTSString, Int32, Uint32
 from basictdf.tdfUtils import (
     raise_if_outside_context,
@@ -46,7 +45,7 @@ def _get_block_class(block_type: BlockType) -> Type[Block]:
     elif block_type == BlockType.data3D:
         return Data3D
     elif block_type == BlockType.opticalSystemConfiguration:
-        return OpticalSystemConfiguration
+        return OpticalSetupBlock
     elif block_type == BlockType.forcePlatformsCalibrationData:
         return ForcePlatformsCalibrationData
     elif block_type == BlockType.forcePlatformsCalibrationData2D:
@@ -107,7 +106,7 @@ class TdfEntry:
         BTSString.bwrite(file, 256, self.comment)
 
     @staticmethod
-    def _build(file):
+    def _build(file) -> "TdfEntry":
         type_ = BlockType(Uint32.bread(file))
         format = Uint32.bread(file)
         offset = Int32.bread(file)
@@ -127,6 +126,9 @@ class TdfEntry:
             last_access_date,
             comment,
         )
+
+    def __repr__(self) -> str:
+        return f"TdfEntry({self.type}, {self.format}, {self.offset}, {self.size}, {self.creation_date}, {self.last_modification_date}, {self.last_access_date}, {self.comment})"
 
 
 class Tdf:
@@ -178,15 +180,39 @@ class Tdf:
         self._mode = "rb"
         self.handler.close()
 
-    @raise_if_outside_context
-    def get_block(self, type: BlockType) -> Optional[Type[Block]]:
+    @property
+    @provide_context_if_needed
+    def blocks(self) -> List[Block]:
+        """Get all blocks in the file."""
+        return [self.get_block(entry.type) for entry in self.entries]
+
+    @provide_context_if_needed
+    def get_block(self, index_or_type: Union[BlockType, int]) -> Optional[Type[Block]]:
         """Get a block from the TDF file."""
-        for entry in self.entries:
-            if entry.type == type:
-                self.handler.seek(entry.offset, 0)
-                block_class = _get_block_class(entry.type)
-                return block_class._build(self.handler, entry.format)
-        return None
+
+        if isinstance(index_or_type, int):
+            if 0 <= index_or_type < len(self.entries):
+                entry = self.entries[index_or_type]
+            else:
+                raise IndexError(f"Index {index_or_type} out of range")
+
+        elif isinstance(index_or_type, BlockType):
+            entry = next((e for e in self.entries if e.type == index_or_type), None)
+            if entry is None:
+                raise Exception(f"Block {index_or_type} not found")
+
+        else:
+            raise TypeError(f"Expected int or BlockType, got {type(index_or_type)}")
+
+        self.handler.seek(entry.offset, 0)
+        block_class = _get_block_class(entry.type)
+        print(entry.type, block_class)
+        return block_class._build(self.handler, entry.format)
+
+    def __getitem__(
+        self, index_or_type: Union[BlockType, int]
+    ) -> Optional[Type[Block]]:
+        return self.get_block(index_or_type)
 
     @property
     @provide_context_if_needed
@@ -281,10 +307,13 @@ class Tdf:
                 "Can't add blocks, this file was opened in read-only mode"
             )
 
-        if self.get_block(newBlock.type):
-            raise ValueError(
-                f"There's already a block of this type {newBlock.type}. Remove it first"
-            )
+        try:
+            if self.get_block(newBlock.type):
+                raise ValueError(
+                    f"There's already a block of this type {newBlock.type}. Remove it first"
+                )
+        except Exception:
+            pass
 
         # find first unused slot
         try:
@@ -465,7 +494,6 @@ class Tdf:
         """Return the size of the TDF file in bytes"""
         return self.filePath.stat().st_size
 
+    @provide_context_if_needed
     def __repr__(self) -> str:
-        if self._inside_context:
-            return f"Tdf({self.filePath}, mode={self._mode}), nEntries={self.nEntries}, nBytes={self.nBytes}"
-        return f"Tdf({self.filePath}, mode={self._mode})"
+        return f"Tdf({self.filePath}, nEntries={self.nEntries}, nBytes={self.nBytes}"

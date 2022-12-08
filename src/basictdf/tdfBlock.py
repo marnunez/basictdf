@@ -28,9 +28,10 @@ class BlockType(Enum):
 
 
 class Block(ABC):
+    type = BlockType.notDefined
+
     def __init__(
         self,
-        blockType: BlockType,
         creation_date: Optional[datetime] = None,
         last_modification_date: Optional[datetime] = None,
         last_access_date: Optional[datetime] = None,
@@ -46,8 +47,6 @@ class Block(ABC):
         self.last_access_date = (
             last_access_date if last_access_date is not None else datetime.now()
         )
-        self.blockType = blockType
-        self.type = blockType
 
     @abstractmethod
     def nBytes(self) -> int:
@@ -62,56 +61,67 @@ class Block(ABC):
         pass
 
     def __repr__(self):
-        return self.__class__.__name__ + "(" + str(self.type) + ")"
+        return self.__class__.__name__ + "(" + str(self.__class__.type) + ")"
 
 
-class CalibrationData(Block):
-    pass
+class NotImplementedBlock(Block):
+    type = BlockType.notDefined
+
+    @classmethod
+    def _build(cls, *args, **kwargs):
+        raise NotImplementedError(
+            f"Buidling blocks of type {cls.type} is yet implemented"
+        )
+
+    def _write(self, *args, **kwargs):
+        raise NotImplementedError(
+            f"Writing blocks type {self.type} is not implemented yet."
+        )
 
 
-class CalibrationData2D(Block):
-    pass
+class CalibrationData(NotImplementedBlock):
+    type = BlockType.calibrationData
 
 
-class Data2D(Block):
-    pass
+class CalibrationData2D(NotImplementedBlock):
+    type = BlockType.calibrationData2D
 
 
-class OpticalSystemConfiguration(Block):
-    pass
+class Data2D(NotImplementedBlock):
+    type = BlockType.data2D
 
 
-class ForcePlatformsCalibrationData(Block):
-    pass
+class ForcePlatformsCalibrationData(NotImplementedBlock):
+    type = BlockType.forcePlatformsCalibrationData
 
 
-class ForcePlatformsCalibrationData2D(Block):
-    pass
+class ForcePlatformsCalibrationData2D(NotImplementedBlock):
+    type = BlockType.forcePlatformsCalibrationData2D
 
 
-class ForcePlatformsData(Block):
-    pass
+class ForcePlatformsData(NotImplementedBlock):
+    type = BlockType.forcePlatformsData
 
 
-class AnthropometricData(Block):
-    pass
+class AnthropometricData(NotImplementedBlock):
+    type = BlockType.anthropometricData
 
 
-class VolumetricData(Block):
-    pass
+class VolumetricData(NotImplementedBlock):
+    type = BlockType.volumetricData
 
 
-class AnalogData(Block):
-    pass
+class AnalogData(NotImplementedBlock):
+    type = BlockType.analogData
 
 
-class GeneralCalibrationData(Block):
-    pass
+class GeneralCalibrationData(NotImplementedBlock):
+    type = BlockType.generalCalibrationData
 
 
-class UnusedBlock(Block):
-    pass
+class UnusedBlock(NotImplementedBlock):
+    type = BlockType.unusedSlot
 
 
-class NotDefinedBlock(Block):
-    pass
+class NotDefinedBlock(NotImplementedBlock):
+    type = BlockType.notDefined

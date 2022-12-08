@@ -4,9 +4,7 @@ from datetime import datetime
 import struct
 from typing import (
     IO,
-    Any,
     Optional,
-    Type,
     TypeVar,
     Union,
     BinaryIO,
@@ -18,19 +16,19 @@ import numpy.typing as npt
 
 class BTSDate:
     @staticmethod
-    def read(data):
+    def read(data) -> datetime:
         return datetime.fromtimestamp(struct.unpack("<i", data)[0])
 
     @staticmethod
-    def bread(f):
+    def bread(f) -> datetime:
         return BTSDate.read(f.read(4))
 
     @staticmethod
-    def write(data):
+    def write(data) -> bytes:
         return struct.pack("<i", int(data.timestamp()))
 
     @staticmethod
-    def bwrite(file, data):
+    def bwrite(file, data) -> None:
         file.write(BTSDate.write(data))
 
 
@@ -67,7 +65,7 @@ class BTSString:
         return dat + padding
 
     @staticmethod
-    def bwrite(file: BinaryIO, size: int, data: str):
+    def bwrite(file: BinaryIO, size: int, data: str) -> None:
         file.write(BTSString.write(size, data))
 
     @staticmethod
@@ -92,7 +90,7 @@ X = TypeVar("X", bound=np.dtype)
 
 
 class TdfType(Generic[X]):
-    def __init__(self, btype: npt.DTypeLike):
+    def __init__(self, btype: npt.DTypeLike) -> None:
         self.btype: X = np.dtype(btype)
 
     def read(self, data: bytes) -> npt.NDArray[X]:
@@ -130,22 +128,23 @@ class TdfType(Generic[X]):
             else np.array(data, dtype=self.btype.base).tobytes()
         )
 
-    def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]):
+    def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]) -> None:
         file.write(self.write(data))
 
-    def skip(self, file: IO[bytes], n: int = 1):
+    def skip(self, file: IO[bytes], n: int = 1) -> None:
         file.seek(n * self.btype.itemsize, 1)
 
     def pad(self, n: int = 1):
         return b"\x00" * (n * self.btype.itemsize)
 
-    def bpad(self, file: IO[bytes], n: int = 1):
+    def bpad(self, file: IO[bytes], n: int = 1) -> None:
         file.write(self.pad(n))
 
 
 Volume = TdfType(np.dtype("3<f4"))
 
 VEC3F = TdfType(np.dtype("3<f4"))
+VEC2I = TdfType(np.dtype("2<i4"))
 
 Matrix = TdfType(np.dtype("(3,3)<f4"))
 

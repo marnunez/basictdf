@@ -161,6 +161,8 @@ class MarkerTrack:
 
 
 class Data3D(Block):
+    type = BlockType.data3D
+
     def __init__(
         self,
         frequency: float,
@@ -189,7 +191,7 @@ class Data3D(Block):
             ValueError: the rotation matrix is not an array of 3x3 floats
             ValueError: the translation vector is not an array of 3 floats
         """
-        super().__init__(BlockType.data3D)
+        super().__init__()
         self.format = format
         self.frequency = frequency
         self.startTime = startTime

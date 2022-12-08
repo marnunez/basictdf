@@ -8,7 +8,7 @@ from basictdf.tdfTypes import Float32
 
 
 class TestEMGTrack(TestCase):
-    def test_creation(self):
+    def test_creation(self) -> None:
         data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
         a = EMGTrack("Right Rectus Femoris", data)
         self.assertEqual(a.label, "Right Rectus Femoris")
@@ -17,7 +17,7 @@ class TestEMGTrack(TestCase):
         self.assertEqual(a.nSamples, 11)
         self.assertEqual(a.nBytes, 256 + 4 + 4 + 4 + 4 + 11 * 4)
 
-    def test_build(self):
+    def test_build(self) -> None:
         data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
         b = b""
         # label
@@ -43,7 +43,7 @@ class TestEMGTrack(TestCase):
         a.write(d)
         self.assertEqual(d.getvalue(), b)
 
-    def test_write(self):
+    def test_write(self) -> None:
         data = np.array([1, 2, 3.342, 4, 5, 6, 7, 8.54, 9, 10.123, 1e-3])
         a = EMGTrack("Right Rectus Femoris", data)
         self.assertEqual(len(a._segments), 1)
@@ -70,7 +70,7 @@ class TestEMGTrack(TestCase):
 
 
 class TestEMG(TestCase):
-    def test_creation(self):
+    def test_creation(self) -> None:
         t1 = EMGTrack(
             "Right Rectus Femoris", np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
         )
@@ -103,7 +103,7 @@ class TestEMG(TestCase):
         with self.assertRaises(TypeError):
             a.addSignal("Not a EMGTrack")
 
-    def test_addSignal(self):
+    def test_addSignal(self) -> None:
         t1 = EMGTrack(
             "Right Rectus Femoris", np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
         )
