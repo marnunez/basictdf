@@ -3,7 +3,7 @@ __doc__ = "Events data module."
 from enum import Enum
 from typing import Iterator, Union
 from basictdf.tdfBlock import Block
-from basictdf.tdfTypes import BTSString, Uint32, Int32, Float32
+from basictdf.tdfTypes import BTSString, u32, i32, f32
 from basictdf.tdfUtils import is_iterable
 from basictdf.tdfBlock import BlockType
 import numpy as np
@@ -39,16 +39,16 @@ class Event:
 
     def _write(self, stream) -> None:
         BTSString.bwrite(stream, 256, self.label)
-        Uint32.bwrite(stream, self.type.value)  # type
-        Uint32.bwrite(stream, len(self.values))  # nItems
-        Float32.bwrite(stream, self.values)
+        u32.bwrite(stream, self.type.value)  # type
+        u32.bwrite(stream, len(self.values))  # nItems
+        f32.bwrite(stream, self.values)
 
     @staticmethod
     def _build(stream) -> "Event":
         label = BTSString.bread(stream, 256)
-        type_ = EventsDataType(Uint32.bread(stream))
-        nItems = Int32.bread(stream)
-        values = np.array([Float32.bread(stream) for _ in range(nItems)])
+        type_ = EventsDataType(u32.bread(stream))
+        nItems = i32.bread(stream)
+        values = np.array([f32.bread(stream) for _ in range(nItems)])
         return Event(label, values, type_)
 
     def __len__(self) -> int:
@@ -79,8 +79,8 @@ class TemporalEventsData(Block):
     def _build(stream, format) -> "TemporalEventsData":
 
         format = TemporalEventsDataFormat(format)
-        nEvents = Int32.bread(stream)
-        start_time = Float32.bread(stream)
+        nEvents = i32.bread(stream)
+        start_time = f32.bread(stream)
 
         t = TemporalEventsData(format, start_time)
         t.events = [Event._build(stream) for _ in range(nEvents)]
@@ -88,8 +88,8 @@ class TemporalEventsData(Block):
         return t
 
     def _write(self, stream) -> None:
-        Int32.bwrite(stream, len(self.events))
-        Float32.bwrite(stream, self.start_time)
+        i32.bwrite(stream, len(self.events))
+        f32.bwrite(stream, self.start_time)
         for event in self.events:
             event._write(stream)
 

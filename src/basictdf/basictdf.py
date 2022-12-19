@@ -7,7 +7,6 @@ from basictdf.tdfBlock import (
     AnthropometricData,
     Block,
     BlockType,
-    CalibrationData,
     CalibrationData2D,
     Data2D,
     ForcePlatformsCalibrationData,
@@ -18,12 +17,13 @@ from basictdf.tdfBlock import (
     UnusedBlock,
     VolumetricData,
 )
+from basictdf.tdfCalibrationData import CalibrationDataBlock
 from basictdf.tdfData3D import Data3D
 from basictdf.tdfEMG import EMG
 from basictdf.tdfEvents import TemporalEventsData
 from basictdf.tdfForce3D import ForceTorque3D
 from basictdf.tdfOpticalSystem import OpticalSetupBlock
-from basictdf.tdfTypes import BTSDate, BTSString, Int32, Uint32
+from basictdf.tdfTypes import BTSDate, BTSString, i32, u32
 from basictdf.tdfUtils import (
     raise_if_outside_context,
     provide_context_if_needed,
@@ -37,7 +37,7 @@ def _get_block_class(block_type: BlockType) -> Type[Block]:
     elif block_type == BlockType.notDefined:
         return NotDefinedBlock
     elif block_type == BlockType.calibrationData:
-        return CalibrationData
+        return CalibrationDataBlock
     elif block_type == BlockType.calibrationData2D:
         return CalibrationData2D
     elif block_type == BlockType.data2D:
@@ -95,26 +95,26 @@ class TdfEntry:
         self.nBytes = 8 * 4 + 256
 
     def _write(self, file):
-        Uint32.bwrite(file, self.type.value)
-        Uint32.bwrite(file, self.format)
-        Int32.bwrite(file, self.offset)
-        Int32.bwrite(file, self.size)
+        u32.bwrite(file, self.type.value)
+        u32.bwrite(file, self.format)
+        i32.bwrite(file, self.offset)
+        i32.bwrite(file, self.size)
         BTSDate.bwrite(file, self.creation_date)
         BTSDate.bwrite(file, self.last_modification_date)
         BTSDate.bwrite(file, self.last_access_date)
-        Int32.bpad(file)
+        i32.bpad(file)
         BTSString.bwrite(file, 256, self.comment)
 
     @staticmethod
     def _build(file) -> "TdfEntry":
-        type_ = BlockType(Uint32.bread(file))
-        format = Uint32.bread(file)
-        offset = Int32.bread(file)
-        size = Int32.bread(file)
+        type_ = BlockType(u32.bread(file))
+        format = u32.bread(file)
+        offset = i32.bread(file)
+        size = i32.bread(file)
         creation_date = BTSDate.bread(file)
         last_modification_date = BTSDate.bread(file)
         last_access_date = BTSDate.bread(file)
-        Int32.skip(file)
+        i32.skip(file)
         comment = BTSString.bread(file, 256)
         return TdfEntry(
             type_,
@@ -158,18 +158,18 @@ class Tdf:
         if self.signature != self.SIGNATURE:
             raise Exception("Invalid TDF file")
 
-        self.version = Uint32.bread(self.handler)
-        self.nEntries = Int32.bread(self.handler)
+        self.version = u32.bread(self.handler)
+        self.nEntries = i32.bread(self.handler)
 
         # pad 8 bytes
-        Int32.skip(self.handler, 2)
+        i32.skip(self.handler, 2)
 
         self.creation_date = BTSDate.bread(self.handler)
         self.last_modification_date = BTSDate.bread(self.handler)
         self.last_access_date = BTSDate.bread(self.handler)
 
         # pad 20 bytes
-        Int32.skip(self.handler, 5)
+        i32.skip(self.handler, 5)
 
         self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
 
@@ -206,7 +206,6 @@ class Tdf:
 
         self.handler.seek(entry.offset, 0)
         block_class = _get_block_class(entry.type)
-        print(entry.type, block_class)
         return block_class._build(self.handler, entry.format)
 
     def __getitem__(
@@ -271,7 +270,7 @@ class Tdf:
     @provide_context_if_needed
     def emg(self) -> Optional[EMG]:
         """Convenience property to get/set the EMG data block."""
-        return self.get_block(BlockType.electromyographicData)
+        return self.get_block(EMG.type)
 
     @emg.setter
     @raise_if_outside_write_context
@@ -285,6 +284,12 @@ class Tdf:
         return any(
             entry.type == BlockType.electromyographicData for entry in self.entries
         )
+
+    @property
+    @provide_context_if_needed
+    def calibrationData(self) -> Optional[CalibrationDataBlock]:
+        """Convenience property to get/set the calibration data block."""
+        return self.get_block(CalibrationDataBlock.type)
 
     @raise_if_outside_write_context
     def add_block(
@@ -432,11 +437,11 @@ class Tdf:
             # signature
             f.write(Tdf.SIGNATURE)
             # version
-            Int32.bwrite(f, 1)
+            i32.bwrite(f, 1)
             # nEntries
-            Int32.bwrite(f, nEntries)
+            i32.bwrite(f, nEntries)
             # reserved
-            Int32.bpad(f, 2)
+            i32.bpad(f, 2)
             # creation date
             BTSDate.bwrite(f, date)
             # last modification date
@@ -444,7 +449,7 @@ class Tdf:
             # last access date
             BTSDate.bwrite(f, date)
             # reserved
-            Int32.bpad(f, 5)
+            i32.bpad(f, 5)
 
             # start entries
             entryOffset = 64
@@ -454,13 +459,13 @@ class Tdf:
 
             for _ in range(nEntries):
                 # type
-                Uint32.bwrite(f, 0)
+                u32.bwrite(f, 0)
                 # format
-                Uint32.bwrite(f, 0)
+                u32.bwrite(f, 0)
                 # offset
-                Int32.bwrite(f, blockOffset)
+                i32.bwrite(f, blockOffset)
                 # size
-                Int32.bwrite(f, 0)
+                i32.bwrite(f, 0)
                 # creation date
                 BTSDate.bwrite(f, date)
                 # last modification date
@@ -468,7 +473,7 @@ class Tdf:
                 # last access date
                 BTSDate.bwrite(f, date)
                 # reserved
-                Int32.bpad(f, 1)
+                i32.bpad(f, 1)
                 # comment
                 BTSString.bwrite(f, 256, "Generated by basicTDF")
 
@@ -493,6 +498,12 @@ class Tdf:
     def nBytes(self) -> int:
         """Return the size of the TDF file in bytes"""
         return self.filePath.stat().st_size
+
+    def __len__(self) -> int:
+        """Return the number of blocks in the TDF file
+        that are not of type unusedSlot
+        """
+        return sum(1 for i in self.entries if i.type != BlockType.unusedSlot)
 
     @provide_context_if_needed
     def __repr__(self) -> str:

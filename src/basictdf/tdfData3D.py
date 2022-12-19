@@ -7,12 +7,12 @@ from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfTypes import (
     BTSString,
-    Int32,
-    Uint32,
+    i32,
+    u32,
     Volume,
     VEC3F,
-    Matrix,
-    Float32,
+    MAT3X3F,
+    f32,
     TdfType,
 )
 import numpy as np
@@ -110,8 +110,8 @@ class MarkerTrack:
         trackData[:] = np.NaN
 
         label = BTSString.bread(stream, 256)
-        nSegments = Int32.bread(stream)
-        Int32.skip(stream)
+        nSegments = i32.bread(stream)
+        i32.skip(stream)
         segmentData = SegmentData.bread(stream, nSegments)
         for startFrame, nFrames in segmentData:
             dat = TrackType.bread(stream, nFrames)
@@ -126,16 +126,16 @@ class MarkerTrack:
         segments = self._segments
 
         # nSegments
-        Int32.bwrite(file, len(segments))
+        i32.bwrite(file, len(segments))
 
         # padding
-        Int32.bpad(file, 1)
+        i32.bpad(file, 1)
 
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, np.array(segment.start))
+            i32.bwrite(file, np.array(segment.start))
             # nFrames
-            Int32.bwrite(file, np.array(segment.stop - segment.start))
+            i32.bwrite(file, np.array(segment.stop - segment.start))
 
         for segment in segments:
 
@@ -198,10 +198,10 @@ class Data3D(Block):
 
         if not (
             isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == Matrix.btype.shape
+            and rotationMatrix.shape == MAT3X3F.btype.shape
         ):
             raise ValueError(
-                f"rotationMatrix must be a numpy array of shape {Matrix.btype.shape}"
+                f"rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}"
             )
         self.rotationMatrix = rotationMatrix
 
@@ -270,14 +270,14 @@ class Data3D(Block):
     @staticmethod
     def _build(stream, format) -> "Data3D":
         format = Data3dBlockFormat(format)
-        nFrames = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nTracks = Uint32.bread(stream)
+        nFrames = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nTracks = u32.bread(stream)
         volume = Volume.bread(stream)
-        rotationMatrix = Matrix.bread(stream)
+        rotationMatrix = MAT3X3F.bread(stream)
         translationVector = VEC3F.bread(stream)
-        flag = Flags(Uint32.bread(stream))
+        flag = Flags(u32.bread(stream))
 
         d = Data3D(
             frequency,
@@ -291,8 +291,8 @@ class Data3D(Block):
         )
 
         if format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
-            nLinks = Int32.bread(stream)
-            Int32.skip(stream, 1)
+            nLinks = i32.bread(stream)
+            i32.skip(stream, 1)
             d.links = LinkType.bread(stream, nLinks)
 
         if format in [
@@ -354,22 +354,22 @@ class Data3D(Block):
             )
 
         # nFrames
-        Int32.bwrite(file, self.nFrames)
+        i32.bwrite(file, self.nFrames)
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, len(self._tracks))
+        u32.bwrite(file, len(self._tracks))
 
         # volume
         Volume.bwrite(file, self.volume)
         # rotationMatrix
-        Matrix.bwrite(file, self.rotationMatrix)
+        MAT3X3F.bwrite(file, self.rotationMatrix)
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
         # flags
-        Uint32.bwrite(file, self.flag.value)
+        u32.bwrite(file, self.flag.value)
 
         if self.format in [
             Data3dBlockFormat.byFrame,
@@ -380,9 +380,9 @@ class Data3D(Block):
             nLinks = len(links)
 
             # nLinks
-            Int32.bwrite(file, nLinks)
+            i32.bwrite(file, nLinks)
             # padding
-            Int32.bpad(file)
+            i32.bpad(file)
             # links
             LinkType.bwrite(file, links)
 
@@ -397,7 +397,7 @@ class Data3D(Block):
             + 4  # startTime
             + 4  # nTracks
             + Volume.btype.itemsize  # volume
-            + Matrix.btype.itemsize  # rotationMatrix
+            + MAT3X3F.btype.itemsize  # rotationMatrix
             + VEC3F.btype.itemsize  # translationVector
             + 4  # flags
         )

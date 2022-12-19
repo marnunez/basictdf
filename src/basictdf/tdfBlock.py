@@ -79,10 +79,6 @@ class NotImplementedBlock(Block):
         )
 
 
-class CalibrationData(NotImplementedBlock):
-    type = BlockType.calibrationData
-
-
 class CalibrationData2D(NotImplementedBlock):
     type = BlockType.calibrationData2D
 

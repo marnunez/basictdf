@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import numpy as np
 from basictdf.tdfEMG import EMGTrack, EMG
-from basictdf.tdfTypes import Float32
+from basictdf.tdfTypes import f32
 
 
 class TestEMGTrack(TestCase):
@@ -31,7 +31,7 @@ class TestEMGTrack(TestCase):
         # nFrames
         b += b"\x0B\x00\x00\x00"
         # data
-        b += Float32.write(data)
+        b += f32.write(data)
         c = BytesIO(b)
         a = EMGTrack.build(c, 11)
         self.assertEqual(a.label, "Right Rectus Femoris")
@@ -61,7 +61,7 @@ class TestEMGTrack(TestCase):
         # nFrames
         b += b"\x0B\x00\x00\x00"
         # data
-        b += Float32.write(data)
+        b += f32.write(data)
         i = BytesIO(b)
         other = BytesIO()
         a.write(other)
@@ -129,64 +129,3 @@ class TestEMG(TestCase):
         a.addSignal(t2)
         self.assertEqual(a._signals, [t1, t2])
         self.assertEqual(a._emgMap, [5, 6])
-
-
-# class TestData3D(TestCase):
-#     def test_creation(self):
-#         t = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
-
-#         a = Data3D(
-#             frequency=100,
-#             nFrames=2,
-#             volume=np.array([1, 2, 3]),
-#             translationVector=np.array([1, 2, 3]),
-#             rotationMatrix=np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
-#         )
-#         self.assertEqual(a.format, Data3dBlockFormat.byTrack)
-#         self.assertEqual(a.nFrames, 2)
-#         self.assertEqual(a.nTracks, 0)
-
-#         # different nFrames
-#         t2 = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
-#         with self.assertRaises(ValueError):
-#             a.add_track(t2)
-
-#         with self.assertRaises(TypeError):
-#             a.add_track([])
-
-#         a.add_track(t)
-
-#         self.assertEqual(a.nTracks, 1)
-#         self.assertEqual(a.tracks, [t])
-
-#         a.tracks = []
-#         self.assertEqual(a.nTracks, 0)
-#         a.tracks = [t, t]
-#         self.assertEqual(a.nTracks, 2)
-
-#     def test_build(self):
-#         t = MarkerTrack("marker", np.array([[1, 2, 3], [4, 5, 6]]))
-#         t2 = MarkerTrack("marker2", np.array([[4, 5, 6], [7, 8, 9]]))
-
-#         dataBlock1 = Data3D(
-#             frequency=100,
-#             nFrames=2,
-#             volume=np.array([1, 2, 3]),
-#             translationVector=np.array([1, 2, 3]),
-#             rotationMatrix=np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
-#         )
-
-#         dataBlock1.tracks = [t, t2]
-
-#         buff1 = BytesIO()
-#         dataBlock1.write(buff1)
-#         buff1.seek(0, 0)
-#         dataBlock2 = Data3D.build(
-#             buff1,
-#             Data3dBlockFormat.byTrack,
-#         )
-#         buff2 = BytesIO()
-#         dataBlock2.write(buff2)
-#         self.assertEqual(dataBlock2.format, Data3dBlockFormat.byTrack)
-#         self.assertEqual(dataBlock1, dataBlock2)
-#         self.assertEqual(buff1.getvalue(), buff2.getvalue())

@@ -5,59 +5,8 @@ from enum import Enum
 from io import BytesIO
 from typing import BinaryIO, Iterator, List, Union
 from basictdf.tdfBlock import Block, BlockType
-from basictdf.tdfTypes import BTSString, Int32, Int16, VEC2I, TdfType
+from basictdf.tdfTypes import BTSString, i32, CameraViewPort
 import numpy as np
-
-
-class CameraViewPort:
-    def __init__(self, origin, size) -> None:
-        if isinstance(origin, np.ndarray) and origin.shape != VEC2I.btype.shape:
-            raise TypeError(
-                f"origin must be a {VEC2I.btype.shape} if it is a numpy array"
-            )
-        elif isinstance(origin, list) or isinstance(origin, tuple) and len(origin) != 2:
-            raise TypeError(f"origin must be of length == 2 if it is a list or tuple")
-
-        if isinstance(size, np.ndarray) and size.shape != VEC2I.btype.shape:
-            raise TypeError(
-                f"size must be a {VEC2I.btype.shape} if it is a numpy array"
-            )
-        elif isinstance(size, list) or isinstance(size, tuple) and len(size) != 2:
-            raise TypeError(f"size must be of length == 2 if it is a list or tuple")
-
-        self.origin = origin
-        self.size = size
-
-    @staticmethod
-    def bread(stream) -> "CameraViewPort":
-        origin = VEC2I.bread(stream)
-        size = VEC2I.bread(stream)
-        return CameraViewPort(origin, size)
-
-    @staticmethod
-    def read(data: bytes) -> "CameraViewPort":
-        origin = VEC2I.read(data[:8])
-        size = VEC2I.read(data[8:])
-        return CameraViewPort(origin, size)
-
-    def write(self) -> bytes:
-        return VEC2I.write(self.origin) + VEC2I.write(self.size)
-
-    def bwrite(self, stream: BinaryIO) -> None:
-        VEC2I.bwrite(stream, self.origin)
-        VEC2I.bwrite(stream, self.size)
-
-    @property
-    def nBytes(self) -> int:
-        return 8 + 8
-
-    def __repr__(self) -> str:
-        return f"CameraViewPort(origin={self.origin}, size={self.size})"
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, CameraViewPort):
-            raise TypeError(f"Can only compare CameraViewPort with CameraViewPort")
-        return np.all(self.origin == other.origin) and np.all(self.size == other.size)
 
 
 class OpticalChannelData:
@@ -99,8 +48,8 @@ class OpticalChannelData:
 
     @staticmethod
     def _build(stream) -> "OpticalChannelData":
-        logical_index = Int32.bread(stream)
-        Int32.skip(stream)  # reserved0
+        logical_index = i32.bread(stream)
+        i32.skip(stream)  # reserved0
         lens_name = BTSString.bread(stream, 32)
         camera_type = BTSString.bread(stream, 32)
         camera_name = BTSString.bread(stream, 32)
@@ -116,10 +65,10 @@ class OpticalChannelData:
     def _write(self, file) -> None:
 
         # logical camera index
-        Int32.bwrite(file, self.logical_camera_index)
+        i32.bwrite(file, self.logical_camera_index)
 
         # Reserved 0
-        Int32.bpad(file, 1)
+        i32.bpad(file, 1)
 
         # lens name
         BTSString.bwrite(file, 32, self.lens_name)
@@ -183,8 +132,8 @@ class OpticalSetupBlock(Block):
     @staticmethod
     def _build(stream, format) -> "OpticalSetupBlock":
         format = OpticalSetupBlockFormat(format)
-        nChannels = Int32.bread(stream)
-        Int32.skip(stream)  # reserved0
+        nChannels = i32.bread(stream)
+        i32.skip(stream)  # reserved0
 
         channels = [OpticalChannelData._build(stream) for _ in range(nChannels)]
         return OpticalSetupBlock(format=format, channels=channels)
@@ -219,10 +168,10 @@ class OpticalSetupBlock(Block):
     def _write(self, file: BinaryIO) -> None:
 
         # nChannels
-        Int32.bwrite(file, len(self.channels))
+        i32.bwrite(file, len(self.channels))
 
         # Reserved 0
-        Int32.bpad(file, 1)
+        i32.bpad(file, 1)
 
         # channels
         for channel in self.channels:

@@ -7,13 +7,13 @@ from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfData3D import TrackType
 from basictdf.tdfTypes import (
-    Int32,
-    Float32,
+    i32,
+    f32,
     BTSString,
     BTSDate,
-    Uint32,
+    u32,
     VEC3F,
-    Matrix,
+    MAT3X3F,
     Volume,
     TdfType,
 )
@@ -76,9 +76,9 @@ class ForceTorqueTrack:
         # label
         label = BTSString.bread(stream, 256)
         # nSegments
-        nSegments = Int32.bread(stream)
+        nSegments = i32.bread(stream)
         # padding
-        Int32.skip(stream)
+        i32.skip(stream)
 
         segmentData = SegmentData.bread(stream, nSegments)
 
@@ -117,17 +117,17 @@ class ForceTorqueTrack:
         nSegments = len(segments)
 
         # nSegments
-        Int32.bwrite(file, nSegments)
+        i32.bwrite(file, nSegments)
 
         # padding
-        Int32.bpad(file)
+        i32.bpad(file)
 
         # segmentData
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, segment.start)
+            i32.bwrite(file, segment.start)
             # nFrames
-            Int32.bwrite(file, segment.stop - segment.start)
+            i32.bwrite(file, segment.stop - segment.start)
 
         for segment in segments:
             # applicationPoint
@@ -177,10 +177,10 @@ class ForceTorque3D(Block):
 
         if not (
             isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == Matrix.btype.shape
+            and rotationMatrix.shape == MAT3X3F.btype.shape
         ):
             raise ValueError(
-                f"rotationMatrix must be a numpy array of shape {Matrix.btype.shape}"
+                f"rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}"
             )
         self.rotationMatrix = rotationMatrix
 
@@ -205,15 +205,15 @@ class ForceTorque3D(Block):
     @staticmethod
     def _build(stream, format) -> "ForceTorque3D":
         format = ForceTorque3DBlockFormat(format)
-        nTracks = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nFrames = Uint32.bread(stream)
+        nTracks = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nFrames = u32.bread(stream)
         volume = Volume.bread(stream)
-        rotationMatrix = Matrix.bread(stream)
+        rotationMatrix = MAT3X3F.bread(stream)
         translationVector = VEC3F.bread(stream)
 
-        Int32.skip(stream)
+        i32.skip(stream)
         f = ForceTorque3D(
             frequency,
             nFrames,
@@ -312,7 +312,7 @@ class ForceTorque3D(Block):
             + 4
             + 4
             + Volume.btype.itemsize
-            + Matrix.btype.itemsize
+            + MAT3X3F.btype.itemsize
             + VEC3F.btype.itemsize
             + 4
         )
@@ -326,24 +326,24 @@ class ForceTorque3D(Block):
                 f"Force3D format {self.format} not implemented yet"
             )
         # nFrames
-        Int32.bwrite(file, self.nFrames)
+        i32.bwrite(file, self.nFrames)
 
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, len(self._tracks))
+        u32.bwrite(file, len(self._tracks))
 
         # volume
         Volume.bwrite(file, self.volume)
         # rotationMatrix
-        Matrix.bwrite(file, self.rotationMatrix)
+        MAT3X3F.bwrite(file, self.rotationMatrix)
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
 
         # padding
-        Int32.bpad(file)
+        i32.bpad(file)
 
         for track in self._tracks:
             track._write(file)

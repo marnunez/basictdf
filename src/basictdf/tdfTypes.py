@@ -140,16 +140,74 @@ class TdfType(Generic[X]):
     def bpad(self, file: IO[bytes], n: int = 1) -> None:
         file.write(self.pad(n))
 
+    def nBytes(self, n: int = 1) -> int:
+        return n * self.btype.itemsize
+
 
 Volume = TdfType(np.dtype("3<f4"))
 
 VEC3F = TdfType(np.dtype("3<f4"))
+VEC3D = TdfType(np.dtype("3<f8"))
+
 VEC2I = TdfType(np.dtype("2<i4"))
+VEC2D = TdfType(np.dtype("2<f8"))
 
-Matrix = TdfType(np.dtype("(3,3)<f4"))
+MAT3X3F = TdfType(np.dtype("(3,3)<f4"))
+MAT3X3D = TdfType(np.dtype("(3,3)<f8"))
+
+i32 = TdfType(np.dtype("<i4"))
+i16 = TdfType(np.dtype("<i2"))
+u32 = TdfType(np.dtype("<u4"))
+f32 = TdfType(np.dtype("<f4"))
+f64 = TdfType(np.dtype("<f8"))
 
 
-Int32 = TdfType(np.dtype("<i4"))
-Int16 = TdfType(np.dtype("<i2"))
-Uint32 = TdfType(np.dtype("<u4"))
-Float32 = TdfType(np.dtype("<f4"))
+class CameraViewPort:
+    def __init__(self, origin, size) -> None:
+        if isinstance(origin, np.ndarray) and origin.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f"origin must be a {VEC2I.btype.shape} if it is a numpy array"
+            )
+        elif isinstance(origin, list) or isinstance(origin, tuple) and len(origin) != 2:
+            raise TypeError(f"origin must be of length 2 if it is a list or tuple")
+
+        if isinstance(size, np.ndarray) and size.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f"size must be a {VEC2I.btype.shape} if it is a numpy array"
+            )
+        elif isinstance(size, list) or isinstance(size, tuple) and len(size) != 2:
+            raise TypeError(f"size must be of length 2 if it is a list or tuple")
+
+        self.origin = origin
+        self.size = size
+
+    @staticmethod
+    def bread(stream) -> "CameraViewPort":
+        origin = VEC2I.bread(stream)
+        size = VEC2I.bread(stream)
+        return CameraViewPort(origin, size)
+
+    @staticmethod
+    def read(data: bytes) -> "CameraViewPort":
+        origin = VEC2I.read(data[:8])
+        size = VEC2I.read(data[8:])
+        return CameraViewPort(origin, size)
+
+    def write(self) -> bytes:
+        return VEC2I.write(self.origin) + VEC2I.write(self.size)
+
+    def bwrite(self, stream: BinaryIO) -> None:
+        VEC2I.bwrite(stream, self.origin)
+        VEC2I.bwrite(stream, self.size)
+
+    @property
+    def nBytes(self) -> int:
+        return 8 + 8
+
+    def __repr__(self) -> str:
+        return f"CameraViewPort(origin={self.origin}, size={self.size})"
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, CameraViewPort):
+            raise TypeError(f"Can only compare CameraViewPort with CameraViewPort")
+        return np.all(self.origin == other.origin) and np.all(self.size == other.size)

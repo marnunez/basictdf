@@ -3,7 +3,9 @@ from io import BytesIO
 from pathlib import Path
 from unittest import TestCase
 
-from basictdf.basictdf import TdfEntry, Tdf
+import numpy as np
+
+from basictdf.basictdf import Tdf, TdfEntry
 from basictdf.tdfBlock import BlockType
 from basictdf.tdfEvents import (
     Event,
@@ -11,9 +13,9 @@ from basictdf.tdfEvents import (
     TemporalEventsData,
     TemporalEventsDataFormat,
 )
-from basictdf.tdfTypes import BTSDate, BTSString, Int32, Uint32
-import numpy as np
+from basictdf.tdfTypes import BTSDate, BTSString, i32, u32
 from basictdf.tdfUtils import OutsideOfContextError
+from tests import test_file_feeder
 
 
 class TestEntry(TestCase):
@@ -42,13 +44,13 @@ class TestEntry(TestCase):
         date = datetime(2020, 1, 1, 1, 1)
         b = BytesIO()
         # type
-        Uint32.bwrite(b, BlockType.temporalEventsData.value)
+        u32.bwrite(b, BlockType.temporalEventsData.value)
         # format
-        Uint32.bwrite(b, 1)
+        u32.bwrite(b, 1)
         # offset
-        Int32.bwrite(b, 16)
+        i32.bwrite(b, 16)
         # size
-        Int32.bwrite(b, 45)
+        i32.bwrite(b, 45)
         # creation_date
         BTSDate.bwrite(b, date)
         # last_modification_date
@@ -56,7 +58,7 @@ class TestEntry(TestCase):
         # last_access_date
         BTSDate.bwrite(b, date)
         # padd
-        Int32.bpad(b)
+        i32.bpad(b)
         # comment
         BTSString.bwrite(b, 256, "comment")
         b.seek(0, 0)
@@ -251,8 +253,9 @@ class TestTdf(TestCase):
 
 class TestRealTdf(TestCase):
     def test_read(self) -> None:
-        file = Path("tests/test_files/2241_aa_Walking 01.tdf")
-        tdf_file = Tdf(file)
-        with tdf_file as tdf:
-            self.assertEqual(tdf.nBytes, file.stat().st_size)
-            self.assertEqual(len(tdf.entries), 14)
+        for file, metadata in test_file_feeder():
+            tdf_file = Tdf(file)
+            with tdf_file as tdf:
+                self.assertEqual(tdf.nBytes, file.stat().st_size)
+                self.assertEqual(len(tdf.entries), 14)
+                self.assertEqual(len(tdf), 8)
