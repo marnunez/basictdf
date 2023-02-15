@@ -26,17 +26,15 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from dataclasses import dataclass
-from datetime import datetime
+<pre><code class="python">from datetime import datetime
 from pathlib import Path
-from typing import IO, Optional, Type, Union
+from typing import IO, List, Optional, Type, Union
 
 from basictdf.tdfBlock import (
     AnalogData,
     AnthropometricData,
     Block,
     BlockType,
-    CalibrationData,
     CalibrationData2D,
     Data2D,
     ForcePlatformsCalibrationData,
@@ -44,15 +42,16 @@ from basictdf.tdfBlock import (
     ForcePlatformsData,
     GeneralCalibrationData,
     NotDefinedBlock,
-    OpticalSystemConfiguration,
     UnusedBlock,
     VolumetricData,
 )
+from basictdf.tdfCalibrationData import CalibrationDataBlock
 from basictdf.tdfData3D import Data3D
 from basictdf.tdfEMG import EMG
 from basictdf.tdfEvents import TemporalEventsData
 from basictdf.tdfForce3D import ForceTorque3D
-from basictdf.tdfTypes import BTSDate, BTSString, Int32, Uint32
+from basictdf.tdfOpticalSystem import OpticalSetupBlock
+from basictdf.tdfTypes import BTSDate, BTSString, i32, u32
 from basictdf.tdfUtils import (
     raise_if_outside_context,
     provide_context_if_needed,
@@ -66,7 +65,7 @@ def _get_block_class(block_type: BlockType) -&gt; Type[Block]:
     elif block_type == BlockType.notDefined:
         return NotDefinedBlock
     elif block_type == BlockType.calibrationData:
-        return CalibrationData
+        return CalibrationDataBlock
     elif block_type == BlockType.calibrationData2D:
         return CalibrationData2D
     elif block_type == BlockType.data2D:
@@ -74,7 +73,7 @@ def _get_block_class(block_type: BlockType) -&gt; Type[Block]:
     elif block_type == BlockType.data3D:
         return Data3D
     elif block_type == BlockType.opticalSystemConfiguration:
-        return OpticalSystemConfiguration
+        return OpticalSetupBlock
     elif block_type == BlockType.forcePlatformsCalibrationData:
         return ForcePlatformsCalibrationData
     elif block_type == BlockType.forcePlatformsCalibrationData2D:
@@ -124,26 +123,26 @@ class TdfEntry:
         self.nBytes = 8 * 4 + 256
 
     def _write(self, file):
-        Uint32.bwrite(file, self.type.value)
-        Uint32.bwrite(file, self.format)
-        Int32.bwrite(file, self.offset)
-        Int32.bwrite(file, self.size)
+        u32.bwrite(file, self.type.value)
+        u32.bwrite(file, self.format)
+        i32.bwrite(file, self.offset)
+        i32.bwrite(file, self.size)
         BTSDate.bwrite(file, self.creation_date)
         BTSDate.bwrite(file, self.last_modification_date)
         BTSDate.bwrite(file, self.last_access_date)
-        Int32.bpad(file)
+        i32.bpad(file)
         BTSString.bwrite(file, 256, self.comment)
 
     @staticmethod
-    def _build(file):
-        type_ = BlockType(Uint32.bread(file))
-        format = Uint32.bread(file)
-        offset = Int32.bread(file)
-        size = Int32.bread(file)
+    def _build(file) -&gt; &#34;TdfEntry&#34;:
+        type_ = BlockType(u32.bread(file))
+        format = u32.bread(file)
+        offset = i32.bread(file)
+        size = i32.bread(file)
         creation_date = BTSDate.bread(file)
         last_modification_date = BTSDate.bread(file)
         last_access_date = BTSDate.bread(file)
-        Int32.skip(file)
+        i32.skip(file)
         comment = BTSString.bread(file, 256)
         return TdfEntry(
             type_,
@@ -155,6 +154,9 @@ class TdfEntry:
             last_access_date,
             comment,
         )
+
+    def __repr__(self) -&gt; str:
+        return f&#34;TdfEntry({self.type}, {self.format}, {self.offset}, {self.size}, {self.creation_date}, {self.last_modification_date}, {self.last_access_date}, {self.comment})&#34;
 
 
 class Tdf:
@@ -184,18 +186,18 @@ class Tdf:
         if self.signature != self.SIGNATURE:
             raise Exception(&#34;Invalid TDF file&#34;)
 
-        self.version = Uint32.bread(self.handler)
-        self.nEntries = Int32.bread(self.handler)
+        self.version = u32.bread(self.handler)
+        self.nEntries = i32.bread(self.handler)
 
         # pad 8 bytes
-        Int32.skip(self.handler, 2)
+        i32.skip(self.handler, 2)
 
         self.creation_date = BTSDate.bread(self.handler)
         self.last_modification_date = BTSDate.bread(self.handler)
         self.last_access_date = BTSDate.bread(self.handler)
 
         # pad 20 bytes
-        Int32.skip(self.handler, 5)
+        i32.skip(self.handler, 5)
 
         self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
 
@@ -206,15 +208,38 @@ class Tdf:
         self._mode = &#34;rb&#34;
         self.handler.close()
 
-    @raise_if_outside_context
-    def get_block(self, type: BlockType) -&gt; Optional[Type[Block]]:
+    @property
+    @provide_context_if_needed
+    def blocks(self) -&gt; List[Block]:
+        &#34;&#34;&#34;Get all blocks in the file.&#34;&#34;&#34;
+        return [self.get_block(entry.type) for entry in self.entries]
+
+    @provide_context_if_needed
+    def get_block(self, index_or_type: Union[BlockType, int]) -&gt; Optional[Type[Block]]:
         &#34;&#34;&#34;Get a block from the TDF file.&#34;&#34;&#34;
-        for entry in self.entries:
-            if entry.type == type:
-                self.handler.seek(entry.offset, 0)
-                block_class = _get_block_class(entry.type)
-                return block_class._build(self.handler, entry.format)
-        return None
+
+        if isinstance(index_or_type, int):
+            if 0 &lt;= index_or_type &lt; len(self.entries):
+                entry = self.entries[index_or_type]
+            else:
+                raise IndexError(f&#34;Index {index_or_type} out of range&#34;)
+
+        elif isinstance(index_or_type, BlockType):
+            entry = next((e for e in self.entries if e.type == index_or_type), None)
+            if entry is None:
+                raise Exception(f&#34;Block {index_or_type} not found&#34;)
+
+        else:
+            raise TypeError(f&#34;Expected int or BlockType, got {type(index_or_type)}&#34;)
+
+        self.handler.seek(entry.offset, 0)
+        block_class = _get_block_class(entry.type)
+        return block_class._build(self.handler, entry.format)
+
+    def __getitem__(
+        self, index_or_type: Union[BlockType, int]
+    ) -&gt; Optional[Type[Block]]:
+        return self.get_block(index_or_type)
 
     @property
     @provide_context_if_needed
@@ -273,7 +298,7 @@ class Tdf:
     @provide_context_if_needed
     def emg(self) -&gt; Optional[EMG]:
         &#34;&#34;&#34;Convenience property to get/set the EMG data block.&#34;&#34;&#34;
-        return self.get_block(BlockType.electromyographicData)
+        return self.get_block(EMG.type)
 
     @emg.setter
     @raise_if_outside_write_context
@@ -287,6 +312,12 @@ class Tdf:
         return any(
             entry.type == BlockType.electromyographicData for entry in self.entries
         )
+
+    @property
+    @provide_context_if_needed
+    def calibrationData(self) -&gt; Optional[CalibrationDataBlock]:
+        &#34;&#34;&#34;Convenience property to get/set the calibration data block.&#34;&#34;&#34;
+        return self.get_block(CalibrationDataBlock.type)
 
     @raise_if_outside_write_context
     def add_block(
@@ -309,10 +340,13 @@ class Tdf:
                 &#34;Can&#39;t add blocks, this file was opened in read-only mode&#34;
             )
 
-        if self.get_block(newBlock.type):
-            raise ValueError(
-                f&#34;There&#39;s already a block of this type {newBlock.type}. Remove it first&#34;
-            )
+        try:
+            if self.get_block(newBlock.type):
+                raise ValueError(
+                    f&#34;There&#39;s already a block of this type {newBlock.type}. Remove it first&#34;
+                )
+        except Exception:
+            pass
 
         # find first unused slot
         try:
@@ -431,11 +465,11 @@ class Tdf:
             # signature
             f.write(Tdf.SIGNATURE)
             # version
-            Int32.bwrite(f, 1)
+            i32.bwrite(f, 1)
             # nEntries
-            Int32.bwrite(f, nEntries)
+            i32.bwrite(f, nEntries)
             # reserved
-            Int32.bpad(f, 2)
+            i32.bpad(f, 2)
             # creation date
             BTSDate.bwrite(f, date)
             # last modification date
@@ -443,7 +477,7 @@ class Tdf:
             # last access date
             BTSDate.bwrite(f, date)
             # reserved
-            Int32.bpad(f, 5)
+            i32.bpad(f, 5)
 
             # start entries
             entryOffset = 64
@@ -453,13 +487,13 @@ class Tdf:
 
             for _ in range(nEntries):
                 # type
-                Uint32.bwrite(f, 0)
+                u32.bwrite(f, 0)
                 # format
-                Uint32.bwrite(f, 0)
+                u32.bwrite(f, 0)
                 # offset
-                Int32.bwrite(f, blockOffset)
+                i32.bwrite(f, blockOffset)
                 # size
-                Int32.bwrite(f, 0)
+                i32.bwrite(f, 0)
                 # creation date
                 BTSDate.bwrite(f, date)
                 # last modification date
@@ -467,7 +501,7 @@ class Tdf:
                 # last access date
                 BTSDate.bwrite(f, date)
                 # reserved
-                Int32.bpad(f, 1)
+                i32.bpad(f, 1)
                 # comment
                 BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
 
@@ -493,10 +527,15 @@ class Tdf:
         &#34;&#34;&#34;Return the size of the TDF file in bytes&#34;&#34;&#34;
         return self.filePath.stat().st_size
 
+    def __len__(self) -&gt; int:
+        &#34;&#34;&#34;Return the number of blocks in the TDF file
+        that are not of type unusedSlot
+        &#34;&#34;&#34;
+        return sum(1 for i in self.entries if i.type != BlockType.unusedSlot)
+
+    @provide_context_if_needed
     def __repr__(self) -&gt; str:
-        if self._inside_context:
-            return f&#34;Tdf({self.filePath}, mode={self._mode}), nEntries={self.nEntries}, nBytes={self.nBytes}&#34;
-        return f&#34;Tdf({self.filePath}, mode={self._mode})&#34;</code></pre>
+        return f&#34;Tdf({self.filePath}, nEntries={self.nEntries}, nBytes={self.nBytes}&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -545,18 +584,18 @@ class Tdf:
         if self.signature != self.SIGNATURE:
             raise Exception(&#34;Invalid TDF file&#34;)
 
-        self.version = Uint32.bread(self.handler)
-        self.nEntries = Int32.bread(self.handler)
+        self.version = u32.bread(self.handler)
+        self.nEntries = i32.bread(self.handler)
 
         # pad 8 bytes
-        Int32.skip(self.handler, 2)
+        i32.skip(self.handler, 2)
 
         self.creation_date = BTSDate.bread(self.handler)
         self.last_modification_date = BTSDate.bread(self.handler)
         self.last_access_date = BTSDate.bread(self.handler)
 
         # pad 20 bytes
-        Int32.skip(self.handler, 5)
+        i32.skip(self.handler, 5)
 
         self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
 
@@ -567,15 +606,38 @@ class Tdf:
         self._mode = &#34;rb&#34;
         self.handler.close()
 
-    @raise_if_outside_context
-    def get_block(self, type: BlockType) -&gt; Optional[Type[Block]]:
+    @property
+    @provide_context_if_needed
+    def blocks(self) -&gt; List[Block]:
+        &#34;&#34;&#34;Get all blocks in the file.&#34;&#34;&#34;
+        return [self.get_block(entry.type) for entry in self.entries]
+
+    @provide_context_if_needed
+    def get_block(self, index_or_type: Union[BlockType, int]) -&gt; Optional[Type[Block]]:
         &#34;&#34;&#34;Get a block from the TDF file.&#34;&#34;&#34;
-        for entry in self.entries:
-            if entry.type == type:
-                self.handler.seek(entry.offset, 0)
-                block_class = _get_block_class(entry.type)
-                return block_class._build(self.handler, entry.format)
-        return None
+
+        if isinstance(index_or_type, int):
+            if 0 &lt;= index_or_type &lt; len(self.entries):
+                entry = self.entries[index_or_type]
+            else:
+                raise IndexError(f&#34;Index {index_or_type} out of range&#34;)
+
+        elif isinstance(index_or_type, BlockType):
+            entry = next((e for e in self.entries if e.type == index_or_type), None)
+            if entry is None:
+                raise Exception(f&#34;Block {index_or_type} not found&#34;)
+
+        else:
+            raise TypeError(f&#34;Expected int or BlockType, got {type(index_or_type)}&#34;)
+
+        self.handler.seek(entry.offset, 0)
+        block_class = _get_block_class(entry.type)
+        return block_class._build(self.handler, entry.format)
+
+    def __getitem__(
+        self, index_or_type: Union[BlockType, int]
+    ) -&gt; Optional[Type[Block]]:
+        return self.get_block(index_or_type)
 
     @property
     @provide_context_if_needed
@@ -634,7 +696,7 @@ class Tdf:
     @provide_context_if_needed
     def emg(self) -&gt; Optional[EMG]:
         &#34;&#34;&#34;Convenience property to get/set the EMG data block.&#34;&#34;&#34;
-        return self.get_block(BlockType.electromyographicData)
+        return self.get_block(EMG.type)
 
     @emg.setter
     @raise_if_outside_write_context
@@ -648,6 +710,12 @@ class Tdf:
         return any(
             entry.type == BlockType.electromyographicData for entry in self.entries
         )
+
+    @property
+    @provide_context_if_needed
+    def calibrationData(self) -&gt; Optional[CalibrationDataBlock]:
+        &#34;&#34;&#34;Convenience property to get/set the calibration data block.&#34;&#34;&#34;
+        return self.get_block(CalibrationDataBlock.type)
 
     @raise_if_outside_write_context
     def add_block(
@@ -670,10 +738,13 @@ class Tdf:
                 &#34;Can&#39;t add blocks, this file was opened in read-only mode&#34;
             )
 
-        if self.get_block(newBlock.type):
-            raise ValueError(
-                f&#34;There&#39;s already a block of this type {newBlock.type}. Remove it first&#34;
-            )
+        try:
+            if self.get_block(newBlock.type):
+                raise ValueError(
+                    f&#34;There&#39;s already a block of this type {newBlock.type}. Remove it first&#34;
+                )
+        except Exception:
+            pass
 
         # find first unused slot
         try:
@@ -792,11 +863,11 @@ class Tdf:
             # signature
             f.write(Tdf.SIGNATURE)
             # version
-            Int32.bwrite(f, 1)
+            i32.bwrite(f, 1)
             # nEntries
-            Int32.bwrite(f, nEntries)
+            i32.bwrite(f, nEntries)
             # reserved
-            Int32.bpad(f, 2)
+            i32.bpad(f, 2)
             # creation date
             BTSDate.bwrite(f, date)
             # last modification date
@@ -804,7 +875,7 @@ class Tdf:
             # last access date
             BTSDate.bwrite(f, date)
             # reserved
-            Int32.bpad(f, 5)
+            i32.bpad(f, 5)
 
             # start entries
             entryOffset = 64
@@ -814,13 +885,13 @@ class Tdf:
 
             for _ in range(nEntries):
                 # type
-                Uint32.bwrite(f, 0)
+                u32.bwrite(f, 0)
                 # format
-                Uint32.bwrite(f, 0)
+                u32.bwrite(f, 0)
                 # offset
-                Int32.bwrite(f, blockOffset)
+                i32.bwrite(f, blockOffset)
                 # size
-                Int32.bwrite(f, 0)
+                i32.bwrite(f, 0)
                 # creation date
                 BTSDate.bwrite(f, date)
                 # last modification date
@@ -828,7 +899,7 @@ class Tdf:
                 # last access date
                 BTSDate.bwrite(f, date)
                 # reserved
-                Int32.bpad(f, 1)
+                i32.bpad(f, 1)
                 # comment
                 BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
 
@@ -854,10 +925,15 @@ class Tdf:
         &#34;&#34;&#34;Return the size of the TDF file in bytes&#34;&#34;&#34;
         return self.filePath.stat().st_size
 
+    def __len__(self) -&gt; int:
+        &#34;&#34;&#34;Return the number of blocks in the TDF file
+        that are not of type unusedSlot
+        &#34;&#34;&#34;
+        return sum(1 for i in self.entries if i.type != BlockType.unusedSlot)
+
+    @provide_context_if_needed
     def __repr__(self) -&gt; str:
-        if self._inside_context:
-            return f&#34;Tdf({self.filePath}, mode={self._mode}), nEntries={self.nEntries}, nBytes={self.nBytes}&#34;
-        return f&#34;Tdf({self.filePath}, mode={self._mode})&#34;</code></pre>
+        return f&#34;Tdf({self.filePath}, nEntries={self.nEntries}, nBytes={self.nBytes}&#34;</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -890,11 +966,11 @@ def new(filename: str) -&gt; &#34;Tdf&#34;:
         # signature
         f.write(Tdf.SIGNATURE)
         # version
-        Int32.bwrite(f, 1)
+        i32.bwrite(f, 1)
         # nEntries
-        Int32.bwrite(f, nEntries)
+        i32.bwrite(f, nEntries)
         # reserved
-        Int32.bpad(f, 2)
+        i32.bpad(f, 2)
         # creation date
         BTSDate.bwrite(f, date)
         # last modification date
@@ -902,7 +978,7 @@ def new(filename: str) -&gt; &#34;Tdf&#34;:
         # last access date
         BTSDate.bwrite(f, date)
         # reserved
-        Int32.bpad(f, 5)
+        i32.bpad(f, 5)
 
         # start entries
         entryOffset = 64
@@ -912,13 +988,13 @@ def new(filename: str) -&gt; &#34;Tdf&#34;:
 
         for _ in range(nEntries):
             # type
-            Uint32.bwrite(f, 0)
+            u32.bwrite(f, 0)
             # format
-            Uint32.bwrite(f, 0)
+            u32.bwrite(f, 0)
             # offset
-            Int32.bwrite(f, blockOffset)
+            i32.bwrite(f, blockOffset)
             # size
-            Int32.bwrite(f, 0)
+            i32.bwrite(f, 0)
             # creation date
             BTSDate.bwrite(f, date)
             # last modification date
@@ -926,7 +1002,7 @@ def new(filename: str) -&gt; &#34;Tdf&#34;:
             # last access date
             BTSDate.bwrite(f, date)
             # reserved
-            Int32.bpad(f, 1)
+            i32.bpad(f, 1)
             # comment
             BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
 
@@ -936,6 +1012,34 @@ def new(filename: str) -&gt; &#34;Tdf&#34;:
 </dl>
 <h3>Instance variables</h3>
 <dl>
+<dt id="basictdf.basictdf.Tdf.blocks"><code class="name">var <span class="ident">blocks</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.basictdf.Tdf.calibrationData"><code class="name">var <span class="ident">calibrationData</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decorator(self, *args, **kwargs):
+    if not self._inside_context:
+        with self:
+            return method(self, *args, **kwargs)
+    return method(self, *args, **kwargs)</code></pre>
+</details>
+</dd>
 <dt id="basictdf.basictdf.Tdf.data3D"><code class="name">var <span class="ident">data3D</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -1107,9 +1211,8 @@ def nBytes(self) -&gt; int:
 </summary>
 <pre><code class="python">def decorator(self, *args, **kwargs):
     if not self._inside_context:
-        raise OutsideOfContextError(
-            &#34;This method should be called inside a context manager&#34;
-        )
+        with self:
+            return method(self, *args, **kwargs)
     return method(self, *args, **kwargs)</code></pre>
 </details>
 </dd>
@@ -1184,26 +1287,26 @@ def nBytes(self) -&gt; int:
         self.nBytes = 8 * 4 + 256
 
     def _write(self, file):
-        Uint32.bwrite(file, self.type.value)
-        Uint32.bwrite(file, self.format)
-        Int32.bwrite(file, self.offset)
-        Int32.bwrite(file, self.size)
+        u32.bwrite(file, self.type.value)
+        u32.bwrite(file, self.format)
+        i32.bwrite(file, self.offset)
+        i32.bwrite(file, self.size)
         BTSDate.bwrite(file, self.creation_date)
         BTSDate.bwrite(file, self.last_modification_date)
         BTSDate.bwrite(file, self.last_access_date)
-        Int32.bpad(file)
+        i32.bpad(file)
         BTSString.bwrite(file, 256, self.comment)
 
     @staticmethod
-    def _build(file):
-        type_ = BlockType(Uint32.bread(file))
-        format = Uint32.bread(file)
-        offset = Int32.bread(file)
-        size = Int32.bread(file)
+    def _build(file) -&gt; &#34;TdfEntry&#34;:
+        type_ = BlockType(u32.bread(file))
+        format = u32.bread(file)
+        offset = i32.bread(file)
+        size = i32.bread(file)
         creation_date = BTSDate.bread(file)
         last_modification_date = BTSDate.bread(file)
         last_access_date = BTSDate.bread(file)
-        Int32.skip(file)
+        i32.skip(file)
         comment = BTSString.bread(file, 256)
         return TdfEntry(
             type_,
@@ -1214,7 +1317,10 @@ def nBytes(self) -&gt; int:
             last_modification_date,
             last_access_date,
             comment,
-        )</code></pre>
+        )
+
+    def __repr__(self) -&gt; str:
+        return f&#34;TdfEntry({self.type}, {self.format}, {self.offset}, {self.size}, {self.creation_date}, {self.last_modification_date}, {self.last_access_date}, {self.comment})&#34;</code></pre>
 </details>
 </dd>
 </dl>
@@ -1239,6 +1345,8 @@ def nBytes(self) -&gt; int:
 <li><code><a title="basictdf.basictdf.Tdf.SIGNATURE" href="#basictdf.basictdf.Tdf.SIGNATURE">SIGNATURE</a></code></li>
 <li><code><a title="basictdf.basictdf.Tdf.add_block" href="#basictdf.basictdf.Tdf.add_block">add_block</a></code></li>
 <li><code><a title="basictdf.basictdf.Tdf.allow_write" href="#basictdf.basictdf.Tdf.allow_write">allow_write</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.blocks" href="#basictdf.basictdf.Tdf.blocks">blocks</a></code></li>
+<li><code><a title="basictdf.basictdf.Tdf.calibrationData" href="#basictdf.basictdf.Tdf.calibrationData">calibrationData</a></code></li>
 <li><code><a title="basictdf.basictdf.Tdf.data3D" href="#basictdf.basictdf.Tdf.data3D">data3D</a></code></li>
 <li><code><a title="basictdf.basictdf.Tdf.emg" href="#basictdf.basictdf.Tdf.emg">emg</a></code></li>
 <li><code><a title="basictdf.basictdf.Tdf.events" href="#basictdf.basictdf.Tdf.events">events</a></code></li>

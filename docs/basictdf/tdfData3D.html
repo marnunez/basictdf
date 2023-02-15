@@ -36,12 +36,12 @@ from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfTypes import (
     BTSString,
-    Int32,
-    Uint32,
+    i32,
+    u32,
     Volume,
     VEC3F,
-    Matrix,
-    Float32,
+    MAT3X3F,
+    f32,
     TdfType,
 )
 import numpy as np
@@ -139,8 +139,8 @@ class MarkerTrack:
         trackData[:] = np.NaN
 
         label = BTSString.bread(stream, 256)
-        nSegments = Int32.bread(stream)
-        Int32.skip(stream)
+        nSegments = i32.bread(stream)
+        i32.skip(stream)
         segmentData = SegmentData.bread(stream, nSegments)
         for startFrame, nFrames in segmentData:
             dat = TrackType.bread(stream, nFrames)
@@ -155,16 +155,16 @@ class MarkerTrack:
         segments = self._segments
 
         # nSegments
-        Int32.bwrite(file, len(segments))
+        i32.bwrite(file, len(segments))
 
         # padding
-        Int32.bpad(file, 1)
+        i32.bpad(file, 1)
 
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, np.array(segment.start))
+            i32.bwrite(file, np.array(segment.start))
             # nFrames
-            Int32.bwrite(file, np.array(segment.stop - segment.start))
+            i32.bwrite(file, np.array(segment.stop - segment.start))
 
         for segment in segments:
 
@@ -190,6 +190,8 @@ class MarkerTrack:
 
 
 class Data3D(Block):
+    type = BlockType.data3D
+
     def __init__(
         self,
         frequency: float,
@@ -218,17 +220,17 @@ class Data3D(Block):
             ValueError: the rotation matrix is not an array of 3x3 floats
             ValueError: the translation vector is not an array of 3 floats
         &#34;&#34;&#34;
-        super().__init__(BlockType.data3D)
+        super().__init__()
         self.format = format
         self.frequency = frequency
         self.startTime = startTime
 
         if not (
             isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == Matrix.btype.shape
+            and rotationMatrix.shape == MAT3X3F.btype.shape
         ):
             raise ValueError(
-                f&#34;rotationMatrix must be a numpy array of shape {Matrix.btype.shape}&#34;
+                f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
@@ -297,14 +299,14 @@ class Data3D(Block):
     @staticmethod
     def _build(stream, format) -&gt; &#34;Data3D&#34;:
         format = Data3dBlockFormat(format)
-        nFrames = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nTracks = Uint32.bread(stream)
+        nFrames = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nTracks = u32.bread(stream)
         volume = Volume.bread(stream)
-        rotationMatrix = Matrix.bread(stream)
+        rotationMatrix = MAT3X3F.bread(stream)
         translationVector = VEC3F.bread(stream)
-        flag = Flags(Uint32.bread(stream))
+        flag = Flags(u32.bread(stream))
 
         d = Data3D(
             frequency,
@@ -318,8 +320,8 @@ class Data3D(Block):
         )
 
         if format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
-            nLinks = Int32.bread(stream)
-            Int32.skip(stream, 1)
+            nLinks = i32.bread(stream)
+            i32.skip(stream, 1)
             d.links = LinkType.bread(stream, nLinks)
 
         if format in [
@@ -381,22 +383,22 @@ class Data3D(Block):
             )
 
         # nFrames
-        Int32.bwrite(file, self.nFrames)
+        i32.bwrite(file, self.nFrames)
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, len(self._tracks))
+        u32.bwrite(file, len(self._tracks))
 
         # volume
         Volume.bwrite(file, self.volume)
         # rotationMatrix
-        Matrix.bwrite(file, self.rotationMatrix)
+        MAT3X3F.bwrite(file, self.rotationMatrix)
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
         # flags
-        Uint32.bwrite(file, self.flag.value)
+        u32.bwrite(file, self.flag.value)
 
         if self.format in [
             Data3dBlockFormat.byFrame,
@@ -407,9 +409,9 @@ class Data3D(Block):
             nLinks = len(links)
 
             # nLinks
-            Int32.bwrite(file, nLinks)
+            i32.bwrite(file, nLinks)
             # padding
-            Int32.bpad(file)
+            i32.bpad(file)
             # links
             LinkType.bwrite(file, links)
 
@@ -424,7 +426,7 @@ class Data3D(Block):
             + 4  # startTime
             + 4  # nTracks
             + Volume.btype.itemsize  # volume
-            + Matrix.btype.itemsize  # rotationMatrix
+            + MAT3X3F.btype.itemsize  # rotationMatrix
             + VEC3F.btype.itemsize  # translationVector
             + 4  # flags
         )
@@ -500,6 +502,8 @@ inheritance.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Data3D(Block):
+    type = BlockType.data3D
+
     def __init__(
         self,
         frequency: float,
@@ -528,17 +532,17 @@ inheritance.</p>
             ValueError: the rotation matrix is not an array of 3x3 floats
             ValueError: the translation vector is not an array of 3 floats
         &#34;&#34;&#34;
-        super().__init__(BlockType.data3D)
+        super().__init__()
         self.format = format
         self.frequency = frequency
         self.startTime = startTime
 
         if not (
             isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == Matrix.btype.shape
+            and rotationMatrix.shape == MAT3X3F.btype.shape
         ):
             raise ValueError(
-                f&#34;rotationMatrix must be a numpy array of shape {Matrix.btype.shape}&#34;
+                f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
@@ -607,14 +611,14 @@ inheritance.</p>
     @staticmethod
     def _build(stream, format) -&gt; &#34;Data3D&#34;:
         format = Data3dBlockFormat(format)
-        nFrames = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nTracks = Uint32.bread(stream)
+        nFrames = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nTracks = u32.bread(stream)
         volume = Volume.bread(stream)
-        rotationMatrix = Matrix.bread(stream)
+        rotationMatrix = MAT3X3F.bread(stream)
         translationVector = VEC3F.bread(stream)
-        flag = Flags(Uint32.bread(stream))
+        flag = Flags(u32.bread(stream))
 
         d = Data3D(
             frequency,
@@ -628,8 +632,8 @@ inheritance.</p>
         )
 
         if format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
-            nLinks = Int32.bread(stream)
-            Int32.skip(stream, 1)
+            nLinks = i32.bread(stream)
+            i32.skip(stream, 1)
             d.links = LinkType.bread(stream, nLinks)
 
         if format in [
@@ -691,22 +695,22 @@ inheritance.</p>
             )
 
         # nFrames
-        Int32.bwrite(file, self.nFrames)
+        i32.bwrite(file, self.nFrames)
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, len(self._tracks))
+        u32.bwrite(file, len(self._tracks))
 
         # volume
         Volume.bwrite(file, self.volume)
         # rotationMatrix
-        Matrix.bwrite(file, self.rotationMatrix)
+        MAT3X3F.bwrite(file, self.rotationMatrix)
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
         # flags
-        Uint32.bwrite(file, self.flag.value)
+        u32.bwrite(file, self.flag.value)
 
         if self.format in [
             Data3dBlockFormat.byFrame,
@@ -717,9 +721,9 @@ inheritance.</p>
             nLinks = len(links)
 
             # nLinks
-            Int32.bwrite(file, nLinks)
+            i32.bwrite(file, nLinks)
             # padding
-            Int32.bpad(file)
+            i32.bpad(file)
             # links
             LinkType.bwrite(file, links)
 
@@ -734,7 +738,7 @@ inheritance.</p>
             + 4  # startTime
             + 4  # nTracks
             + Volume.btype.itemsize  # volume
-            + Matrix.btype.itemsize  # rotationMatrix
+            + MAT3X3F.btype.itemsize  # rotationMatrix
             + VEC3F.btype.itemsize  # translationVector
             + 4  # flags
         )
@@ -764,6 +768,13 @@ inheritance.</p>
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
 <li>abc.ABC</li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfData3D.Data3D.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfData3D.Data3D.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
@@ -781,7 +792,7 @@ def nBytes(self) -&gt; int:
         + 4  # startTime
         + 4  # nTracks
         + Volume.btype.itemsize  # volume
-        + Matrix.btype.itemsize  # rotationMatrix
+        + MAT3X3F.btype.itemsize  # rotationMatrix
         + VEC3F.btype.itemsize  # translationVector
         + 4  # flags
     )
@@ -1050,8 +1061,8 @@ def tracks(self) -&gt; List[MarkerTrack]:
         trackData[:] = np.NaN
 
         label = BTSString.bread(stream, 256)
-        nSegments = Int32.bread(stream)
-        Int32.skip(stream)
+        nSegments = i32.bread(stream)
+        i32.skip(stream)
         segmentData = SegmentData.bread(stream, nSegments)
         for startFrame, nFrames in segmentData:
             dat = TrackType.bread(stream, nFrames)
@@ -1066,16 +1077,16 @@ def tracks(self) -&gt; List[MarkerTrack]:
         segments = self._segments
 
         # nSegments
-        Int32.bwrite(file, len(segments))
+        i32.bwrite(file, len(segments))
 
         # padding
-        Int32.bpad(file, 1)
+        i32.bpad(file, 1)
 
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, np.array(segment.start))
+            i32.bwrite(file, np.array(segment.start))
             # nFrames
-            Int32.bwrite(file, np.array(segment.stop - segment.start))
+            i32.bwrite(file, np.array(segment.stop - segment.start))
 
         for segment in segments:
 
@@ -1222,6 +1233,7 @@ def nFrames(self) -&gt; int:
 <li><code><a title="basictdf.tdfData3D.Data3D.nBytes" href="#basictdf.tdfData3D.Data3D.nBytes">nBytes</a></code></li>
 <li><code><a title="basictdf.tdfData3D.Data3D.nTracks" href="#basictdf.tdfData3D.Data3D.nTracks">nTracks</a></code></li>
 <li><code><a title="basictdf.tdfData3D.Data3D.tracks" href="#basictdf.tdfData3D.Data3D.tracks">tracks</a></code></li>
+<li><code><a title="basictdf.tdfData3D.Data3D.type" href="#basictdf.tdfData3D.Data3D.type">type</a></code></li>
 </ul>
 </li>
 <li>

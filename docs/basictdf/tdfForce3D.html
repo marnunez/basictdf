@@ -31,18 +31,18 @@
 
 from io import BytesIO
 from re import I
-from typing import BinaryIO, Iterable, Iterator, List, Optional, Type, Union
+from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Optional, Type, Union
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
 from basictdf.tdfData3D import TrackType
 from basictdf.tdfTypes import (
-    Int32,
-    Float32,
+    i32,
+    f32,
     BTSString,
     BTSDate,
-    Uint32,
+    u32,
     VEC3F,
-    Matrix,
+    MAT3X3F,
     Volume,
     TdfType,
 )
@@ -78,7 +78,7 @@ class ForceTorqueTrack:
         return np.ma.clump_unmasked(maskedPressureData.T[0])
 
     @_segments.setter
-    def _segments(self, value):
+    def _segments(self, value) -&gt; NoReturn:
         raise AttributeError(
             &#34;Can&#39;t set number of segments directly, it&#39;s inferred from the data&#34;
         )
@@ -105,9 +105,9 @@ class ForceTorqueTrack:
         # label
         label = BTSString.bread(stream, 256)
         # nSegments
-        nSegments = Int32.bread(stream)
+        nSegments = i32.bread(stream)
         # padding
-        Int32.skip(stream)
+        i32.skip(stream)
 
         segmentData = SegmentData.bread(stream, nSegments)
 
@@ -137,7 +137,7 @@ class ForceTorqueTrack:
             torque=torque_data,
         )
 
-    def _write(self, file: BinaryIO):
+    def _write(self, file: BinaryIO) -&gt; None:
 
         # label
         BTSString.bwrite(file, 256, self.label)
@@ -146,17 +146,17 @@ class ForceTorqueTrack:
         nSegments = len(segments)
 
         # nSegments
-        Int32.bwrite(file, nSegments)
+        i32.bwrite(file, nSegments)
 
         # padding
-        Int32.bpad(file)
+        i32.bpad(file)
 
         # segmentData
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, segment.start)
+            i32.bwrite(file, segment.start)
             # nFrames
-            Int32.bwrite(file, segment.stop - segment.start)
+            i32.bwrite(file, segment.stop - segment.start)
 
         for segment in segments:
             # applicationPoint
@@ -187,6 +187,8 @@ class ForceTorque3DBlockFormat(Enum):
 
 
 class ForceTorque3D(Block):
+    type = BlockType.forceAndTorqueData
+
     def __init__(
         self,
         frequency: Union[int, float],
@@ -196,18 +198,18 @@ class ForceTorque3D(Block):
         translationVector: np.ndarray,
         startTime: float = 0.0,
         format=ForceTorque3DBlockFormat.byTrack,
-    ):
-        super().__init__(BlockType.forceAndTorqueData)
+    ) -&gt; None:
+        super().__init__()
         self.format = format
         self.frequency = frequency
         self.startTime = startTime
 
         if not (
             isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == Matrix.btype.shape
+            and rotationMatrix.shape == MAT3X3F.btype.shape
         ):
             raise ValueError(
-                f&#34;rotationMatrix must be a numpy array of shape {Matrix.btype.shape}&#34;
+                f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
@@ -230,17 +232,17 @@ class ForceTorque3D(Block):
         self._tracks = []
 
     @staticmethod
-    def _build(stream, format):
+    def _build(stream, format) -&gt; &#34;ForceTorque3D&#34;:
         format = ForceTorque3DBlockFormat(format)
-        nTracks = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nFrames = Uint32.bread(stream)
+        nTracks = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nFrames = u32.bread(stream)
         volume = Volume.bread(stream)
-        rotationMatrix = Matrix.bread(stream)
+        rotationMatrix = MAT3X3F.bread(stream)
         translationVector = VEC3F.bread(stream)
 
-        Int32.skip(stream)
+        i32.skip(stream)
         f = ForceTorque3D(
             frequency,
             nFrames,
@@ -256,7 +258,7 @@ class ForceTorque3D(Block):
         f._tracks = [ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)]
         return f
 
-    def add_track(self, track: ForceTorqueTrack):
+    def add_track(self, track: ForceTorqueTrack) -&gt; None:
         &#34;&#34;&#34;Adds a track to the data block
 
         Args:
@@ -284,7 +286,7 @@ class ForceTorque3D(Block):
         return self._tracks
 
     @tracks.setter
-    def tracks(self, values: Iterable[ForceTorqueTrack]):
+    def tracks(self, values: Iterable[ForceTorqueTrack]) -&gt; None:
         &#34;&#34;&#34;
         Sets the tracks in the data block.
         &#34;&#34;&#34;
@@ -339,7 +341,7 @@ class ForceTorque3D(Block):
             + 4
             + 4
             + Volume.btype.itemsize
-            + Matrix.btype.itemsize
+            + MAT3X3F.btype.itemsize
             + VEC3F.btype.itemsize
             + 4
         )
@@ -353,24 +355,24 @@ class ForceTorque3D(Block):
                 f&#34;Force3D format {self.format} not implemented yet&#34;
             )
         # nFrames
-        Int32.bwrite(file, self.nFrames)
+        i32.bwrite(file, self.nFrames)
 
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, len(self._tracks))
+        u32.bwrite(file, len(self._tracks))
 
         # volume
         Volume.bwrite(file, self.volume)
         # rotationMatrix
-        Matrix.bwrite(file, self.rotationMatrix)
+        MAT3X3F.bwrite(file, self.rotationMatrix)
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
 
         # padding
-        Int32.bpad(file)
+        i32.bpad(file)
 
         for track in self._tracks:
             track._write(file)
@@ -400,6 +402,8 @@ inheritance.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ForceTorque3D(Block):
+    type = BlockType.forceAndTorqueData
+
     def __init__(
         self,
         frequency: Union[int, float],
@@ -409,18 +413,18 @@ inheritance.</p></div>
         translationVector: np.ndarray,
         startTime: float = 0.0,
         format=ForceTorque3DBlockFormat.byTrack,
-    ):
-        super().__init__(BlockType.forceAndTorqueData)
+    ) -&gt; None:
+        super().__init__()
         self.format = format
         self.frequency = frequency
         self.startTime = startTime
 
         if not (
             isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == Matrix.btype.shape
+            and rotationMatrix.shape == MAT3X3F.btype.shape
         ):
             raise ValueError(
-                f&#34;rotationMatrix must be a numpy array of shape {Matrix.btype.shape}&#34;
+                f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
@@ -443,17 +447,17 @@ inheritance.</p></div>
         self._tracks = []
 
     @staticmethod
-    def _build(stream, format):
+    def _build(stream, format) -&gt; &#34;ForceTorque3D&#34;:
         format = ForceTorque3DBlockFormat(format)
-        nTracks = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nFrames = Uint32.bread(stream)
+        nTracks = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nFrames = u32.bread(stream)
         volume = Volume.bread(stream)
-        rotationMatrix = Matrix.bread(stream)
+        rotationMatrix = MAT3X3F.bread(stream)
         translationVector = VEC3F.bread(stream)
 
-        Int32.skip(stream)
+        i32.skip(stream)
         f = ForceTorque3D(
             frequency,
             nFrames,
@@ -469,7 +473,7 @@ inheritance.</p></div>
         f._tracks = [ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)]
         return f
 
-    def add_track(self, track: ForceTorqueTrack):
+    def add_track(self, track: ForceTorqueTrack) -&gt; None:
         &#34;&#34;&#34;Adds a track to the data block
 
         Args:
@@ -497,7 +501,7 @@ inheritance.</p></div>
         return self._tracks
 
     @tracks.setter
-    def tracks(self, values: Iterable[ForceTorqueTrack]):
+    def tracks(self, values: Iterable[ForceTorqueTrack]) -&gt; None:
         &#34;&#34;&#34;
         Sets the tracks in the data block.
         &#34;&#34;&#34;
@@ -552,7 +556,7 @@ inheritance.</p></div>
             + 4
             + 4
             + Volume.btype.itemsize
-            + Matrix.btype.itemsize
+            + MAT3X3F.btype.itemsize
             + VEC3F.btype.itemsize
             + 4
         )
@@ -566,24 +570,24 @@ inheritance.</p></div>
                 f&#34;Force3D format {self.format} not implemented yet&#34;
             )
         # nFrames
-        Int32.bwrite(file, self.nFrames)
+        i32.bwrite(file, self.nFrames)
 
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
         # nTracks
-        Uint32.bwrite(file, len(self._tracks))
+        u32.bwrite(file, len(self._tracks))
 
         # volume
         Volume.bwrite(file, self.volume)
         # rotationMatrix
-        Matrix.bwrite(file, self.rotationMatrix)
+        MAT3X3F.bwrite(file, self.rotationMatrix)
         # translationVector
         VEC3F.bwrite(file, self.translationVector)
 
         # padding
-        Int32.bpad(file)
+        i32.bpad(file)
 
         for track in self._tracks:
             track._write(file)
@@ -596,6 +600,13 @@ inheritance.</p></div>
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
 <li>abc.ABC</li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfForce3D.ForceTorque3D.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfForce3D.ForceTorque3D.nBytes"><code class="name">var <span class="ident">nBytes</span></code></dt>
@@ -613,7 +624,7 @@ def nBytes(self):
         + 4
         + 4
         + Volume.btype.itemsize
-        + Matrix.btype.itemsize
+        + MAT3X3F.btype.itemsize
         + VEC3F.btype.itemsize
         + 4
     )
@@ -660,7 +671,7 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
 <h3>Methods</h3>
 <dl>
 <dt id="basictdf.tdfForce3D.ForceTorque3D.add_track"><code class="name flex">
-<span>def <span class="ident">add_track</span></span>(<span>self, track: <a title="basictdf.tdfForce3D.ForceTorqueTrack" href="#basictdf.tdfForce3D.ForceTorqueTrack">ForceTorqueTrack</a>)</span>
+<span>def <span class="ident">add_track</span></span>(<span>self, track: <a title="basictdf.tdfForce3D.ForceTorqueTrack" href="#basictdf.tdfForce3D.ForceTorqueTrack">ForceTorqueTrack</a>) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Adds a track to the data block</p>
@@ -680,7 +691,7 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_track(self, track: ForceTorqueTrack):
+<pre><code class="python">def add_track(self, track: ForceTorqueTrack) -&gt; None:
     &#34;&#34;&#34;Adds a track to the data block
 
     Args:
@@ -782,7 +793,7 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
         return np.ma.clump_unmasked(maskedPressureData.T[0])
 
     @_segments.setter
-    def _segments(self, value):
+    def _segments(self, value) -&gt; NoReturn:
         raise AttributeError(
             &#34;Can&#39;t set number of segments directly, it&#39;s inferred from the data&#34;
         )
@@ -809,9 +820,9 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
         # label
         label = BTSString.bread(stream, 256)
         # nSegments
-        nSegments = Int32.bread(stream)
+        nSegments = i32.bread(stream)
         # padding
-        Int32.skip(stream)
+        i32.skip(stream)
 
         segmentData = SegmentData.bread(stream, nSegments)
 
@@ -841,7 +852,7 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
             torque=torque_data,
         )
 
-    def _write(self, file: BinaryIO):
+    def _write(self, file: BinaryIO) -&gt; None:
 
         # label
         BTSString.bwrite(file, 256, self.label)
@@ -850,17 +861,17 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
         nSegments = len(segments)
 
         # nSegments
-        Int32.bwrite(file, nSegments)
+        i32.bwrite(file, nSegments)
 
         # padding
-        Int32.bpad(file)
+        i32.bpad(file)
 
         # segmentData
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, segment.start)
+            i32.bwrite(file, segment.start)
             # nFrames
-            Int32.bwrite(file, segment.stop - segment.start)
+            i32.bwrite(file, segment.stop - segment.start)
 
         for segment in segments:
             # applicationPoint
@@ -940,6 +951,7 @@ def nFrames(self) -&gt; int:
 <li><code><a title="basictdf.tdfForce3D.ForceTorque3D.nBytes" href="#basictdf.tdfForce3D.ForceTorque3D.nBytes">nBytes</a></code></li>
 <li><code><a title="basictdf.tdfForce3D.ForceTorque3D.nTracks" href="#basictdf.tdfForce3D.ForceTorque3D.nTracks">nTracks</a></code></li>
 <li><code><a title="basictdf.tdfForce3D.ForceTorque3D.tracks" href="#basictdf.tdfForce3D.ForceTorque3D.tracks">tracks</a></code></li>
+<li><code><a title="basictdf.tdfForce3D.ForceTorque3D.type" href="#basictdf.tdfForce3D.ForceTorque3D.type">type</a></code></li>
 </ul>
 </li>
 <li>

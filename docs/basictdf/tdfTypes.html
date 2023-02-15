@@ -33,9 +33,7 @@ from datetime import datetime
 import struct
 from typing import (
     IO,
-    Any,
     Optional,
-    Type,
     TypeVar,
     Union,
     BinaryIO,
@@ -47,19 +45,19 @@ import numpy.typing as npt
 
 class BTSDate:
     @staticmethod
-    def read(data):
+    def read(data) -&gt; datetime:
         return datetime.fromtimestamp(struct.unpack(&#34;&lt;i&#34;, data)[0])
 
     @staticmethod
-    def bread(f):
+    def bread(f) -&gt; datetime:
         return BTSDate.read(f.read(4))
 
     @staticmethod
-    def write(data):
+    def write(data) -&gt; bytes:
         return struct.pack(&#34;&lt;i&#34;, int(data.timestamp()))
 
     @staticmethod
-    def bwrite(file, data):
+    def bwrite(file, data) -&gt; None:
         file.write(BTSDate.write(data))
 
 
@@ -96,7 +94,7 @@ class BTSString:
         return dat + padding
 
     @staticmethod
-    def bwrite(file: BinaryIO, size: int, data: str):
+    def bwrite(file: BinaryIO, size: int, data: str) -&gt; None:
         file.write(BTSString.write(size, data))
 
     @staticmethod
@@ -121,7 +119,7 @@ X = TypeVar(&#34;X&#34;, bound=np.dtype)
 
 
 class TdfType(Generic[X]):
-    def __init__(self, btype: npt.DTypeLike):
+    def __init__(self, btype: npt.DTypeLike) -&gt; None:
         self.btype: X = np.dtype(btype)
 
     def read(self, data: bytes) -&gt; npt.NDArray[X]:
@@ -159,30 +157,89 @@ class TdfType(Generic[X]):
             else np.array(data, dtype=self.btype.base).tobytes()
         )
 
-    def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]):
+    def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]) -&gt; None:
         file.write(self.write(data))
 
-    def skip(self, file: IO[bytes], n: int = 1):
+    def skip(self, file: IO[bytes], n: int = 1) -&gt; None:
         file.seek(n * self.btype.itemsize, 1)
 
     def pad(self, n: int = 1):
         return b&#34;\x00&#34; * (n * self.btype.itemsize)
 
-    def bpad(self, file: IO[bytes], n: int = 1):
+    def bpad(self, file: IO[bytes], n: int = 1) -&gt; None:
         file.write(self.pad(n))
+
+    def nBytes(self, n: int = 1) -&gt; int:
+        return n * self.btype.itemsize
 
 
 Volume = TdfType(np.dtype(&#34;3&lt;f4&#34;))
 
 VEC3F = TdfType(np.dtype(&#34;3&lt;f4&#34;))
+VEC3D = TdfType(np.dtype(&#34;3&lt;f8&#34;))
 
-Matrix = TdfType(np.dtype(&#34;(3,3)&lt;f4&#34;))
+VEC2I = TdfType(np.dtype(&#34;2&lt;i4&#34;))
+VEC2D = TdfType(np.dtype(&#34;2&lt;f8&#34;))
+
+MAT3X3F = TdfType(np.dtype(&#34;(3,3)&lt;f4&#34;))
+MAT3X3D = TdfType(np.dtype(&#34;(3,3)&lt;f8&#34;))
+
+i32 = TdfType(np.dtype(&#34;&lt;i4&#34;))
+i16 = TdfType(np.dtype(&#34;&lt;i2&#34;))
+u32 = TdfType(np.dtype(&#34;&lt;u4&#34;))
+f32 = TdfType(np.dtype(&#34;&lt;f4&#34;))
+f64 = TdfType(np.dtype(&#34;&lt;f8&#34;))
 
 
-Int32 = TdfType(np.dtype(&#34;&lt;i4&#34;))
-Int16 = TdfType(np.dtype(&#34;&lt;i2&#34;))
-Uint32 = TdfType(np.dtype(&#34;&lt;u4&#34;))
-Float32 = TdfType(np.dtype(&#34;&lt;f4&#34;))</code></pre>
+class CameraViewPort:
+    def __init__(self, origin, size) -&gt; None:
+        if isinstance(origin, np.ndarray) and origin.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f&#34;origin must be a {VEC2I.btype.shape} if it is a numpy array&#34;
+            )
+        elif isinstance(origin, list) or isinstance(origin, tuple) and len(origin) != 2:
+            raise TypeError(f&#34;origin must be of length 2 if it is a list or tuple&#34;)
+
+        if isinstance(size, np.ndarray) and size.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f&#34;size must be a {VEC2I.btype.shape} if it is a numpy array&#34;
+            )
+        elif isinstance(size, list) or isinstance(size, tuple) and len(size) != 2:
+            raise TypeError(f&#34;size must be of length 2 if it is a list or tuple&#34;)
+
+        self.origin = origin
+        self.size = size
+
+    @staticmethod
+    def bread(stream) -&gt; &#34;CameraViewPort&#34;:
+        origin = VEC2I.bread(stream)
+        size = VEC2I.bread(stream)
+        return CameraViewPort(origin, size)
+
+    @staticmethod
+    def read(data: bytes) -&gt; &#34;CameraViewPort&#34;:
+        origin = VEC2I.read(data[:8])
+        size = VEC2I.read(data[8:])
+        return CameraViewPort(origin, size)
+
+    def write(self) -&gt; bytes:
+        return VEC2I.write(self.origin) + VEC2I.write(self.size)
+
+    def bwrite(self, stream: BinaryIO) -&gt; None:
+        VEC2I.bwrite(stream, self.origin)
+        VEC2I.bwrite(stream, self.size)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return 8 + 8
+
+    def __repr__(self) -&gt; str:
+        return f&#34;CameraViewPort(origin={self.origin}, size={self.size})&#34;
+
+    def __eq__(self, other) -&gt; bool:
+        if not isinstance(other, CameraViewPort):
+            raise TypeError(f&#34;Can only compare CameraViewPort with CameraViewPort&#34;)
+        return np.all(self.origin == other.origin) and np.all(self.size == other.size)</code></pre>
 </details>
 </section>
 <section>
@@ -205,25 +262,25 @@ Float32 = TdfType(np.dtype(&#34;&lt;f4&#34;))</code></pre>
 </summary>
 <pre><code class="python">class BTSDate:
     @staticmethod
-    def read(data):
+    def read(data) -&gt; datetime:
         return datetime.fromtimestamp(struct.unpack(&#34;&lt;i&#34;, data)[0])
 
     @staticmethod
-    def bread(f):
+    def bread(f) -&gt; datetime:
         return BTSDate.read(f.read(4))
 
     @staticmethod
-    def write(data):
+    def write(data) -&gt; bytes:
         return struct.pack(&#34;&lt;i&#34;, int(data.timestamp()))
 
     @staticmethod
-    def bwrite(file, data):
+    def bwrite(file, data) -&gt; None:
         file.write(BTSDate.write(data))</code></pre>
 </details>
 <h3>Static methods</h3>
 <dl>
 <dt id="basictdf.tdfTypes.BTSDate.bread"><code class="name flex">
-<span>def <span class="ident">bread</span></span>(<span>f)</span>
+<span>def <span class="ident">bread</span></span>(<span>f) ‑> datetime.datetime</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -232,12 +289,12 @@ Float32 = TdfType(np.dtype(&#34;&lt;f4&#34;))</code></pre>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def bread(f):
+def bread(f) -&gt; datetime:
     return BTSDate.read(f.read(4))</code></pre>
 </details>
 </dd>
 <dt id="basictdf.tdfTypes.BTSDate.bwrite"><code class="name flex">
-<span>def <span class="ident">bwrite</span></span>(<span>file, data)</span>
+<span>def <span class="ident">bwrite</span></span>(<span>file, data) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -246,12 +303,12 @@ def bread(f):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def bwrite(file, data):
+def bwrite(file, data) -&gt; None:
     file.write(BTSDate.write(data))</code></pre>
 </details>
 </dd>
 <dt id="basictdf.tdfTypes.BTSDate.read"><code class="name flex">
-<span>def <span class="ident">read</span></span>(<span>data)</span>
+<span>def <span class="ident">read</span></span>(<span>data) ‑> datetime.datetime</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -260,12 +317,12 @@ def bwrite(file, data):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def read(data):
+def read(data) -&gt; datetime:
     return datetime.fromtimestamp(struct.unpack(&#34;&lt;i&#34;, data)[0])</code></pre>
 </details>
 </dd>
 <dt id="basictdf.tdfTypes.BTSDate.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>data)</span>
+<span>def <span class="ident">write</span></span>(<span>data) ‑> bytes</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -274,7 +331,7 @@ def read(data):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def write(data):
+def write(data) -&gt; bytes:
     return struct.pack(&#34;&lt;i&#34;, int(data.timestamp()))</code></pre>
 </details>
 </dd>
@@ -322,7 +379,7 @@ def write(data):
         return dat + padding
 
     @staticmethod
-    def bwrite(file: BinaryIO, size: int, data: str):
+    def bwrite(file: BinaryIO, size: int, data: str) -&gt; None:
         file.write(BTSString.write(size, data))
 
     @staticmethod
@@ -380,7 +437,7 @@ def bread(file: BinaryIO, size: int, encoding: str = &#34;windows-1252&#34;) -&g
 </details>
 </dd>
 <dt id="basictdf.tdfTypes.BTSString.bwrite"><code class="name flex">
-<span>def <span class="ident">bwrite</span></span>(<span>file: <class 'BinaryIO'>, size: int, data: str)</span>
+<span>def <span class="ident">bwrite</span></span>(<span>file: <class 'BinaryIO'>, size: int, data: str) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -389,7 +446,7 @@ def bread(file: BinaryIO, size: int, encoding: str = &#34;windows-1252&#34;) -&g
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def bwrite(file: BinaryIO, size: int, data: str):
+def bwrite(file: BinaryIO, size: int, data: str) -&gt; None:
     file.write(BTSString.write(size, data))</code></pre>
 </details>
 </dd>
@@ -456,6 +513,147 @@ def write(size: int, data: str) -&gt; bytes:
 </dd>
 </dl>
 </dd>
+<dt id="basictdf.tdfTypes.CameraViewPort"><code class="flex name class">
+<span>class <span class="ident">CameraViewPort</span></span>
+<span>(</span><span>origin, size)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CameraViewPort:
+    def __init__(self, origin, size) -&gt; None:
+        if isinstance(origin, np.ndarray) and origin.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f&#34;origin must be a {VEC2I.btype.shape} if it is a numpy array&#34;
+            )
+        elif isinstance(origin, list) or isinstance(origin, tuple) and len(origin) != 2:
+            raise TypeError(f&#34;origin must be of length 2 if it is a list or tuple&#34;)
+
+        if isinstance(size, np.ndarray) and size.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f&#34;size must be a {VEC2I.btype.shape} if it is a numpy array&#34;
+            )
+        elif isinstance(size, list) or isinstance(size, tuple) and len(size) != 2:
+            raise TypeError(f&#34;size must be of length 2 if it is a list or tuple&#34;)
+
+        self.origin = origin
+        self.size = size
+
+    @staticmethod
+    def bread(stream) -&gt; &#34;CameraViewPort&#34;:
+        origin = VEC2I.bread(stream)
+        size = VEC2I.bread(stream)
+        return CameraViewPort(origin, size)
+
+    @staticmethod
+    def read(data: bytes) -&gt; &#34;CameraViewPort&#34;:
+        origin = VEC2I.read(data[:8])
+        size = VEC2I.read(data[8:])
+        return CameraViewPort(origin, size)
+
+    def write(self) -&gt; bytes:
+        return VEC2I.write(self.origin) + VEC2I.write(self.size)
+
+    def bwrite(self, stream: BinaryIO) -&gt; None:
+        VEC2I.bwrite(stream, self.origin)
+        VEC2I.bwrite(stream, self.size)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return 8 + 8
+
+    def __repr__(self) -&gt; str:
+        return f&#34;CameraViewPort(origin={self.origin}, size={self.size})&#34;
+
+    def __eq__(self, other) -&gt; bool:
+        if not isinstance(other, CameraViewPort):
+            raise TypeError(f&#34;Can only compare CameraViewPort with CameraViewPort&#34;)
+        return np.all(self.origin == other.origin) and np.all(self.size == other.size)</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="basictdf.tdfTypes.CameraViewPort.bread"><code class="name flex">
+<span>def <span class="ident">bread</span></span>(<span>stream) ‑> <a title="basictdf.tdfTypes.CameraViewPort" href="#basictdf.tdfTypes.CameraViewPort">CameraViewPort</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def bread(stream) -&gt; &#34;CameraViewPort&#34;:
+    origin = VEC2I.bread(stream)
+    size = VEC2I.bread(stream)
+    return CameraViewPort(origin, size)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfTypes.CameraViewPort.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>data: bytes) ‑> <a title="basictdf.tdfTypes.CameraViewPort" href="#basictdf.tdfTypes.CameraViewPort">CameraViewPort</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def read(data: bytes) -&gt; &#34;CameraViewPort&#34;:
+    origin = VEC2I.read(data[:8])
+    size = VEC2I.read(data[8:])
+    return CameraViewPort(origin, size)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.tdfTypes.CameraViewPort.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    return 8 + 8</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.tdfTypes.CameraViewPort.bwrite"><code class="name flex">
+<span>def <span class="ident">bwrite</span></span>(<span>self, stream: <class 'BinaryIO'>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bwrite(self, stream: BinaryIO) -&gt; None:
+    VEC2I.bwrite(stream, self.origin)
+    VEC2I.bwrite(stream, self.size)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfTypes.CameraViewPort.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self) ‑> bytes</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write(self) -&gt; bytes:
+    return VEC2I.write(self.origin) + VEC2I.write(self.size)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="basictdf.tdfTypes.TdfType"><code class="flex name class">
 <span>class <span class="ident">TdfType</span></span>
 <span>(</span><span>btype: Union[numpy.dtype[Any], ForwardRef(None), Type[Any], numpy.typing._dtype_like._SupportsDType[numpy.dtype[Any]], str, Tuple[Any, int], Tuple[Any, Union[SupportsIndex, Sequence[SupportsIndex]]], List[Any], numpy.typing._dtype_like._DTypeDict, Tuple[Any, Any]])</span>
@@ -480,7 +678,7 @@ return default</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TdfType(Generic[X]):
-    def __init__(self, btype: npt.DTypeLike):
+    def __init__(self, btype: npt.DTypeLike) -&gt; None:
         self.btype: X = np.dtype(btype)
 
     def read(self, data: bytes) -&gt; npt.NDArray[X]:
@@ -518,17 +716,20 @@ return default</p></div>
             else np.array(data, dtype=self.btype.base).tobytes()
         )
 
-    def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]):
+    def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]) -&gt; None:
         file.write(self.write(data))
 
-    def skip(self, file: IO[bytes], n: int = 1):
+    def skip(self, file: IO[bytes], n: int = 1) -&gt; None:
         file.seek(n * self.btype.itemsize, 1)
 
     def pad(self, n: int = 1):
         return b&#34;\x00&#34; * (n * self.btype.itemsize)
 
-    def bpad(self, file: IO[bytes], n: int = 1):
-        file.write(self.pad(n))</code></pre>
+    def bpad(self, file: IO[bytes], n: int = 1) -&gt; None:
+        file.write(self.pad(n))
+
+    def nBytes(self, n: int = 1) -&gt; int:
+        return n * self.btype.itemsize</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -537,7 +738,7 @@ return default</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="basictdf.tdfTypes.TdfType.bpad"><code class="name flex">
-<span>def <span class="ident">bpad</span></span>(<span>self, file: IO[bytes], n: int = 1)</span>
+<span>def <span class="ident">bpad</span></span>(<span>self, file: IO[bytes], n: int = 1) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -545,7 +746,7 @@ return default</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def bpad(self, file: IO[bytes], n: int = 1):
+<pre><code class="python">def bpad(self, file: IO[bytes], n: int = 1) -&gt; None:
     file.write(self.pad(n))</code></pre>
 </details>
 </dd>
@@ -589,7 +790,7 @@ return default</p></div>
 </details>
 </dd>
 <dt id="basictdf.tdfTypes.TdfType.bwrite"><code class="name flex">
-<span>def <span class="ident">bwrite</span></span>(<span>self, file: IO[bytes], data: Union[numpy.ndarray[Any, numpy.dtype[~X]], ~X])</span>
+<span>def <span class="ident">bwrite</span></span>(<span>self, file: IO[bytes], data: Union[numpy.ndarray[Any, numpy.dtype[~X]], ~X]) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -597,8 +798,21 @@ return default</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]):
+<pre><code class="python">def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]) -&gt; None:
     file.write(self.write(data))</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.nBytes"><code class="name flex">
+<span>def <span class="ident">nBytes</span></span>(<span>self, n: int = 1) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nBytes(self, n: int = 1) -&gt; int:
+    return n * self.btype.itemsize</code></pre>
 </details>
 </dd>
 <dt id="basictdf.tdfTypes.TdfType.pad"><code class="name flex">
@@ -646,7 +860,7 @@ return default</p></div>
 </details>
 </dd>
 <dt id="basictdf.tdfTypes.TdfType.skip"><code class="name flex">
-<span>def <span class="ident">skip</span></span>(<span>self, file: IO[bytes], n: int = 1)</span>
+<span>def <span class="ident">skip</span></span>(<span>self, file: IO[bytes], n: int = 1) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -654,7 +868,7 @@ return default</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def skip(self, file: IO[bytes], n: int = 1):
+<pre><code class="python">def skip(self, file: IO[bytes], n: int = 1) -&gt; None:
     file.seek(n * self.btype.itemsize, 1)</code></pre>
 </details>
 </dd>
@@ -712,11 +926,22 @@ return default</p></div>
 </ul>
 </li>
 <li>
+<h4><code><a title="basictdf.tdfTypes.CameraViewPort" href="#basictdf.tdfTypes.CameraViewPort">CameraViewPort</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.bread" href="#basictdf.tdfTypes.CameraViewPort.bread">bread</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.bwrite" href="#basictdf.tdfTypes.CameraViewPort.bwrite">bwrite</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.nBytes" href="#basictdf.tdfTypes.CameraViewPort.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.read" href="#basictdf.tdfTypes.CameraViewPort.read">read</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.write" href="#basictdf.tdfTypes.CameraViewPort.write">write</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="basictdf.tdfTypes.TdfType" href="#basictdf.tdfTypes.TdfType">TdfType</a></code></h4>
 <ul class="two-column">
 <li><code><a title="basictdf.tdfTypes.TdfType.bpad" href="#basictdf.tdfTypes.TdfType.bpad">bpad</a></code></li>
 <li><code><a title="basictdf.tdfTypes.TdfType.bread" href="#basictdf.tdfTypes.TdfType.bread">bread</a></code></li>
 <li><code><a title="basictdf.tdfTypes.TdfType.bwrite" href="#basictdf.tdfTypes.TdfType.bwrite">bwrite</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.nBytes" href="#basictdf.tdfTypes.TdfType.nBytes">nBytes</a></code></li>
 <li><code><a title="basictdf.tdfTypes.TdfType.pad" href="#basictdf.tdfTypes.TdfType.pad">pad</a></code></li>
 <li><code><a title="basictdf.tdfTypes.TdfType.read" href="#basictdf.tdfTypes.TdfType.read">read</a></code></li>
 <li><code><a title="basictdf.tdfTypes.TdfType.skip" href="#basictdf.tdfTypes.TdfType.skip">skip</a></code></li>

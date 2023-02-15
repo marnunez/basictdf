@@ -57,9 +57,10 @@ class BlockType(Enum):
 
 
 class Block(ABC):
+    type = BlockType.notDefined
+
     def __init__(
         self,
-        blockType: BlockType,
         creation_date: Optional[datetime] = None,
         last_modification_date: Optional[datetime] = None,
         last_access_date: Optional[datetime] = None,
@@ -75,8 +76,6 @@ class Block(ABC):
         self.last_access_date = (
             last_access_date if last_access_date is not None else datetime.now()
         )
-        self.blockType = blockType
-        self.type = blockType
 
     @abstractmethod
     def nBytes(self) -&gt; int:
@@ -91,59 +90,66 @@ class Block(ABC):
         pass
 
     def __repr__(self):
-        return self.__class__.__name__ + &#34;(&#34; + str(self.type) + &#34;)&#34;
+        return self.__class__.__name__ + &#34;(&#34; + str(self.__class__.type) + &#34;)&#34;
 
 
-class CalibrationData(Block):
-    pass
+class NotImplementedBlock(Block):
+    type = BlockType.notDefined
+
+    @classmethod
+    def _build(cls, *args, **kwargs):
+        raise NotImplementedError(
+            f&#34;Buidling blocks of type {cls.type} is yet implemented&#34;
+        )
+
+    def _write(self, *args, **kwargs):
+        raise NotImplementedError(
+            f&#34;Writing blocks type {self.type} is not implemented yet.&#34;
+        )
 
 
-class CalibrationData2D(Block):
-    pass
+class CalibrationData2D(NotImplementedBlock):
+    type = BlockType.calibrationData2D
 
 
-class Data2D(Block):
-    pass
+class Data2D(NotImplementedBlock):
+    type = BlockType.data2D
 
 
-class OpticalSystemConfiguration(Block):
-    pass
+class ForcePlatformsCalibrationData(NotImplementedBlock):
+    type = BlockType.forcePlatformsCalibrationData
 
 
-class ForcePlatformsCalibrationData(Block):
-    pass
+class ForcePlatformsCalibrationData2D(NotImplementedBlock):
+    type = BlockType.forcePlatformsCalibrationData2D
 
 
-class ForcePlatformsCalibrationData2D(Block):
-    pass
+class ForcePlatformsData(NotImplementedBlock):
+    type = BlockType.forcePlatformsData
 
 
-class ForcePlatformsData(Block):
-    pass
+class AnthropometricData(NotImplementedBlock):
+    type = BlockType.anthropometricData
 
 
-class AnthropometricData(Block):
-    pass
+class VolumetricData(NotImplementedBlock):
+    type = BlockType.volumetricData
 
 
-class VolumetricData(Block):
-    pass
+class AnalogData(NotImplementedBlock):
+    type = BlockType.analogData
 
 
-class AnalogData(Block):
-    pass
+class GeneralCalibrationData(NotImplementedBlock):
+    type = BlockType.generalCalibrationData
 
 
-class GeneralCalibrationData(Block):
-    pass
+class UnusedBlock(NotImplementedBlock):
+    type = BlockType.unusedSlot
 
 
-class UnusedBlock(Block):
-    pass
-
-
-class NotDefinedBlock(Block):
-    pass</code></pre>
+class NotDefinedBlock(NotImplementedBlock):
+    type = BlockType.notDefined</code></pre>
 </details>
 </section>
 <section>
@@ -157,7 +163,7 @@ class NotDefinedBlock(Block):
 <dl>
 <dt id="basictdf.tdfBlock.Block"><code class="flex name class">
 <span>class <span class="ident">Block</span></span>
-<span>(</span><span>blockType: <a title="basictdf.tdfBlock.BlockType" href="#basictdf.tdfBlock.BlockType">BlockType</a>, creation_date: Optional[datetime.datetime] = None, last_modification_date: Optional[datetime.datetime] = None, last_access_date: Optional[datetime.datetime] = None)</span>
+<span>(</span><span>creation_date: Optional[datetime.datetime] = None, last_modification_date: Optional[datetime.datetime] = None, last_access_date: Optional[datetime.datetime] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Helper class that provides a standard way to create an ABC using
@@ -167,9 +173,10 @@ inheritance.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Block(ABC):
+    type = BlockType.notDefined
+
     def __init__(
         self,
-        blockType: BlockType,
         creation_date: Optional[datetime] = None,
         last_modification_date: Optional[datetime] = None,
         last_access_date: Optional[datetime] = None,
@@ -185,8 +192,6 @@ inheritance.</p></div>
         self.last_access_date = (
             last_access_date if last_access_date is not None else datetime.now()
         )
-        self.blockType = blockType
-        self.type = blockType
 
     @abstractmethod
     def nBytes(self) -&gt; int:
@@ -201,7 +206,7 @@ inheritance.</p></div>
         pass
 
     def __repr__(self):
-        return self.__class__.__name__ + &#34;(&#34; + str(self.type) + &#34;)&#34;</code></pre>
+        return self.__class__.__name__ + &#34;(&#34; + str(self.__class__.type) + &#34;)&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -209,24 +214,21 @@ inheritance.</p></div>
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li>basictdf.tdfBlock.AnalogData</li>
-<li>basictdf.tdfBlock.AnthropometricData</li>
-<li>basictdf.tdfBlock.CalibrationData</li>
-<li>basictdf.tdfBlock.CalibrationData2D</li>
-<li>basictdf.tdfBlock.Data2D</li>
-<li>basictdf.tdfBlock.ForcePlatformsCalibrationData</li>
-<li>basictdf.tdfBlock.ForcePlatformsCalibrationData2D</li>
-<li>basictdf.tdfBlock.ForcePlatformsData</li>
-<li>basictdf.tdfBlock.GeneralCalibrationData</li>
-<li>basictdf.tdfBlock.NotDefinedBlock</li>
-<li>basictdf.tdfBlock.OpticalSystemConfiguration</li>
-<li>basictdf.tdfBlock.UnusedBlock</li>
-<li>basictdf.tdfBlock.VolumetricData</li>
+<li>basictdf.tdfBlock.NotImplementedBlock</li>
+<li><a title="basictdf.tdfCalibrationData.CalibrationDataBlock" href="tdfCalibrationData.html#basictdf.tdfCalibrationData.CalibrationDataBlock">CalibrationDataBlock</a></li>
 <li><a title="basictdf.tdfData3D.Data3D" href="tdfData3D.html#basictdf.tdfData3D.Data3D">Data3D</a></li>
 <li><a title="basictdf.tdfEMG.EMG" href="tdfEMG.html#basictdf.tdfEMG.EMG">EMG</a></li>
 <li><a title="basictdf.tdfEvents.TemporalEventsData" href="tdfEvents.html#basictdf.tdfEvents.TemporalEventsData">TemporalEventsData</a></li>
 <li><a title="basictdf.tdfForce3D.ForceTorque3D" href="tdfForce3D.html#basictdf.tdfForce3D.ForceTorque3D">ForceTorque3D</a></li>
+<li><a title="basictdf.tdfOpticalSystem.OpticalSetupBlock" href="tdfOpticalSystem.html#basictdf.tdfOpticalSystem.OpticalSetupBlock">OpticalSetupBlock</a></li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfBlock.Block.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="basictdf.tdfBlock.Block.nBytes"><code class="name flex">
@@ -370,6 +372,7 @@ def nBytes(self) -&gt; int:
 <h4><code><a title="basictdf.tdfBlock.Block" href="#basictdf.tdfBlock.Block">Block</a></code></h4>
 <ul class="">
 <li><code><a title="basictdf.tdfBlock.Block.nBytes" href="#basictdf.tdfBlock.Block.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.tdfBlock.Block.type" href="#basictdf.tdfBlock.Block.type">type</a></code></li>
 </ul>
 </li>
 <li>

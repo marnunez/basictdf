@@ -34,7 +34,7 @@ from typing import Iterator, Union
 
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
-from basictdf.tdfTypes import BTSString, Int32, Float32, TdfType, Int16
+from basictdf.tdfTypes import BTSString, i32, f32, TdfType, i16
 
 import numpy as np
 
@@ -69,15 +69,13 @@ class EMGTrack:
     @staticmethod
     def build(stream, nSamples):
         label = BTSString.bread(stream, 256)
-        nSegments = Int32.bread(stream)
-        Int32.skip(stream)  # padding
+        nSegments = i32.bread(stream)
+        i32.skip(stream)  # padding
         segmentData = SegmentData.bread(stream, nSegments)
         trackData = np.empty(nSamples, dtype=&#34;&lt;f4&#34;)
         trackData[:] = np.nan
         for startFrame, nFrames in segmentData:
-            trackData[startFrame : startFrame + nFrames] = Float32.bread(
-                stream, nFrames
-            )
+            trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
     def write(self, file):
@@ -88,26 +86,26 @@ class EMGTrack:
         segments = self._segments
 
         # nSegments
-        Int32.bwrite(file, len(segments))
+        i32.bwrite(file, len(segments))
 
         # padding
-        Int32.bpad(file, 1)
+        i32.bpad(file, 1)
 
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, segment.start)
+            i32.bwrite(file, segment.start)
             # nFrames
-            Int32.bwrite(file, segment.stop - segment.start)
+            i32.bwrite(file, segment.stop - segment.start)
 
         for segment in segments:
             # data
-            Float32.bwrite(file, self.data[segment])
+            f32.bwrite(file, self.data[segment])
 
     @property
     def nBytes(self):
         base = 256 + 4 + 4
         for segment in self._segments:
-            base += 4 + 4 + (segment.stop - segment.start) * Float32.btype.itemsize
+            base += 4 + 4 + (segment.stop - segment.start) * f32.btype.itemsize
         return base
 
     def __eq__(self, other):
@@ -118,22 +116,26 @@ class EMGTrack:
 
 
 class EMG(Block):
+    &#34;&#34;&#34;Electromyography data block&#34;&#34;&#34;
+
+    type = BlockType.electromyographicData
+
     def __init__(self, frequency, nSamples, startTime=0.0):
+        super().__init__()
         self.frequency = frequency
         self.startTime = startTime
         self.nSamples = nSamples
         self._signals = []
         self._emgMap = []
-        super().__init__(BlockType.electromyographicData)
 
     @staticmethod
     def _build(stream, format):
         format = EMGBlockFormat(format)
-        nSignals = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nSamples = Int32.bread(stream) + 49  # Why 49??? Whyyyy????
-        emgMap = Int16.bread(stream, n=nSignals)
+        nSignals = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nSamples = i32.bread(stream) + 49  # Why 49??? Whyyyy????
+        emgMap = i16.bread(stream, n=nSignals)
 
         d = EMG(frequency, nSamples, startTime)
         if format == EMGBlockFormat.byTrack:
@@ -150,19 +152,19 @@ class EMG(Block):
             raise NotImplementedError(f&#34;EMG format {self.format} not implemented yet&#34;)
 
         # nSignals
-        Int32.bwrite(file, len(self._signals))
+        i32.bwrite(file, len(self._signals))
 
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
 
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
 
         # emgMap
-        Int16.bwrite(file, self._emgMap)
+        i16.bwrite(file, self._emgMap)
 
         # nSamples
-        Int32.bwrite(file, self.nSamples - 49)  # That 49 again
+        i32.bwrite(file, self.nSamples - 49)  # That 49 again
 
         # signals
         for signal in self._signals:
@@ -259,29 +261,32 @@ class EMG(Block):
 <span>(</span><span>frequency, nSamples, startTime=0.0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p></div>
+<div class="desc"><p>Electromyography data block</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class EMG(Block):
+    &#34;&#34;&#34;Electromyography data block&#34;&#34;&#34;
+
+    type = BlockType.electromyographicData
+
     def __init__(self, frequency, nSamples, startTime=0.0):
+        super().__init__()
         self.frequency = frequency
         self.startTime = startTime
         self.nSamples = nSamples
         self._signals = []
         self._emgMap = []
-        super().__init__(BlockType.electromyographicData)
 
     @staticmethod
     def _build(stream, format):
         format = EMGBlockFormat(format)
-        nSignals = Int32.bread(stream)
-        frequency = Int32.bread(stream)
-        startTime = Float32.bread(stream)
-        nSamples = Int32.bread(stream) + 49  # Why 49??? Whyyyy????
-        emgMap = Int16.bread(stream, n=nSignals)
+        nSignals = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nSamples = i32.bread(stream) + 49  # Why 49??? Whyyyy????
+        emgMap = i16.bread(stream, n=nSignals)
 
         d = EMG(frequency, nSamples, startTime)
         if format == EMGBlockFormat.byTrack:
@@ -298,19 +303,19 @@ inheritance.</p></div>
             raise NotImplementedError(f&#34;EMG format {self.format} not implemented yet&#34;)
 
         # nSignals
-        Int32.bwrite(file, len(self._signals))
+        i32.bwrite(file, len(self._signals))
 
         # frequency
-        Int32.bwrite(file, self.frequency)
+        i32.bwrite(file, self.frequency)
 
         # startTime
-        Float32.bwrite(file, self.startTime)
+        f32.bwrite(file, self.startTime)
 
         # emgMap
-        Int16.bwrite(file, self._emgMap)
+        i16.bwrite(file, self._emgMap)
 
         # nSamples
-        Int32.bwrite(file, self.nSamples - 49)  # That 49 again
+        i32.bwrite(file, self.nSamples - 49)  # That 49 again
 
         # signals
         for signal in self._signals:
@@ -397,6 +402,13 @@ inheritance.</p></div>
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
 <li>abc.ABC</li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfEMG.EMG.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfEMG.EMG.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
@@ -550,15 +562,13 @@ available</p></div>
     @staticmethod
     def build(stream, nSamples):
         label = BTSString.bread(stream, 256)
-        nSegments = Int32.bread(stream)
-        Int32.skip(stream)  # padding
+        nSegments = i32.bread(stream)
+        i32.skip(stream)  # padding
         segmentData = SegmentData.bread(stream, nSegments)
         trackData = np.empty(nSamples, dtype=&#34;&lt;f4&#34;)
         trackData[:] = np.nan
         for startFrame, nFrames in segmentData:
-            trackData[startFrame : startFrame + nFrames] = Float32.bread(
-                stream, nFrames
-            )
+            trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
     def write(self, file):
@@ -569,26 +579,26 @@ available</p></div>
         segments = self._segments
 
         # nSegments
-        Int32.bwrite(file, len(segments))
+        i32.bwrite(file, len(segments))
 
         # padding
-        Int32.bpad(file, 1)
+        i32.bpad(file, 1)
 
         for segment in segments:
             # startFrame
-            Int32.bwrite(file, segment.start)
+            i32.bwrite(file, segment.start)
             # nFrames
-            Int32.bwrite(file, segment.stop - segment.start)
+            i32.bwrite(file, segment.stop - segment.start)
 
         for segment in segments:
             # data
-            Float32.bwrite(file, self.data[segment])
+            f32.bwrite(file, self.data[segment])
 
     @property
     def nBytes(self):
         base = 256 + 4 + 4
         for segment in self._segments:
-            base += 4 + 4 + (segment.stop - segment.start) * Float32.btype.itemsize
+            base += 4 + 4 + (segment.stop - segment.start) * f32.btype.itemsize
         return base
 
     def __eq__(self, other):
@@ -611,15 +621,13 @@ available</p></div>
 <pre><code class="python">@staticmethod
 def build(stream, nSamples):
     label = BTSString.bread(stream, 256)
-    nSegments = Int32.bread(stream)
-    Int32.skip(stream)  # padding
+    nSegments = i32.bread(stream)
+    i32.skip(stream)  # padding
     segmentData = SegmentData.bread(stream, nSegments)
     trackData = np.empty(nSamples, dtype=&#34;&lt;f4&#34;)
     trackData[:] = np.nan
     for startFrame, nFrames in segmentData:
-        trackData[startFrame : startFrame + nFrames] = Float32.bread(
-            stream, nFrames
-        )
+        trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
     return EMGTrack(label, trackData)</code></pre>
 </details>
 </dd>
@@ -637,7 +645,7 @@ def build(stream, nSamples):
 def nBytes(self):
     base = 256 + 4 + 4
     for segment in self._segments:
-        base += 4 + 4 + (segment.stop - segment.start) * Float32.btype.itemsize
+        base += 4 + 4 + (segment.stop - segment.start) * f32.btype.itemsize
     return base</code></pre>
 </details>
 </dd>
@@ -681,20 +689,20 @@ def nSamples(self) -&gt; int:
     segments = self._segments
 
     # nSegments
-    Int32.bwrite(file, len(segments))
+    i32.bwrite(file, len(segments))
 
     # padding
-    Int32.bpad(file, 1)
+    i32.bpad(file, 1)
 
     for segment in segments:
         # startFrame
-        Int32.bwrite(file, segment.start)
+        i32.bwrite(file, segment.start)
         # nFrames
-        Int32.bwrite(file, segment.stop - segment.start)
+        i32.bwrite(file, segment.stop - segment.start)
 
     for segment in segments:
         # data
-        Float32.bwrite(file, self.data[segment])</code></pre>
+        f32.bwrite(file, self.data[segment])</code></pre>
 </details>
 </dd>
 </dl>
@@ -722,6 +730,7 @@ def nSamples(self) -&gt; int:
 <li><code><a title="basictdf.tdfEMG.EMG.nBytes" href="#basictdf.tdfEMG.EMG.nBytes">nBytes</a></code></li>
 <li><code><a title="basictdf.tdfEMG.EMG.nSignals" href="#basictdf.tdfEMG.EMG.nSignals">nSignals</a></code></li>
 <li><code><a title="basictdf.tdfEMG.EMG.removeSignal" href="#basictdf.tdfEMG.EMG.removeSignal">removeSignal</a></code></li>
+<li><code><a title="basictdf.tdfEMG.EMG.type" href="#basictdf.tdfEMG.EMG.type">type</a></code></li>
 </ul>
 </li>
 <li>
