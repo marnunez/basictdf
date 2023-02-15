@@ -91,3 +91,7 @@ from basictdf.basictdf import Tdf
 from basictdf.tdfData3D import Data3D, MarkerTrack
 from basictdf.tdfEvents import TemporalEventsData, Event, EventsDataType
 from basictdf.tdfEMG import EMG, EMGTrack
+
+__pdoc__ = {}
+__pdoc__["basictdf.tdfUtils"] = False
+__pdoc__["basictdf.tdfTypes"] = False

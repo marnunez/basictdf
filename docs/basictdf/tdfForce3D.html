@@ -30,16 +30,13 @@
 <pre><code class="python">__doc__ = &#34;Force, torque and acceleration data module.&#34;
 
 from io import BytesIO
-from re import I
-from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Optional, Type, Union
+from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Type, Union
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
-from basictdf.tdfData3D import TrackType
 from basictdf.tdfTypes import (
     i32,
     f32,
     BTSString,
-    BTSDate,
     u32,
     VEC3F,
     MAT3X3F,
@@ -101,7 +98,6 @@ class ForceTorqueTrack:
 
     @staticmethod
     def _build(stream, frames: int) -&gt; &#34;ForceTorqueTrack&#34;:
-
         # label
         label = BTSString.bread(stream, 256)
         # nSegments
@@ -138,7 +134,6 @@ class ForceTorqueTrack:
         )
 
     def _write(self, file: BinaryIO) -&gt; None:
-
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -269,7 +264,7 @@ class ForceTorque3D(Block):
             ValueError: Track has a different number of frames than the data block
         &#34;&#34;&#34;
         if not isinstance(track, ForceTorqueTrack):
-            raise TypeError(f&#34;Track must be of type ForceTorqueTrack&#34;)
+            raise TypeError(&#34;Track must be of type ForceTorqueTrack&#34;)
         if track.nFrames != self.nFrames:
             raise ValueError(
                 f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
@@ -484,7 +479,7 @@ inheritance.</p></div>
             ValueError: Track has a different number of frames than the data block
         &#34;&#34;&#34;
         if not isinstance(track, ForceTorqueTrack):
-            raise TypeError(f&#34;Track must be of type ForceTorqueTrack&#34;)
+            raise TypeError(&#34;Track must be of type ForceTorqueTrack&#34;)
         if track.nFrames != self.nFrames:
             raise ValueError(
                 f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
@@ -702,7 +697,7 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
         ValueError: Track has a different number of frames than the data block
     &#34;&#34;&#34;
     if not isinstance(track, ForceTorqueTrack):
-        raise TypeError(f&#34;Track must be of type ForceTorqueTrack&#34;)
+        raise TypeError(&#34;Track must be of type ForceTorqueTrack&#34;)
     if track.nFrames != self.nFrames:
         raise ValueError(
             f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
@@ -816,7 +811,6 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
 
     @staticmethod
     def _build(stream, frames: int) -&gt; &#34;ForceTorqueTrack&#34;:
-
         # label
         label = BTSString.bread(stream, 256)
         # nSegments
@@ -853,7 +847,6 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
         )
 
     def _write(self, file: BinaryIO) -&gt; None:
-
         # label
         BTSString.bwrite(file, 256, self.label)
 

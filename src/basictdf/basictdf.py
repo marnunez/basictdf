@@ -133,7 +133,6 @@ class TdfEntry:
 
 class Tdf:
     SIGNATURE = b"\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08"
-    "The magic number at the beginning of the file"
 
     def __init__(self, filename: Union[Path, str]) -> None:
         self.filePath = Path(filename)

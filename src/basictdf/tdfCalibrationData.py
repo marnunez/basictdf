@@ -17,6 +17,8 @@ from basictdf.tdfTypes import (
     TdfType,
 )
 
+__doc__ = "The TDF Calibration Data block"
+
 CameraMap = TdfType(np.dtype("(1,)<i2"))
 
 

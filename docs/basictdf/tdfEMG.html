@@ -79,7 +79,6 @@ class EMGTrack:
         return EMGTrack(label, trackData)
 
     def write(self, file):
-
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -572,7 +571,6 @@ available</p></div>
         return EMGTrack(label, trackData)
 
     def write(self, file):
-
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -682,7 +680,6 @@ def nSamples(self) -&gt; int:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def write(self, file):
-
     # label
     BTSString.bwrite(file, 256, self.label)
 

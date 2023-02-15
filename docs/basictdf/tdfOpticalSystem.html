@@ -69,7 +69,7 @@ class OpticalChannelData:
             camera_viewport = CameraViewPort(camera_viewport[0], camera_viewport[1])
         else:
             raise TypeError(
-                f&#34;camera_viewport must be a CameraViewPort or a (2,2) shape numpy array&#34;
+                &#34;camera_viewport must be a CameraViewPort or a (2,2) shape numpy array&#34;
             )
 
         self.camera_viewport = camera_viewport
@@ -92,7 +92,6 @@ class OpticalChannelData:
         )
 
     def _write(self, file) -&gt; None:
-
         # logical camera index
         i32.bwrite(file, self.logical_camera_index)
 
@@ -195,7 +194,6 @@ class OpticalSetupBlock(Block):
         return len(self.channels)
 
     def _write(self, file: BinaryIO) -&gt; None:
-
         # nChannels
         i32.bwrite(file, len(self.channels))
 
@@ -230,7 +228,7 @@ class OpticalSetupBlock(Block):
 <dl>
 <dt id="basictdf.tdfOpticalSystem.OpticalChannelData"><code class="flex name class">
 <span>class <span class="ident">OpticalChannelData</span></span>
-<span>(</span><span>logical_camera_index: int, lens_name: str, camera_type: str, camera_name: str, camera_viewport: Union[<a title="basictdf.tdfTypes.CameraViewPort" href="tdfTypes.html#basictdf.tdfTypes.CameraViewPort">CameraViewPort</a>, numpy.ndarray])</span>
+<span>(</span><span>logical_camera_index: int, lens_name: str, camera_type: str, camera_name: str, camera_viewport: Union[basictdf.tdfTypes.CameraViewPort, numpy.ndarray])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>An object that collects data for a single channel of the optical system.</p></div>
@@ -269,7 +267,7 @@ class OpticalSetupBlock(Block):
             camera_viewport = CameraViewPort(camera_viewport[0], camera_viewport[1])
         else:
             raise TypeError(
-                f&#34;camera_viewport must be a CameraViewPort or a (2,2) shape numpy array&#34;
+                &#34;camera_viewport must be a CameraViewPort or a (2,2) shape numpy array&#34;
             )
 
         self.camera_viewport = camera_viewport
@@ -292,7 +290,6 @@ class OpticalSetupBlock(Block):
         )
 
     def _write(self, file) -&gt; None:
-
         # logical camera index
         i32.bwrite(file, self.logical_camera_index)
 
@@ -447,7 +444,6 @@ motion capture.</p></div>
         return len(self.channels)
 
     def _write(self, file: BinaryIO) -&gt; None:
-
         # nChannels
         i32.bwrite(file, len(self.channels))
 
