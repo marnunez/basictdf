@@ -110,9 +110,9 @@ class TestOpticalSetupBlock(TestCase):
 
         self.assertEqual(a.format, OpticalSetupBlockFormat.basicFormat)
         self.assertEqual(a.channels, channels)
-        self.assertEqual(a.channels[0].camera_name, f"Camera 0")
-        self.assertEqual(a.channels[0].camera_type, f"Type n° 0")
-        self.assertEqual(a.channels[0].lens_name, f"Lens 0")
+        self.assertEqual(a.channels[0].camera_name, "Camera 0")
+        self.assertEqual(a.channels[0].camera_type, "Type n° 0")
+        self.assertEqual(a.channels[0].lens_name, "Lens 0")
         self.assertEqual(a.channels[0].logical_camera_index, 0)
         self.assertEqual(a.channels[0].camera_viewport, CameraViewPort((0, 0), (0, 0)))
 
@@ -139,9 +139,9 @@ class TestOpticalSetupBlock(TestCase):
 
         self.assertEqual(block2.format, OpticalSetupBlockFormat.basicFormat)
         self.assertEqual(block2.channels, channels)
-        self.assertEqual(block2.channels[0].camera_name, f"Camera 0")
-        self.assertEqual(block2.channels[0].camera_type, f"Type n° 0")
-        self.assertEqual(block2.channels[0].lens_name, f"Lens 0")
+        self.assertEqual(block2.channels[0].camera_name, "Camera 0")
+        self.assertEqual(block2.channels[0].camera_type, "Type n° 0")
+        self.assertEqual(block2.channels[0].lens_name, "Lens 0")
         self.assertEqual(block2.channels[0].logical_camera_index, 0)
         self.assertEqual(
             block2.channels[0].camera_viewport, CameraViewPort((0, 0), (0, 0))

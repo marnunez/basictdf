@@ -73,7 +73,7 @@ class SeelabCameraData:
             view_port = CameraViewPort(view_port[0], view_port[1])
         else:
             raise TypeError(
-                f"view_port must be a CameraViewPort or a (2,2) shape numpy array"
+                "view_port must be a CameraViewPort or a (2,2) shape numpy array"
             )
 
         self.view_port = view_port
@@ -176,7 +176,7 @@ class BTSCameraData:
             view_port = CameraViewPort(view_port[0], view_port[1])
         else:
             raise TypeError(
-                f"view_port must be a CameraViewPort or a (2,2) shape numpy array"
+                "view_port must be a CameraViewPort or a (2,2) shape numpy array"
             )
 
         self.view_port = view_port
@@ -285,9 +285,7 @@ class CalibrationDataBlock(Block):
             not isinstance(cameras_calibration_map, np.ndarray)
             or len(cameras_calibration_map.shape) != 1
         ):
-            raise ValueError(
-                f"cameras_calibration_map must be a single row numpy array"
-            )
+            raise ValueError("Cameras_calibration_map must be a single row numpy array")
         self.cameras_calibration_map = cameras_calibration_map
 
         self.cam_data = cam_data

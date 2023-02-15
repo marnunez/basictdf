@@ -40,7 +40,7 @@ class OpticalChannelData:
             camera_viewport = CameraViewPort(camera_viewport[0], camera_viewport[1])
         else:
             raise TypeError(
-                f"camera_viewport must be a CameraViewPort or a (2,2) shape numpy array"
+                "camera_viewport must be a CameraViewPort or a (2,2) shape numpy array"
             )
 
         self.camera_viewport = camera_viewport
@@ -63,7 +63,6 @@ class OpticalChannelData:
         )
 
     def _write(self, file) -> None:
-
         # logical camera index
         i32.bwrite(file, self.logical_camera_index)
 
@@ -166,7 +165,6 @@ class OpticalSetupBlock(Block):
         return len(self.channels)
 
     def _write(self, file: BinaryIO) -> None:
-
         # nChannels
         i32.bwrite(file, len(self.channels))
 

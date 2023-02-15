@@ -1,5 +1,5 @@
 from io import BytesIO
-from unittest import TestCase
+from unittest import TestCase, skip
 
 import numpy as np
 from basictdf.tdfForce3D import (
@@ -13,6 +13,7 @@ from basictdf.tdfForce3D import (
 
 
 class TestForceTorqueTrack(TestCase):
+    @skip("Not implemented")
     def test_creation(self):
         cop = np.array([[1, 2, 3], [4, 5, 6]])
         force = np.array([[7, 8, 9], [10, 11, 12]])

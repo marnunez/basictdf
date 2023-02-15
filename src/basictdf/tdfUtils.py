@@ -1,3 +1,6 @@
+__all__ = []
+
+
 def is_iterable(obj) -> bool:
     try:
         iter(obj)

@@ -50,7 +50,6 @@ class EMGTrack:
         return EMGTrack(label, trackData)
 
     def write(self, file):
-
         # label
         BTSString.bwrite(file, 256, self.label)
 

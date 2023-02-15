@@ -1,5 +1,5 @@
 __doc__ = """
-basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file format. 
+basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file format.
 This format is tipically used as storage of raw data from a BTS motion capture acquisition system
 (e.g. raw EMG, 2D raw marker data) but can also serve as storage for processed data
 (e.g. 3D reconstructed marker data, filtered EMG signals, events).
@@ -39,7 +39,7 @@ with Tdf("path/to/file.tdf").allow_write() as tdf:
     oldData3D = tdf.data3D
 
     # Let's add 1 to the X coordinate of the c7 marker
-    oldData3D["c7"].X = oldData3D["c7"].X + 1 
+    oldData3D["c7"].X = oldData3D["c7"].X + 1
 
     tdf.data3D = oldData3D
 

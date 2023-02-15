@@ -16,7 +16,6 @@ from basictdf.tdfTypes import (
     TdfType,
 )
 import numpy as np
-from basictdf.tdfUtils import is_iterable
 
 
 class Data3dBlockFormat(Enum):
@@ -105,7 +104,6 @@ class MarkerTrack:
 
     @staticmethod
     def _build(stream, nFrames: int) -> "MarkerTrack":
-
         trackData = np.empty(nFrames, dtype=TrackType.btype)
         trackData[:] = np.NaN
 
@@ -119,7 +117,6 @@ class MarkerTrack:
         return MarkerTrack(label, trackData)
 
     def _write(self, file) -> None:
-
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -138,7 +135,6 @@ class MarkerTrack:
             i32.bwrite(file, np.array(segment.stop - segment.start))
 
         for segment in segments:
-
             # trackData
             TrackType.bwrite(file, self.data[segment])
 
@@ -237,7 +233,7 @@ class Data3D(Block):
             ValueError: Track has a different number of frames than the data block
         """
         if not isinstance(track, MarkerTrack):
-            raise TypeError(f"Track must be of type Track")
+            raise TypeError("Track must be of type Track")
         if track.nFrames != self.nFrames:
             raise ValueError(
                 f"Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames"
@@ -344,7 +340,6 @@ class Data3D(Block):
         return len(self._tracks)
 
     def _write(self, file: BinaryIO) -> None:
-
         if self.format not in [
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
@@ -375,7 +370,6 @@ class Data3D(Block):
             Data3dBlockFormat.byFrame,
             Data3dBlockFormat.byTrack,
         ]:
-
             links = self.links if hasattr(self, "links") else []
             nLinks = len(links)
 

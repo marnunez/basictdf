@@ -169,14 +169,14 @@ class CameraViewPort:
                 f"origin must be a {VEC2I.btype.shape} if it is a numpy array"
             )
         elif isinstance(origin, list) or isinstance(origin, tuple) and len(origin) != 2:
-            raise TypeError(f"origin must be of length 2 if it is a list or tuple")
+            raise TypeError("origin must be of length 2 if it is a list or tuple")
 
         if isinstance(size, np.ndarray) and size.shape != VEC2I.btype.shape:
             raise TypeError(
                 f"size must be a {VEC2I.btype.shape} if it is a numpy array"
             )
         elif isinstance(size, list) or isinstance(size, tuple) and len(size) != 2:
-            raise TypeError(f"size must be of length 2 if it is a list or tuple")
+            raise TypeError("size must be of length 2 if it is a list or tuple")
 
         self.origin = origin
         self.size = size
@@ -209,5 +209,5 @@ class CameraViewPort:
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, CameraViewPort):
-            raise TypeError(f"Can only compare CameraViewPort with CameraViewPort")
+            raise TypeError("Can only compare CameraViewPort with CameraViewPort")
         return np.all(self.origin == other.origin) and np.all(self.size == other.size)

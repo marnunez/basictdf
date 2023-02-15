@@ -15,10 +15,10 @@ class TestEvent(TestCase):
         self.assertEqual(a.label, "hola")
         np.testing.assert_equal(a.values, np.array([], dtype="<f4"))
         with self.assertRaises(TypeError):
-            b = Event("hola", values=1)
+            Event("hola", values=1)
 
         with self.assertRaises(TypeError):
-            b = Event("hola", values=[1, 2, 3], type=EventsDataType.singleEvent)
+            Event("hola", values=[1, 2, 3], type=EventsDataType.singleEvent)
 
     def test_build(self):
         b = b"hola" + b"\x00" * 252

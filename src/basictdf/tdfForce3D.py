@@ -1,16 +1,13 @@
 __doc__ = "Force, torque and acceleration data module."
 
 from io import BytesIO
-from re import I
-from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Optional, Type, Union
+from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Type, Union
 from basictdf.tdfBlock import Block, BlockType
 from enum import Enum
-from basictdf.tdfData3D import TrackType
 from basictdf.tdfTypes import (
     i32,
     f32,
     BTSString,
-    BTSDate,
     u32,
     VEC3F,
     MAT3X3F,
@@ -72,7 +69,6 @@ class ForceTorqueTrack:
 
     @staticmethod
     def _build(stream, frames: int) -> "ForceTorqueTrack":
-
         # label
         label = BTSString.bread(stream, 256)
         # nSegments
@@ -109,7 +105,6 @@ class ForceTorqueTrack:
         )
 
     def _write(self, file: BinaryIO) -> None:
-
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -240,7 +235,7 @@ class ForceTorque3D(Block):
             ValueError: Track has a different number of frames than the data block
         """
         if not isinstance(track, ForceTorqueTrack):
-            raise TypeError(f"Track must be of type ForceTorqueTrack")
+            raise TypeError("Track must be of type ForceTorqueTrack")
         if track.nFrames != self.nFrames:
             raise ValueError(
                 f"Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames"
