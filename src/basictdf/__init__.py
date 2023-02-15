@@ -90,3 +90,4 @@ with tdf.allow_write() as tdf:
 from basictdf.basictdf import Tdf
 from basictdf.tdfData3D import Data3D, MarkerTrack
 from basictdf.tdfEvents import TemporalEventsData, Event, EventsDataType
+from basictdf.tdfEMG import EMG, EMGTrack

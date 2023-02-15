@@ -4,3 +4,16 @@ requires = [
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "basictdf"
+version = "0.0.1"
+authors = [
+    {name = "Marcos Núñez", email = "mnunez@fleni.org.ar"},
+]
+description = "A basic TDF parser"
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = [
+"numpy>=1.24.1"
+]
