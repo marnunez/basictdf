@@ -16,7 +16,6 @@ from basictdf.tdfBlock import (
     NotDefinedBlock,
     UnusedBlock,
     VolumetricData,
-
 )
 from basictdf.tdfCalibrationData import CalibrationDataBlock
 from basictdf.tdfData3D import Data3D
@@ -129,7 +128,12 @@ class TdfEntry:
         )
 
     def __repr__(self) -> str:
-        return f"TdfEntry({self.type}, {self.format}, {self.offset}, {self.size}, {self.creation_date}, {self.last_modification_date}, {self.last_access_date}, {self.comment})"
+        return (
+            f"TdfEntry({self.type}, {self.format}, {self.offset},"
+            f" {self.size}, {self.creation_date},"
+            f" {self.last_modification_date},"
+            f" {self.last_access_date}, {self.comment})"
+        )
 
 
 class Tdf:

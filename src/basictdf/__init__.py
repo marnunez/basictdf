@@ -1,7 +1,9 @@
 __doc__ = """
-basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file format.
-This format is tipically used as storage of raw data from a BTS motion capture acquisition system
-(e.g. raw EMG, 2D raw marker data) but can also serve as storage for processed data
+basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file
+format.
+This format is tipically used as storage of raw data from a BTS motion capture 
+acquisition system (e.g. raw EMG, 2D raw marker data) but can also serve as
+storage for processed data
 (e.g. 3D reconstructed marker data, filtered EMG signals, events).
 
 ## How to read a TDF file?
@@ -54,9 +56,10 @@ with tdf.allow_write() as tdf:
 ## How to add a new block to a TDF file?
 ## How to create a TDF from scratch?
 
-The easiest way to add a new block to a TDF is actually to modify an existing block
-with the same type. However, if you want to add a completely new block, you can use any of the
-`basictdf.tdfBlock.Block` subclasses, like `basictdf.tdfData3D.Data3D` or `basictdf.tdfEvents.TemporalEventsData`.
+The easiest way to add a new block to a TDF is actually to modify an existing
+block with the same type. However, if you want to add a completely new block, 
+you can use any of the `basictdf.tdfBlock.Block` subclasses, like 
+`basictdf.tdfData3D.Data3D` or `basictdf.tdfEvents.TemporalEventsData`.
 
 ```python
 from basictdf import Tdf, Data3D, MarkerTrack
