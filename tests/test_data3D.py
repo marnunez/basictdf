@@ -160,9 +160,7 @@ class TestData3D(TestCase):
                     assert data3d.nFrames == data["nFrames"]
                     assert data3d.nTracks == data["nTracks"]
                     assert data3d.frequency == data["frequency"]
-                    np.testing.assert_almost_equal(
-                        data3d.volume, data["volume"]
-                    )
+                    np.testing.assert_almost_equal(data3d.volume, data["volume"])
                     np.testing.assert_almost_equal(
                         data3d.translationVector, data["translationVector"]
                     )

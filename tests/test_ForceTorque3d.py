@@ -90,29 +90,17 @@ class TestForceTorqueTrack(TestCase):
         a = ForceTorqueTrack(
             "track_label", application_point=cop, force=force, torque=torque
         )
-        self.assertNotEqual(
-            a, ForceTorqueTrack("other_label", cop, force, torque)
-        )
-        self.assertNotEqual(
-            a, ForceTorqueTrack("track_label", force, force, torque)
-        )
-        self.assertNotEqual(
-            a, ForceTorqueTrack("track_label", cop, cop, torque)
-        )
-        self.assertNotEqual(
-            a, ForceTorqueTrack("track_label", cop, force, force)
-        )
-        self.assertEqual(
-            a, ForceTorqueTrack("track_label", cop, force, torque)
-        )
+        self.assertNotEqual(a, ForceTorqueTrack("other_label", cop, force, torque))
+        self.assertNotEqual(a, ForceTorqueTrack("track_label", force, force, torque))
+        self.assertNotEqual(a, ForceTorqueTrack("track_label", cop, cop, torque))
+        self.assertNotEqual(a, ForceTorqueTrack("track_label", cop, force, force))
+        self.assertEqual(a, ForceTorqueTrack("track_label", cop, force, torque))
 
     def test_write(self):
         cop = np.array([[1, 2, 3], [4, 5, 6]])
         force = np.array([[5, 6, 7], [8, 9, 10]])
         torque = np.array([[11, 12, 13], [14, 15, 16]])
-        a = ForceTorqueTrack(
-            "r_gr", application_point=cop, force=force, torque=torque
-        )
+        a = ForceTorqueTrack("r_gr", application_point=cop, force=force, torque=torque)
         self.assertEqual(len(a._segments), 1)
         self.assertEqual(a._segments[0], slice(0, 2))
 

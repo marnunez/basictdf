@@ -116,9 +116,7 @@ class TestOpticalSetupBlock(TestCase):
         self.assertEqual(a.channels[0].camera_type, "Type n° 0")
         self.assertEqual(a.channels[0].lens_name, "Lens 0")
         self.assertEqual(a.channels[0].logical_camera_index, 0)
-        self.assertEqual(
-            a.channels[0].camera_viewport, CameraViewPort((0, 0), (0, 0))
-        )
+        self.assertEqual(a.channels[0].camera_viewport, CameraViewPort((0, 0), (0, 0)))
 
     def test_build(self):
         nChannels = 8
