@@ -64,7 +64,6 @@ jobs:
       #----------------------------------------------
       - name: Rerun the lock
         run: |
-          poetry add python@^${{ steps.setup-python.outputs.python-version }}
           poetry update numpy
       #----------------------------------------------
       #       load cached venv if cache exists
