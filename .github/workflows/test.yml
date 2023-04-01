@@ -60,6 +60,11 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
       #----------------------------------------------
+      # rerun the lock
+      #----------------------------------------------
+      - name: Rerun the lock
+        run: poetry lock --no-interaction --no-cache
+      #----------------------------------------------
       #       load cached venv if cache exists
       #----------------------------------------------
       - name: Load cached venv
@@ -68,11 +73,6 @@ jobs:
         with:
           path: ~/.cache
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      #----------------------------------------------
-      # rerun the lock
-      #----------------------------------------------
-      - name: Rerun the lock
-        run: poetry lock --no-interaction
       #----------------------------------------------
       # install dependencies if cache does not exist
       #----------------------------------------------
