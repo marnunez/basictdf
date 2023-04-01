@@ -6,8 +6,8 @@ authors = ["Marcos A. Núñez <silver94@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
-numpy = ">=1.21"
+python = "^3.7"
+numpy = "1.*"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
