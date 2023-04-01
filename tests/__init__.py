@@ -1,6 +1,7 @@
-from typing import Generator, Tuple
-from basictdf.tdfData3D import Data3dBlockFormat
 from pathlib import Path
+from typing import Generator, Tuple
+
+from basictdf.tdfData3D import Data3dBlockFormat
 
 test_files_data = {
     "2241_aa_Walking 01.tdf": {

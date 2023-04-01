@@ -2,11 +2,12 @@ __doc__ = "Events data module."
 
 from enum import Enum
 from typing import Iterator, Union
-from basictdf.tdfBlock import Block
-from basictdf.tdfTypes import BTSString, u32, i32, f32
-from basictdf.tdfUtils import is_iterable
-from basictdf.tdfBlock import BlockType
+
 import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import BTSString, f32, i32, u32
+from basictdf.tdfUtils import is_iterable
 
 
 class TemporalEventsDataFormat(Enum):
@@ -24,7 +25,9 @@ class Event:
     A class representing a single event or a sequence of events.
     """
 
-    def __init__(self, label, values=[], type=EventsDataType.singleEvent) -> None:
+    def __init__(
+        self, label, values=[], type=EventsDataType.singleEvent
+    ) -> None:
         self.label = label
         self.type = type
         if not is_iterable(values):
@@ -35,7 +38,9 @@ class Event:
             self.values = np.array(values, dtype="<f4")
 
         if len(values) > 1 and type == EventsDataType.singleEvent:
-            raise TypeError("Can't have more than one value for a single event")
+            raise TypeError(
+                "Can't have more than one value for a single event"
+            )
 
     def _write(self, stream) -> None:
         BTSString.bwrite(stream, 256, self.label)
@@ -59,7 +64,9 @@ class Event:
         return 256 + 4 + 4 + len(self.values) * 4
 
     def __repr__(self) -> str:
-        return f"Event(label={self.label}, type={self.type}, items={self.values})"
+        return (
+            f"Event(label={self.label}, type={self.type}, items={self.values})"
+        )
 
 
 class TemporalEventsData(Block):
@@ -69,7 +76,9 @@ class TemporalEventsData(Block):
 
     type = BlockType.temporalEventsData
 
-    def __init__(self, format=TemporalEventsDataFormat.standard, start_time=0.0):
+    def __init__(
+        self, format=TemporalEventsDataFormat.standard, start_time=0.0
+    ):
         super().__init__()
         self.format = format
         self.start_time = start_time

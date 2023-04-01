@@ -1,21 +1,23 @@
 __doc__ = """
 Marker data module.
 """
+from enum import Enum
 from io import BytesIO
 from typing import BinaryIO, Iterable, Iterator, List, Union
+
+import numpy as np
+
 from basictdf.tdfBlock import Block, BlockType
-from enum import Enum
 from basictdf.tdfTypes import (
+    MAT3X3F,
+    VEC3F,
     BTSString,
+    TdfType,
+    Volume,
+    f32,
     i32,
     u32,
-    Volume,
-    VEC3F,
-    MAT3X3F,
-    f32,
-    TdfType,
 )
-import numpy as np
 
 
 class Data3dBlockFormat(Enum):
@@ -146,7 +148,11 @@ class MarkerTrack:
         """
         base = 256 + 4 + 4
         for segment in self._segments:
-            base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
+            base += (
+                4
+                + 4
+                + (segment.stop - segment.start) * TrackType.btype.itemsize
+            )
         return base
 
     def __repr__(self) -> str:
@@ -210,7 +216,10 @@ class Data3D(Block):
             )
         self.translationVector = translationVector
 
-        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+        if not (
+            isinstance(volume, np.ndarray)
+            and volume.shape == Volume.btype.shape
+        ):
             raise ValueError(
                 f"volume must be a numpy array of shape {Volume.btype.shape}"
             )
@@ -295,9 +304,13 @@ class Data3D(Block):
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
         ]:
-            d._tracks = [MarkerTrack._build(stream, nFrames) for _ in range(nTracks)]
+            d._tracks = [
+                MarkerTrack._build(stream, nFrames) for _ in range(nTracks)
+            ]
         else:
-            raise NotImplementedError(f"Data3D format {format} not implemented yet")
+            raise NotImplementedError(
+                f"Data3D format {format} not implemented yet"
+            )
         return d
 
     def __getitem__(self, key: Union[int, str]) -> MarkerTrack:
@@ -305,7 +318,9 @@ class Data3D(Block):
             return self._tracks[key]
         elif isinstance(key, str):
             try:
-                return next(track for track in self._tracks if track.label == key)
+                return next(
+                    track for track in self._tracks if track.label == key
+                )
             except StopIteration:
                 raise KeyError(f"Track with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
@@ -396,7 +411,10 @@ class Data3D(Block):
             + 4  # flags
         )
 
-        if self.format in [Data3dBlockFormat.byFrame, Data3dBlockFormat.byTrack]:
+        if self.format in [
+            Data3dBlockFormat.byFrame,
+            Data3dBlockFormat.byTrack,
+        ]:
             links_size = (
                 4
                 + 4

@@ -2,11 +2,12 @@ from io import BytesIO
 from unittest import TestCase
 
 import numpy as np
+
 from basictdf.tdfOpticalSystem import (
     CameraViewPort,
+    OpticalChannelData,
     OpticalSetupBlock,
     OpticalSetupBlockFormat,
-    OpticalChannelData,
 )
 
 
@@ -24,7 +25,8 @@ class TestChannel(TestCase):
         self.assertEqual(a.lens_name, "Lens")
         self.assertEqual(a.logical_camera_index, 1)
         self.assertEqual(
-            a.camera_viewport, CameraViewPort(np.array((0, 0)), np.array((1, 1)))
+            a.camera_viewport,
+            CameraViewPort(np.array((0, 0)), np.array((1, 1))),
         )
         cv = CameraViewPort(origin=np.array((0, 1)), size=np.array((1, 1)))
         a = OpticalChannelData(
@@ -114,7 +116,9 @@ class TestOpticalSetupBlock(TestCase):
         self.assertEqual(a.channels[0].camera_type, "Type n° 0")
         self.assertEqual(a.channels[0].lens_name, "Lens 0")
         self.assertEqual(a.channels[0].logical_camera_index, 0)
-        self.assertEqual(a.channels[0].camera_viewport, CameraViewPort((0, 0), (0, 0)))
+        self.assertEqual(
+            a.channels[0].camera_viewport, CameraViewPort((0, 0), (0, 0))
+        )
 
     def test_build(self):
         nChannels = 8

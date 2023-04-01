@@ -1,20 +1,22 @@
 __doc__ = "Force, torque and acceleration data module."
 
+from enum import Enum
 from io import BytesIO
 from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Type, Union
-from basictdf.tdfBlock import Block, BlockType
-from enum import Enum
-from basictdf.tdfTypes import (
-    i32,
-    f32,
-    BTSString,
-    u32,
-    VEC3F,
-    MAT3X3F,
-    Volume,
-    TdfType,
-)
+
 import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import (
+    MAT3X3F,
+    VEC3F,
+    BTSString,
+    TdfType,
+    Volume,
+    f32,
+    i32,
+    u32,
+)
 
 SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 ForceType = ApplicationPointType = TorqueType = TdfType(np.dtype("<3f4"))
@@ -78,7 +80,9 @@ class ForceTorqueTrack:
 
         segmentData = SegmentData.bread(stream, nSegments)
 
-        application_point_data = np.empty(frames, dtype=ApplicationPointType.btype)
+        application_point_data = np.empty(
+            frames, dtype=ApplicationPointType.btype
+        )
         application_point_data[:] = np.nan
 
         force_data = np.empty(frames, dtype=ForceType.btype)
@@ -188,7 +192,10 @@ class ForceTorque3D(Block):
             )
         self.translationVector = translationVector
 
-        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+        if not (
+            isinstance(volume, np.ndarray)
+            and volume.shape == Volume.btype.shape
+        ):
             raise ValueError(
                 f"volume must be a numpy array of shape {Volume.btype.shape}"
             )
@@ -219,9 +226,13 @@ class ForceTorque3D(Block):
             format,
         )
         if format != ForceTorque3DBlockFormat.byTrack:
-            raise NotImplementedError(f"Force3D format {format} not implemented yet")
+            raise NotImplementedError(
+                f"Force3D format {format} not implemented yet"
+            )
 
-        f._tracks = [ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)]
+        f._tracks = [
+            ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)
+        ]
         return f
 
     def add_track(self, track: ForceTorqueTrack) -> None:
@@ -270,7 +281,9 @@ class ForceTorque3D(Block):
             return self._tracks[key]
         elif isinstance(key, str):
             try:
-                return next(track for track in self._tracks if track.label == key)
+                return next(
+                    track for track in self._tracks if track.label == key
+                )
             except StopIteration:
                 raise KeyError(f"Track with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")

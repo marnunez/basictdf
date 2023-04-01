@@ -5,16 +5,16 @@ import numpy as np
 
 from basictdf.tdfBlock import Block, BlockType
 from basictdf.tdfTypes import (
+    MAT3X3D,
+    MAT3X3F,
     VEC2D,
     VEC3D,
     VEC3F,
     CameraViewPort,
+    TdfType,
+    f64,
     i16,
     i32,
-    f64,
-    MAT3X3D,
-    MAT3X3F,
-    TdfType,
 )
 
 __doc__ = "The TDF Calibration Data block"
@@ -212,8 +212,12 @@ class BTSCameraData:
         VEC3D.bwrite(file, self.translation_vector)  # translation_vector
         VEC2D.bwrite(file, self.focus)  # focus
         VEC2D.bwrite(file, self.optical_center)  # optical_center
-        f64.bwrite(file, self.x_distortion_coefficients)  # x_distortion_coefficients
-        f64.bwrite(file, self.y_distortion_coefficients)  # y_distortion_coefficients
+        f64.bwrite(
+            file, self.x_distortion_coefficients
+        )  # x_distortion_coefficients
+        f64.bwrite(
+            file, self.y_distortion_coefficients
+        )  # y_distortion_coefficients
         self.view_port.bwrite(file)  # view_port
 
     def nBytes(self) -> int:
@@ -270,7 +274,9 @@ class CalibrationDataBlock(Block):
                 f"calibration_volume_rotation_matrix must be a {MAT3X3F.btype.shape} shape numpy array"
             )
 
-        self.calibration_volume_rotation_matrix = calibration_volume_rotation_matrix
+        self.calibration_volume_rotation_matrix = (
+            calibration_volume_rotation_matrix
+        )
         "Rotation matrix of the calibration volume"
 
         if calibration_volume_translation_vector.shape != VEC3F.btype.shape:
@@ -287,7 +293,9 @@ class CalibrationDataBlock(Block):
             not isinstance(cameras_calibration_map, np.ndarray)
             or len(cameras_calibration_map.shape) != 1
         ):
-            raise ValueError("Cameras_calibration_map must be a single row numpy array")
+            raise ValueError(
+                "Cameras_calibration_map must be a single row numpy array"
+            )
         self.cameras_calibration_map = cameras_calibration_map
 
         self.cam_data = cam_data
@@ -304,9 +312,13 @@ class CalibrationDataBlock(Block):
         calibration_data = []
 
         if format == CalibrationDataBlockFormat.Seelab1:
-            calibration_data = [SeelabCameraData._build(stream) for _ in range(nCams)]
+            calibration_data = [
+                SeelabCameraData._build(stream) for _ in range(nCams)
+            ]
         elif format == CalibrationDataBlockFormat.BTS:
-            calibration_data = [BTSCameraData._build(stream) for _ in range(nCams)]
+            calibration_data = [
+                BTSCameraData._build(stream) for _ in range(nCams)
+            ]
         else:
             raise ValueError(f'"Unknown calibration format "{format}"')
 

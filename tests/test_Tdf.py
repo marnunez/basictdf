@@ -105,7 +105,9 @@ class TestTdf(TestCase):
         self.assertEqual(len(content), 64 + 288 * len(tdf.entries))
 
     def test_add_block(self) -> None:
-        event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
+        event = Event(
+            "jaja", values=[1, 2, 3], type=EventsDataType.eventSequence
+        )
         eventBlock = TemporalEventsData()
         eventBlock.events.append(event)
 
@@ -120,16 +122,23 @@ class TestTdf(TestCase):
             self.assertEqual(
                 tdf.entries[0].format, TemporalEventsDataFormat.standard.value
             )
-            self.assertEqual(tdf.entries[0].comment, "My favourite event block")
-            self.assertEqual(tdf.entries[0].offset, 64 + 288 * len(tdf.entries))
+            self.assertEqual(
+                tdf.entries[0].comment, "My favourite event block"
+            )
+            self.assertEqual(
+                tdf.entries[0].offset, 64 + 288 * len(tdf.entries)
+            )
             self.assertEqual(tdf.entries[0].size, eventBlock.nBytes)
             self.assertIsInstance(tdf.entries[0].creation_date, datetime)
-            self.assertIsInstance(tdf.entries[0].last_modification_date, datetime)
+            self.assertIsInstance(
+                tdf.entries[0].last_modification_date, datetime
+            )
             self.assertIsInstance(tdf.entries[0].last_access_date, datetime)
             for entry in tdf.entries[1:]:
                 self.assertEqual(entry.type, BlockType.unusedSlot)
                 self.assertEqual(
-                    entry.offset, 64 + 288 * len(tdf.entries) + tdf.entries[0].size
+                    entry.offset,
+                    64 + 288 * len(tdf.entries) + tdf.entries[0].size,
                 )
 
             block = tdf.get_block(BlockType.temporalEventsData)
@@ -139,7 +148,9 @@ class TestTdf(TestCase):
                 np.testing.assert_equal(before.values, after.values)
 
     def test_remove_block(self) -> None:
-        event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
+        event = Event(
+            "jaja", values=[1, 2, 3], type=EventsDataType.eventSequence
+        )
         eventBlock = TemporalEventsData()
         eventBlock.events.append(event)
 
@@ -169,7 +180,9 @@ class TestTdf(TestCase):
             self.assertEqual(tdf.nBytes, oldSize - eventBlock.nBytes)
 
     def test_replace_block(self) -> None:
-        event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
+        event = Event(
+            "jaja", values=[1, 2, 3], type=EventsDataType.eventSequence
+        )
         eventBlock = TemporalEventsData()
         eventBlock.events.append(event)
 
@@ -195,13 +208,17 @@ class TestTdf(TestCase):
             self.assertEqual(
                 tdf.entries[0].comment, "My modified favourite event block"
             )
-            self.assertEqual(tdf.entries[0].offset, 64 + 288 * len(tdf.entries))
+            self.assertEqual(
+                tdf.entries[0].offset, 64 + 288 * len(tdf.entries)
+            )
             self.assertEqual(tdf.entries[0].size, eventBlock.nBytes)
             event = tdf.events[0]
             np.testing.assert_equal(event.values, [4, 5, 6])
 
     def test_replace_using_setters(self) -> None:
-        event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
+        event = Event(
+            "jaja", values=[1, 2, 3], type=EventsDataType.eventSequence
+        )
         eventBlock = TemporalEventsData()
         eventBlock.events.append(event)
 
@@ -226,14 +243,20 @@ class TestTdf(TestCase):
             )
 
             # when using setters, the comment from the original block is kept
-            self.assertEqual(tdf.entries[0].comment, "My favourite event block")
-            self.assertEqual(tdf.entries[0].offset, 64 + 288 * len(tdf.entries))
+            self.assertEqual(
+                tdf.entries[0].comment, "My favourite event block"
+            )
+            self.assertEqual(
+                tdf.entries[0].offset, 64 + 288 * len(tdf.entries)
+            )
             self.assertEqual(tdf.entries[0].size, eventBlock.nBytes)
             event = tdf.events[0]
             np.testing.assert_equal(event.values, [4, 5, 6])
 
     def test_cannot_write_outside_context(self) -> None:
-        event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
+        event = Event(
+            "jaja", values=[1, 2, 3], type=EventsDataType.eventSequence
+        )
         eventBlock = TemporalEventsData()
         eventBlock.events.append(event)
 
@@ -246,7 +269,9 @@ class TestTdf(TestCase):
             tdf_file.events = eventBlock
 
     def test_read_only_property(self) -> None:
-        event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
+        event = Event(
+            "jaja", values=[1, 2, 3], type=EventsDataType.eventSequence
+        )
         eventBlock = TemporalEventsData()
         eventBlock.events.append(event)
 

@@ -1,14 +1,13 @@
 __doc__ = "Electromyography data module."
 
+from enum import Enum
 from io import BytesIO
 from typing import Iterator, Union
 
-from basictdf.tdfBlock import Block, BlockType
-from enum import Enum
-from basictdf.tdfTypes import BTSString, i32, f32, TdfType, i16
-
 import numpy as np
 
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import BTSString, TdfType, f32, i16, i32
 
 SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 
@@ -46,7 +45,9 @@ class EMGTrack:
         trackData = np.empty(nSamples, dtype="<f4")
         trackData[:] = np.nan
         for startFrame, nFrames in segmentData:
-            trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
+            trackData[startFrame : startFrame + nFrames] = f32.bread(
+                stream, nFrames
+            )
         return EMGTrack(label, trackData)
 
     def write(self, file):
@@ -114,12 +115,16 @@ class EMG(Block):
                 emgSignal = EMGTrack.build(stream, nSamples)
                 d.addSignal(emgSignal, channel=emgMap[n])
         else:
-            raise NotImplementedError(f"EMG format {format} not implemented yet")
+            raise NotImplementedError(
+                f"EMG format {format} not implemented yet"
+            )
         return d
 
     def _write(self, file):
         if self.format != EMGBlockFormat.byTrack:
-            raise NotImplementedError(f"EMG format {self.format} not implemented yet")
+            raise NotImplementedError(
+                f"EMG format {self.format} not implemented yet"
+            )
 
         # nSignals
         i32.bwrite(file, len(self._signals))
@@ -145,7 +150,9 @@ class EMG(Block):
             return self._signals[key]
         elif isinstance(key, str):
             try:
-                return next(signal for signal in self._signals if signal.label == key)
+                return next(
+                    signal for signal in self._signals if signal.label == key
+                )
             except StopIteration:
                 raise KeyError(f"EMG signal with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
@@ -175,7 +182,9 @@ class EMG(Block):
         adds a signal to the EMG block. If the channel is not specified, it is set to the next one  available
         """
         if not isinstance(signal, EMGTrack):
-            raise TypeError(f"Can only add EMGTrack objects, got {type(signal)}")
+            raise TypeError(
+                f"Can only add EMGTrack objects, got {type(signal)}"
+            )
         if signal.nSamples != self.nSamples:
             raise ValueError(
                 f"EMGTrack with label {signal.label} has {signal.nSamples} samples, expected {self.nSamples}"

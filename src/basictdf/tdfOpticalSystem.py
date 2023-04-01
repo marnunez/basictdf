@@ -4,9 +4,11 @@ Optical System Configuration Data module.
 from enum import Enum
 from io import BytesIO
 from typing import BinaryIO, Iterator, List, Union
-from basictdf.tdfBlock import Block, BlockType
-from basictdf.tdfTypes import BTSString, i32, CameraViewPort
+
 import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import BTSString, CameraViewPort, i32
 
 
 class OpticalChannelData:
@@ -33,11 +35,15 @@ class OpticalChannelData:
 
         if isinstance(camera_viewport, CameraViewPort):
             camera_viewport = camera_viewport
-        elif isinstance(camera_viewport, np.ndarray) and camera_viewport.shape == (
+        elif isinstance(
+            camera_viewport, np.ndarray
+        ) and camera_viewport.shape == (
             2,
             2,
         ):
-            camera_viewport = CameraViewPort(camera_viewport[0], camera_viewport[1])
+            camera_viewport = CameraViewPort(
+                camera_viewport[0], camera_viewport[1]
+            )
         else:
             raise TypeError(
                 "camera_viewport must be a CameraViewPort or a (2,2) shape numpy array"
@@ -134,7 +140,9 @@ class OpticalSetupBlock(Block):
         nChannels = i32.bread(stream)
         i32.skip(stream)  # reserved0
 
-        channels = [OpticalChannelData._build(stream) for _ in range(nChannels)]
+        channels = [
+            OpticalChannelData._build(stream) for _ in range(nChannels)
+        ]
         return OpticalSetupBlock(format=format, channels=channels)
 
     def __iter__(self) -> Iterator[OpticalChannelData]:

@@ -2,7 +2,8 @@ from io import BytesIO
 from unittest import TestCase
 
 import numpy as np
-from basictdf.tdfEMG import EMGTrack, EMG
+
+from basictdf.tdfEMG import EMG, EMGTrack
 from basictdf.tdfTypes import f32
 
 
@@ -97,11 +98,14 @@ class TestEMG(TestCase):
 
     def test_addSignal(self) -> None:
         t1 = EMGTrack(
-            "Right Rectus Femoris", np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+            "Right Rectus Femoris",
+            np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
         )
         t2 = EMGTrack(
             "Left Rectus Femoris",
-            np.array([1.2, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11]),
+            np.array(
+                [1.2, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11]
+            ),
         )
         a = EMG(frequency=1000, nSamples=11)
         a.addSignal(t1)

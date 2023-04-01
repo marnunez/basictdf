@@ -45,7 +45,9 @@ class Block(ABC):
             else datetime.now()
         )
         self.last_access_date = (
-            last_access_date if last_access_date is not None else datetime.now()
+            last_access_date
+            if last_access_date is not None
+            else datetime.now()
         )
 
     @abstractmethod

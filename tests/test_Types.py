@@ -1,7 +1,9 @@
 from io import BytesIO
 from unittest import TestCase
-from basictdf.tdfTypes import TdfType
+
 import numpy as np
+
+from basictdf.tdfTypes import TdfType
 
 
 class TestTypes(TestCase):

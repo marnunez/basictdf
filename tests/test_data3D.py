@@ -1,12 +1,18 @@
 from io import BytesIO
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest import TestCase
 
 import numpy as np
-from basictdf.tdfData3D import Data3D, Data3dBlockFormat, MarkerTrack, TrackType
+
 from basictdf import Tdf
+from basictdf.tdfData3D import (
+    Data3D,
+    Data3dBlockFormat,
+    MarkerTrack,
+    TrackType,
+)
 from tests import test_file_feeder
-from tempfile import TemporaryDirectory
 
 
 class TestMarkerTrack(TestCase):
@@ -154,7 +160,9 @@ class TestData3D(TestCase):
                     assert data3d.nFrames == data["nFrames"]
                     assert data3d.nTracks == data["nTracks"]
                     assert data3d.frequency == data["frequency"]
-                    np.testing.assert_almost_equal(data3d.volume, data["volume"])
+                    np.testing.assert_almost_equal(
+                        data3d.volume, data["volume"]
+                    )
                     np.testing.assert_almost_equal(
                         data3d.translationVector, data["translationVector"]
                     )
