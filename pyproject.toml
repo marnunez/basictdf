@@ -1,19 +1,19 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "basictdf"
-version = "0.0.1"
-authors = [
-    {name = "Marcos Núñez", email = "mnunez@fleni.org.ar"},
-]
+version = "0.1.0"
 description = "A basic TDF parser"
+authors = ["Marcos A. Núñez <silver94@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.6"
-dependencies = [
-"numpy>=1.24.1"
-]
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+numpy = ">=1.21"
+wheel = "^0.40.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+pytest = "^7.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
