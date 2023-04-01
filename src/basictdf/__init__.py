@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __doc__ = """
 basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file
 format.
@@ -105,6 +107,7 @@ __all__ = [
     "EMG",
     "EMGTrack",
 ]
+
 
 __pdoc__ = {}
 __pdoc__["basictdf.tdfUtils"] = False
