@@ -74,8 +74,8 @@ jobs:
       - name: Install dependencies
         # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
-        poetry add "numpy=^1.21"
-        poetry install --no-interaction --no-root
+          poetry add "numpy=^1.21"
+          poetry install --no-interaction --no-root
       #----------------------------------------------
       # install your root project, if required
       #----------------------------------------------
