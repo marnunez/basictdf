@@ -61,21 +61,24 @@ class MarkerTrack:
     @property
     def X(self) -> np.ndarray:
         """
-        Convenience property that returns or sets the X component of the marker position.
+        Convenience property that returns or sets the
+        X component of the marker position.
         """
         return self.data[:, 0]
 
     @property
     def Y(self) -> np.ndarray:
         """
-        Convenience property that returns or sets the Y component of the marker position.
+        Convenience property that returns or sets the
+        Y component of the marker position.
         """
         return self.data[:, 1]
 
     @property
     def Z(self) -> np.ndarray:
         """
-        Convenience property that returns or sets the Z component of the marker position.
+        Convenience property that returns or sets the
+        Z component of the marker position.
         """
         return self.data[:, 2]
 
@@ -148,11 +151,7 @@ class MarkerTrack:
         """
         base = 256 + 4 + 4
         for segment in self._segments:
-            base += (
-                4
-                + 4
-                + (segment.stop - segment.start) * TrackType.btype.itemsize
-            )
+            base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
         return base
 
     def __repr__(self) -> str:
@@ -183,10 +182,11 @@ class Data3D(Block):
             nFrames (int): number of frames in the data block
             volume (Union[Volume,np.ndarray]): acquisition volume
             rotationMatrix (np.ndarray): rotation matrix
-            translationVector (np.ndarray): tralslation vector
+            translationVector (np.ndarray): translation vector
             startTime (float, optional): Acquisition start time. Defaults to 0.0.
             flag (Flags, optional): Data 3D block flags. Defaults to Flags.rawData.
-            format (Data3dBlockFormat, optional): Data3D format. Defaults to Data3dBlockFormat.byTrack.
+            format (Data3dBlockFormat, optional): Data3D format.
+             Defaults to Data3dBlockFormat.byTrack.
 
         Raises:
             ValueError: the volume is not an array of 3 floats
@@ -216,10 +216,7 @@ class Data3D(Block):
             )
         self.translationVector = translationVector
 
-        if not (
-            isinstance(volume, np.ndarray)
-            and volume.shape == Volume.btype.shape
-        ):
+        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
             raise ValueError(
                 f"volume must be a numpy array of shape {Volume.btype.shape}"
             )
@@ -245,7 +242,10 @@ class Data3D(Block):
             raise TypeError("Track must be of type Track")
         if track.nFrames != self.nFrames:
             raise ValueError(
-                f"Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames"
+                (
+                    f"Track with label {track.label} has"
+                    f" {track.nFrames} frames, expected {self.nFrames} frames"
+                )
             )
         self._tracks.append(track)
 
@@ -304,13 +304,9 @@ class Data3D(Block):
             Data3dBlockFormat.byTrack,
             Data3dBlockFormat.byTrackWithoutLinks,
         ]:
-            d._tracks = [
-                MarkerTrack._build(stream, nFrames) for _ in range(nTracks)
-            ]
+            d._tracks = [MarkerTrack._build(stream, nFrames) for _ in range(nTracks)]
         else:
-            raise NotImplementedError(
-                f"Data3D format {format} not implemented yet"
-            )
+            raise NotImplementedError(f"Data3D format {format} not implemented yet")
         return d
 
     def __getitem__(self, key: Union[int, str]) -> MarkerTrack:
@@ -318,9 +314,7 @@ class Data3D(Block):
             return self._tracks[key]
         elif isinstance(key, str):
             try:
-                return next(
-                    track for track in self._tracks if track.label == key
-                )
+                return next(track for track in self._tracks if track.label == key)
             except StopIteration:
                 raise KeyError(f"Track with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
@@ -432,4 +426,7 @@ class Data3D(Block):
         return base
 
     def __repr__(self) -> str:
-        return f"<Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"
+        return (
+            f"<Data3D: {self.nFrames} frames, {self.frequency} Hz,"
+            f" {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"
+        )

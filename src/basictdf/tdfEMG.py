@@ -45,9 +45,7 @@ class EMGTrack:
         trackData = np.empty(nSamples, dtype="<f4")
         trackData[:] = np.nan
         for startFrame, nFrames in segmentData:
-            trackData[startFrame : startFrame + nFrames] = f32.bread(
-                stream, nFrames
-            )
+            trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
     def write(self, file):
@@ -83,7 +81,10 @@ class EMGTrack:
         return self.label == other.label and np.all(self.data == other.data)
 
     def __repr__(self):
-        return f"EMGTrack(label={self.label}, nSamples={self.nSamples},segments={len(self._segments)})"
+        return (
+            f"EMGTrack(label={self.label}, nSamples={self.nSamples},"
+            f"segments={len(self._segments)})"
+        )
 
 
 class EMG(Block):
@@ -115,16 +116,12 @@ class EMG(Block):
                 emgSignal = EMGTrack.build(stream, nSamples)
                 d.addSignal(emgSignal, channel=emgMap[n])
         else:
-            raise NotImplementedError(
-                f"EMG format {format} not implemented yet"
-            )
+            raise NotImplementedError(f"EMG format {format} not implemented yet")
         return d
 
     def _write(self, file):
         if self.format != EMGBlockFormat.byTrack:
-            raise NotImplementedError(
-                f"EMG format {self.format} not implemented yet"
-            )
+            raise NotImplementedError(f"EMG format {self.format} not implemented yet")
 
         # nSignals
         i32.bwrite(file, len(self._signals))
@@ -150,9 +147,7 @@ class EMG(Block):
             return self._signals[key]
         elif isinstance(key, str):
             try:
-                return next(
-                    signal for signal in self._signals if signal.label == key
-                )
+                return next(signal for signal in self._signals if signal.label == key)
             except StopIteration:
                 raise KeyError(f"EMG signal with label {key} not found")
         raise TypeError(f"Invalid key type {type(key)}")
@@ -179,15 +174,17 @@ class EMG(Block):
 
     def addSignal(self, signal: EMGTrack, channel=None):
         """
-        adds a signal to the EMG block. If the channel is not specified, it is set to the next one  available
+        adds a signal to the EMG block. If the channel is not specified,
+        it is set to the next one  available
         """
         if not isinstance(signal, EMGTrack):
-            raise TypeError(
-                f"Can only add EMGTrack objects, got {type(signal)}"
-            )
+            raise TypeError(f"Can only add EMGTrack objects, got {type(signal)}")
         if signal.nSamples != self.nSamples:
             raise ValueError(
-                f"EMGTrack with label {signal.label} has {signal.nSamples} samples, expected {self.nSamples}"
+                (
+                    f"EMGTrack with label {signal.label} has {signal.nSamples} "
+                    f"samples, expected {self.nSamples}"
+                )
             )
 
         if channel is None:
@@ -223,4 +220,7 @@ class EMG(Block):
         return len(self._signals)
 
     def __repr__(self):
-        return f"EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, nSignals={self.nSignals}, startTime={self.startTime},)"
+        return (
+            f"EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, "
+            f"nSignals={self.nSignals}, startTime={self.startTime},)"
+        )

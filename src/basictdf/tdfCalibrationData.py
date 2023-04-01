@@ -152,7 +152,10 @@ class BTSCameraData:
 
         if len(x_distortion_coefficients) > self.max_distorsion_coefficients:
             raise ValueError(
-                f"Can't have more than {self.max_distorsion_coefficients} distortion coefficients"
+                (
+                    f"Can't have more than {self.max_distorsion_coefficients}"
+                    " distortion coefficients"
+                )
             )
 
         self.x_distortion_coefficients = x_distortion_coefficients
@@ -212,12 +215,8 @@ class BTSCameraData:
         VEC3D.bwrite(file, self.translation_vector)  # translation_vector
         VEC2D.bwrite(file, self.focus)  # focus
         VEC2D.bwrite(file, self.optical_center)  # optical_center
-        f64.bwrite(
-            file, self.x_distortion_coefficients
-        )  # x_distortion_coefficients
-        f64.bwrite(
-            file, self.y_distortion_coefficients
-        )  # y_distortion_coefficients
+        f64.bwrite(file, self.x_distortion_coefficients)  # x_distortion_coefficients
+        f64.bwrite(file, self.y_distortion_coefficients)  # y_distortion_coefficients
         self.view_port.bwrite(file)  # view_port
 
     def nBytes(self) -> int:
@@ -263,7 +262,10 @@ class CalibrationDataBlock(Block):
 
         if calibration_volume_size.shape != VEC3F.btype.shape:
             raise ValueError(
-                f"calibration_volume_size must be a {VEC3F.btype.shape} shape numpy array"
+                (
+                    "calibration_volume_size must be a "
+                    f"{VEC3F.btype.shape} shape numpy array"
+                )
             )
 
         self.calibration_volume_size = calibration_volume_size
@@ -271,17 +273,21 @@ class CalibrationDataBlock(Block):
 
         if calibration_volume_rotation_matrix.shape != MAT3X3F.btype.shape:
             raise ValueError(
-                f"calibration_volume_rotation_matrix must be a {MAT3X3F.btype.shape} shape numpy array"
+                (
+                    "calibration_volume_rotation_matrix must "
+                    f"be a {MAT3X3F.btype.shape} shape numpy array"
+                )
             )
 
-        self.calibration_volume_rotation_matrix = (
-            calibration_volume_rotation_matrix
-        )
+        self.calibration_volume_rotation_matrix = calibration_volume_rotation_matrix
         "Rotation matrix of the calibration volume"
 
         if calibration_volume_translation_vector.shape != VEC3F.btype.shape:
             raise ValueError(
-                f"calibration_volume_translation_vector must be a {VEC3F.btype.shape} shape numpy array"
+                (
+                    "calibration_volume_translation_vector must "
+                    f"be a {VEC3F.btype.shape} shape numpy array"
+                )
             )
 
         self.calibration_volume_translation_vector = (
@@ -293,9 +299,7 @@ class CalibrationDataBlock(Block):
             not isinstance(cameras_calibration_map, np.ndarray)
             or len(cameras_calibration_map.shape) != 1
         ):
-            raise ValueError(
-                "Cameras_calibration_map must be a single row numpy array"
-            )
+            raise ValueError("Cameras_calibration_map must be a single row numpy array")
         self.cameras_calibration_map = cameras_calibration_map
 
         self.cam_data = cam_data
@@ -312,13 +316,9 @@ class CalibrationDataBlock(Block):
         calibration_data = []
 
         if format == CalibrationDataBlockFormat.Seelab1:
-            calibration_data = [
-                SeelabCameraData._build(stream) for _ in range(nCams)
-            ]
+            calibration_data = [SeelabCameraData._build(stream) for _ in range(nCams)]
         elif format == CalibrationDataBlockFormat.BTS:
-            calibration_data = [
-                BTSCameraData._build(stream) for _ in range(nCams)
-            ]
+            calibration_data = [BTSCameraData._build(stream) for _ in range(nCams)]
         else:
             raise ValueError(f'"Unknown calibration format "{format}"')
 

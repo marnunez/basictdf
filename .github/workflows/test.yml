@@ -26,9 +26,9 @@ jobs:
       #----------------------------------------------
       #          install and run linters
       #----------------------------------------------
-      - run: python -m pip install black flake8 isort
+      - run: python -m pip install black ruff isort
       - run: |
-          flake8 .
+          ruff check .
           black . --check
           isort .
   test:
@@ -36,9 +36,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ "ubuntu-latest", "macos-latest" ]
-        python-version: [ "3.7", "3.8", "3.9", "3.10", "3.11" ]
-        django-version: ["3", "4" ]
+        os: ["ubuntu-latest", "macos-latest"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        django-version: ["3", "4"]
     runs-on: ${{ matrix.os }}
     steps:
       #----------------------------------------------

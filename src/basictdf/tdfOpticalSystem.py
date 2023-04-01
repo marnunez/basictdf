@@ -35,15 +35,11 @@ class OpticalChannelData:
 
         if isinstance(camera_viewport, CameraViewPort):
             camera_viewport = camera_viewport
-        elif isinstance(
-            camera_viewport, np.ndarray
-        ) and camera_viewport.shape == (
+        elif isinstance(camera_viewport, np.ndarray) and camera_viewport.shape == (
             2,
             2,
         ):
-            camera_viewport = CameraViewPort(
-                camera_viewport[0], camera_viewport[1]
-            )
+            camera_viewport = CameraViewPort(camera_viewport[0], camera_viewport[1])
         else:
             raise TypeError(
                 "camera_viewport must be a CameraViewPort or a (2,2) shape numpy array"
@@ -97,7 +93,10 @@ class OpticalChannelData:
         return 4 + 4 + 32 + 32 + 32 + self.camera_viewport.nBytes
 
     def __repr__(self) -> str:
-        return f"OpticalChannelData(camera_name={self.camera_name}, camera_type={self.camera_type})"
+        return (
+            f"OpticalChannelData(camera_name={self.camera_name},"
+            f" camera_type={self.camera_type})"
+        )
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, OpticalChannelData):
@@ -140,9 +139,7 @@ class OpticalSetupBlock(Block):
         nChannels = i32.bread(stream)
         i32.skip(stream)  # reserved0
 
-        channels = [
-            OpticalChannelData._build(stream) for _ in range(nChannels)
-        ]
+        channels = [OpticalChannelData._build(stream) for _ in range(nChannels)]
         return OpticalSetupBlock(format=format, channels=channels)
 
     def __iter__(self) -> Iterator[OpticalChannelData]:

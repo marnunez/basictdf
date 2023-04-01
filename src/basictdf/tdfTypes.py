@@ -63,9 +63,7 @@ class BTSString:
         file.write(BTSString.write(size, data))
 
     @staticmethod
-    def bread(
-        file: BinaryIO, size: int, encoding: str = "windows-1252"
-    ) -> str:
+    def bread(file: BinaryIO, size: int, encoding: str = "windows-1252") -> str:
         """Read a BTSString from a binary file or buffer
 
         Args:
@@ -107,10 +105,12 @@ class TdfType(Generic[X]):
 
         Args:
             file (IO[Any]): input file or buffer
-            n (int, optional): Ammount of items to take. If _None_, returns a single item, otherwise returns an array of _n_ items. Defaults to None.
+            n (int, optional): Ammount of items to take. If _None_, returns a
+            single item, otherwise returns an array of _n_ items. Defaults to None.
 
         Returns:
-            Union[np.ndarray,type]: A numpy type (custom or classic, like numpy.float32) or a np.array of numpy types
+            Union[np.ndarray,type]: A numpy type (custom or classic,
+            like numpy.float32) or a np.array of numpy types
         """
         if n is None:
             return self.read(file.read(self.btype.itemsize))[0]
@@ -160,34 +160,19 @@ f64 = TdfType(np.dtype("<f8"))
 
 class CameraViewPort:
     def __init__(self, origin, size) -> None:
-        if (
-            isinstance(origin, np.ndarray)
-            and origin.shape != VEC2I.btype.shape
-        ):
+        if isinstance(origin, np.ndarray) and origin.shape != VEC2I.btype.shape:
             raise TypeError(
                 f"origin must be a {VEC2I.btype.shape} if it is a numpy array"
             )
-        elif (
-            isinstance(origin, list)
-            or isinstance(origin, tuple)
-            and len(origin) != 2
-        ):
-            raise TypeError(
-                "origin must be of length 2 if it is a list or tuple"
-            )
+        elif isinstance(origin, list) or isinstance(origin, tuple) and len(origin) != 2:
+            raise TypeError("origin must be of length 2 if it is a list or tuple")
 
         if isinstance(size, np.ndarray) and size.shape != VEC2I.btype.shape:
             raise TypeError(
                 f"size must be a {VEC2I.btype.shape} if it is a numpy array"
             )
-        elif (
-            isinstance(size, list)
-            or isinstance(size, tuple)
-            and len(size) != 2
-        ):
-            raise TypeError(
-                "size must be of length 2 if it is a list or tuple"
-            )
+        elif isinstance(size, list) or isinstance(size, tuple) and len(size) != 2:
+            raise TypeError("size must be of length 2 if it is a list or tuple")
 
         self.origin = origin
         self.size = size
@@ -220,9 +205,5 @@ class CameraViewPort:
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, CameraViewPort):
-            raise TypeError(
-                "Can only compare CameraViewPort with CameraViewPort"
-            )
-        return np.all(self.origin == other.origin) and np.all(
-            self.size == other.size
-        )
+            raise TypeError("Can only compare CameraViewPort with CameraViewPort")
+        return np.all(self.origin == other.origin) and np.all(self.size == other.size)
