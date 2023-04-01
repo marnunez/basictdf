@@ -60,12 +60,6 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
       #----------------------------------------------
-      # rerun the lock
-      #----------------------------------------------
-      - name: Rerun the lock
-        run: |
-          poetry update python numpy
-      #----------------------------------------------
       #       load cached venv if cache exists
       #----------------------------------------------
       # - name: Load cached venv
@@ -77,6 +71,9 @@ jobs:
       #----------------------------------------------
       # install dependencies if cache does not exist
       #----------------------------------------------
+      - name: Install numpy first
+        run: pip install numpy
+
       - name: Install dependencies
         # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
@@ -86,6 +83,7 @@ jobs:
       #----------------------------------------------
       - name: Install library
         run: poetry install --no-interaction
+
       #----------------------------------------------
       #    add matrix specifics and run test suite
       #----------------------------------------------
