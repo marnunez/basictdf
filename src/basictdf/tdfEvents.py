@@ -77,7 +77,6 @@ class TemporalEventsData(Block):
 
     @staticmethod
     def _build(stream, format) -> "TemporalEventsData":
-
         format = TemporalEventsDataFormat(format)
         nEvents = i32.bread(stream)
         start_time = f32.bread(stream)
