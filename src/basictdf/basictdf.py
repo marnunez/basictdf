@@ -175,9 +175,7 @@ class Tdf:
         # pad 20 bytes
         i32.skip(self.handler, 5)
 
-        self.entries = [
-            TdfEntry._build(self.handler) for _ in range(self.nEntries)
-        ]
+        self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
 
         return self
 
@@ -193,9 +191,7 @@ class Tdf:
         return [self.get_block(entry.type) for entry in self.entries]
 
     @provide_context_if_needed
-    def get_block(
-        self, index_or_type: Union[BlockType, int]
-    ) -> Optional[Type[Block]]:
+    def get_block(self, index_or_type: Union[BlockType, int]) -> Optional[Type[Block]]:
         """Get a block from the TDF file."""
 
         if isinstance(index_or_type, int):
@@ -205,16 +201,12 @@ class Tdf:
                 raise IndexError(f"Index {index_or_type} out of range")
 
         elif isinstance(index_or_type, BlockType):
-            entry = next(
-                (e for e in self.entries if e.type == index_or_type), None
-            )
+            entry = next((e for e in self.entries if e.type == index_or_type), None)
             if entry is None:
                 raise Exception(f"Block {index_or_type} not found")
 
         else:
-            raise TypeError(
-                f"Expected int or BlockType, got {type(index_or_type)}"
-            )
+            raise TypeError(f"Expected int or BlockType, got {type(index_or_type)}")
 
         self.handler.seek(entry.offset, 0)
         block_class = _get_block_class(entry.type)
@@ -253,18 +245,13 @@ class Tdf:
     @force_and_torque.setter
     @raise_if_outside_write_context
     def force_and_torque(self, data: ForceTorque3D) -> None:
-        self.replace_block(
-            data
-        ) if self.has_force_and_torque else self.add_block(data)
+        self.replace_block(data) if self.has_force_and_torque else self.add_block(data)
 
     @property
     @provide_context_if_needed
     def has_force_and_torque(self) -> bool:
         """Check if the file has a force and torque data block."""
-        return any(
-            entry.type == BlockType.forceAndTorqueData
-            for entry in self.entries
-        )
+        return any(entry.type == BlockType.forceAndTorqueData for entry in self.entries)
 
     @property
     @provide_context_if_needed
@@ -281,9 +268,7 @@ class Tdf:
     @provide_context_if_needed
     def has_events(self) -> bool:
         """Check if the TDF file has an events block"""
-        return any(
-            i for i in self.entries if i.type == BlockType.temporalEventsData
-        )
+        return any(i for i in self.entries if i.type == BlockType.temporalEventsData)
 
     @property
     @provide_context_if_needed
@@ -301,8 +286,7 @@ class Tdf:
     def has_emg(self) -> bool:
         """Check if the TDF file has an EMG block"""
         return any(
-            entry.type == BlockType.electromyographicData
-            for entry in self.entries
+            entry.type == BlockType.electromyographicData for entry in self.entries
         )
 
     @property
@@ -347,9 +331,7 @@ class Tdf:
         # find first unused slot
         try:
             unusedBlockPos = next(
-                n
-                for n, i in enumerate(self.entries)
-                if i.type == BlockType.unusedSlot
+                n for n, i in enumerate(self.entries) if i.type == BlockType.unusedSlot
             )
         except StopIteration:
             raise ValueError(f"Block limit reached ({len(self.entries)})")
@@ -382,9 +364,7 @@ class Tdf:
                 self.handler.seek(64 + 288 * n, 0)
                 entry._write(self.handler)
             else:
-                raise IOError(
-                    "All unused slots must be at the end of the file"
-                )
+                raise IOError("All unused slots must be at the end of the file")
 
         # write new block
         self.handler.seek(new_entry.offset, 0)
@@ -423,9 +403,7 @@ class Tdf:
 
         # calculate new offset for the next unused slot
         newOffset = (
-            self.entries[-1].offset
-            if oldEntryPos != 0
-            else (64 + 288 * self.nEntries)
+            self.entries[-1].offset if oldEntryPos != 0 else (64 + 288 * self.nEntries)
         )
 
         # delete entry
@@ -514,15 +492,11 @@ class Tdf:
         return Tdf(filePath)
 
     @raise_if_outside_write_context
-    def replace_block(
-        self, newBlock: Block, comment: Optional[str] = None
-    ) -> None:
+    def replace_block(self, newBlock: Block, comment: Optional[str] = None) -> None:
         """Replace a block of the same type with a new one. This is done by
         removing the old block and adding the new one."""
 
-        old_entry = next(
-            (i for i in self.entries if i.type == newBlock.type), None
-        )
+        old_entry = next((i for i in self.entries if i.type == newBlock.type), None)
 
         if old_entry is None:
             raise ValueError(f"No block of type {newBlock.type} found")
