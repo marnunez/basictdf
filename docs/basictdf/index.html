@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>basictdf API documentation</title>
-<meta name="description" content="basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file format.
+<meta name="description" content="basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file
+format.
 This format is tipically used as storage of raw data from a …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -23,9 +24,11 @@ This format is tipically used as storage of raw data from a …" />
 <h1 class="title">Package <code>basictdf</code></h1>
 </header>
 <section id="section-intro">
-<p>basictdf is a <strong>read</strong> and <strong>write</strong> parser for the BTS Bioengineering TDF file format.
-This format is tipically used as storage of raw data from a BTS motion capture acquisition system
-(e.g. raw EMG, 2D raw marker data) but can also serve as storage for processed data
+<p>basictdf is a <strong>read</strong> and <strong>write</strong> parser for the BTS Bioengineering TDF file
+format.
+This format is tipically used as storage of raw data from a BTS motion capture
+acquisition system (e.g. raw EMG, 2D raw marker data) but can also serve as
+storage for processed data
 (e.g. 3D reconstructed marker data, filtered EMG signals, events).</p>
 <h2 id="how-to-read-a-tdf-file">How to read a TDF file?</h2>
 <pre><code class="language-python">from basictdf import Tdf
@@ -41,7 +44,7 @@ data3D = Tdf(&quot;path/to/file.tdf&quot;).data3D
 <p>The propper way to modify a TDF file is through a context manager.
 This way, the file is guaranteed to be closed properly.
 Specifying the mode as "r+b" (read and write) is also required
-using the <code><a title="basictdf.basictdf.Tdf.allow_write" href="basictdf.html#basictdf.basictdf.Tdf.allow_write">Tdf.allow_write()</a></code> method.</p>
+using the <code><a title="basictdf.Tdf.allow_write" href="#basictdf.Tdf.allow_write">Tdf.allow_write()</a></code> method.</p>
 <p>You <strong>can't</strong> write to a tdf file like this.</p>
 <pre><code class="language-python"># Don't do this. This will fail
 Tdf(&quot;path/to/file.tdf&quot;).data3D = oldData3D
@@ -64,9 +67,10 @@ with tdf.allow_write() as tdf:
 </code></pre>
 <h2 id="how-to-add-a-new-block-to-a-tdf-file">How to add a new block to a TDF file?</h2>
 <h2 id="how-to-create-a-tdf-from-scratch">How to create a TDF from scratch?</h2>
-<p>The easiest way to add a new block to a TDF is actually to modify an existing block
-with the same type. However, if you want to add a completely new block, you can use any of the
-<code><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></code> subclasses, like <code><a title="basictdf.tdfData3D.Data3D" href="tdfData3D.html#basictdf.tdfData3D.Data3D">Data3D</a></code> or <code><a title="basictdf.tdfEvents.TemporalEventsData" href="tdfEvents.html#basictdf.tdfEvents.TemporalEventsData">TemporalEventsData</a></code>.</p>
+<p>The easiest way to add a new block to a TDF is actually to modify an existing
+block with the same type. However, if you want to add a completely new block,
+you can use any of the <code><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></code> subclasses, like
+<code><a title="basictdf.tdfData3D.Data3D" href="tdfData3D.html#basictdf.tdfData3D.Data3D">Data3D</a></code> or <code><a title="basictdf.tdfEvents.TemporalEventsData" href="tdfEvents.html#basictdf.tdfEvents.TemporalEventsData">TemporalEventsData</a></code>.</p>
 <pre><code class="language-python">from basictdf import Tdf, Data3D, MarkerTrack
 import numpy as np
 
@@ -98,10 +102,14 @@ with tdf.allow_write() as tdf:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">__doc__ = &#34;&#34;&#34;
-basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file format.
-This format is tipically used as storage of raw data from a BTS motion capture acquisition system
-(e.g. raw EMG, 2D raw marker data) but can also serve as storage for processed data
+<pre><code class="python">from __future__ import annotations
+
+__doc__ = &#34;&#34;&#34;
+basictdf is a **read** and **write** parser for the BTS Bioengineering TDF file
+format.
+This format is tipically used as storage of raw data from a BTS motion capture
+ acquisition system (e.g. raw EMG, 2D raw marker data) but can also serve as
+storage for processed data
 (e.g. 3D reconstructed marker data, filtered EMG signals, events).
 
 ## How to read a TDF file?
@@ -154,9 +162,10 @@ with tdf.allow_write() as tdf:
 ## How to add a new block to a TDF file?
 ## How to create a TDF from scratch?
 
-The easiest way to add a new block to a TDF is actually to modify an existing block
-with the same type. However, if you want to add a completely new block, you can use any of the
-`basictdf.tdfBlock.Block` subclasses, like `basictdf.tdfData3D.Data3D` or `basictdf.tdfEvents.TemporalEventsData`.
+The easiest way to add a new block to a TDF is actually to modify an existing
+block with the same type. However, if you want to add a completely new block,
+ you can use any of the `basictdf.tdfBlock.Block` subclasses, like
+ `basictdf.tdfData3D.Data3D` or `basictdf.tdfEvents.TemporalEventsData`.
 
 ```python
 from basictdf import Tdf, Data3D, MarkerTrack
@@ -189,8 +198,20 @@ with tdf.allow_write() as tdf:
 &#34;&#34;&#34;
 from basictdf.basictdf import Tdf
 from basictdf.tdfData3D import Data3D, MarkerTrack
-from basictdf.tdfEvents import TemporalEventsData, Event, EventsDataType
 from basictdf.tdfEMG import EMG, EMGTrack
+from basictdf.tdfEvents import Event, EventsDataType, TemporalEventsData
+
+__all__ = [
+    &#34;Tdf&#34;,
+    &#34;Data3D&#34;,
+    &#34;MarkerTrack&#34;,
+    &#34;TemporalEventsData&#34;,
+    &#34;Event&#34;,
+    &#34;EventsDataType&#34;,
+    &#34;EMG&#34;,
+    &#34;EMGTrack&#34;,
+]
+
 
 __pdoc__ = {}
 __pdoc__[&#34;basictdf.tdfUtils&#34;] = False
@@ -206,7 +227,7 @@ __pdoc__[&#34;basictdf.tdfTypes&#34;] = False</code></pre>
 </dd>
 <dt><code class="name"><a title="basictdf.tdfBlock" href="tdfBlock.html">basictdf.tdfBlock</a></code></dt>
 <dd>
-<div class="desc"><p>Block and block type classess.</p></div>
+<div class="desc"><p>Block and block type classes.</p></div>
 </dd>
 <dt><code class="name"><a title="basictdf.tdfCalibrationData" href="tdfCalibrationData.html">basictdf.tdfCalibrationData</a></code></dt>
 <dd>
@@ -239,6 +260,2221 @@ __pdoc__[&#34;basictdf.tdfTypes&#34;] = False</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="basictdf.Data3D"><code class="flex name class">
+<span>class <span class="ident">Data3D</span></span>
+<span>(</span><span>frequency: float, nFrames: int, volume: numpy.ndarray, rotationMatrix: numpy.ndarray, translationVector: numpy.ndarray, startTime: float = 0.0, flag: <a title="basictdf.tdfData3D.Flags" href="tdfData3D.html#basictdf.tdfData3D.Flags">Flags</a> = Flags.rawData, format: <a title="basictdf.tdfData3D.Data3dBlockFormat" href="tdfData3D.html#basictdf.tdfData3D.Data3dBlockFormat">Data3dBlockFormat</a> = Data3dBlockFormat.byTrack)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p>
+<p>A data block that contains marker tracks.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frequency</code></strong> :&ensp;<code>float</code></dt>
+<dd>data frequency in Hz</dd>
+<dt><strong><code>nFrames</code></strong> :&ensp;<code>int</code></dt>
+<dd>number of frames in the data block</dd>
+<dt><strong><code>volume</code></strong> :&ensp;<code>Union[Volume,np.ndarray]</code></dt>
+<dd>acquisition volume</dd>
+<dt><strong><code>rotationMatrix</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>rotation matrix</dd>
+<dt><strong><code>translationVector</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>translation vector</dd>
+<dt><strong><code>startTime</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Acquisition start time. Defaults to 0.0.</dd>
+<dt><strong><code>flag</code></strong> :&ensp;<code>Flags</code>, optional</dt>
+<dd>Data 3D block flags. Defaults to Flags.rawData.</dd>
+<dt><strong><code>format</code></strong> :&ensp;<code>Data3dBlockFormat</code>, optional</dt>
+<dd>Data3D format.</dd>
+</dl>
+<p>Defaults to Data3dBlockFormat.byTrack.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>the volume is not an array of 3 floats</dd>
+<dt><code>ValueError</code></dt>
+<dd>the rotation matrix is not an array of 3x3 floats</dd>
+<dt><code>ValueError</code></dt>
+<dd>the translation vector is not an array of 3 floats</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Data3D(Block):
+    type = BlockType.data3D
+
+    def __init__(
+        self,
+        frequency: float,
+        nFrames: int,
+        volume: np.ndarray,
+        rotationMatrix: np.ndarray,
+        translationVector: np.ndarray,
+        startTime: float = 0.0,
+        flag: Flags = Flags.rawData,
+        format: Data3dBlockFormat = Data3dBlockFormat.byTrack,
+    ) -&gt; None:
+        &#34;&#34;&#34;A data block that contains marker tracks.
+
+        Args:
+            frequency (float): data frequency in Hz
+            nFrames (int): number of frames in the data block
+            volume (Union[Volume,np.ndarray]): acquisition volume
+            rotationMatrix (np.ndarray): rotation matrix
+            translationVector (np.ndarray): translation vector
+            startTime (float, optional): Acquisition start time. Defaults to 0.0.
+            flag (Flags, optional): Data 3D block flags. Defaults to Flags.rawData.
+            format (Data3dBlockFormat, optional): Data3D format.
+             Defaults to Data3dBlockFormat.byTrack.
+
+        Raises:
+            ValueError: the volume is not an array of 3 floats
+            ValueError: the rotation matrix is not an array of 3x3 floats
+            ValueError: the translation vector is not an array of 3 floats
+        &#34;&#34;&#34;
+        super().__init__()
+        self.format = format
+        self.frequency = frequency
+        self.startTime = startTime
+
+        if not (
+            isinstance(rotationMatrix, np.ndarray)
+            and rotationMatrix.shape == MAT3X3F.btype.shape
+        ):
+            raise ValueError(
+                f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
+            )
+        self.rotationMatrix = rotationMatrix
+
+        if not (
+            isinstance(translationVector, np.ndarray)
+            and translationVector.shape == VEC3F.btype.shape
+        ):
+            raise ValueError(
+                f&#34;translationVector must be a numpy array of shape {VEC3F.btype}&#34;
+            )
+        self.translationVector = translationVector
+
+        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+            raise ValueError(
+                f&#34;volume must be a numpy array of shape {Volume.btype.shape}&#34;
+            )
+
+        self.volume = volume
+
+        self.flag = flag
+        self.nFrames = nFrames
+
+        self._tracks = []
+
+    def add_track(self, track: MarkerTrack) -&gt; None:
+        &#34;&#34;&#34;Adds a track to the data block
+
+        Args:
+            track (MarkerTrack): track to add
+
+        Raises:
+            TypeError: Track is not of type MarkerTrack
+            ValueError: Track has a different number of frames than the data block
+        &#34;&#34;&#34;
+        if not isinstance(track, MarkerTrack):
+            raise TypeError(&#34;Track must be of type Track&#34;)
+        if track.nFrames != self.nFrames:
+            raise ValueError(
+                (
+                    f&#34;Track with label {track.label} has&#34;
+                    f&#34; {track.nFrames} frames, expected {self.nFrames} frames&#34;
+                )
+            )
+        self._tracks.append(track)
+
+    @property
+    def tracks(self) -&gt; List[MarkerTrack]:
+        &#34;&#34;&#34;Returns a list of all tracks in the data block
+
+        Returns:
+            List[MarkerTrack]: list of all tracks in the data block
+        &#34;&#34;&#34;
+        return self._tracks
+
+    @tracks.setter
+    def tracks(self, values: Iterable[MarkerTrack]) -&gt; None:
+        &#34;&#34;&#34;
+        Sets the tracks in the data block.
+        &#34;&#34;&#34;
+        oldTracks = self._tracks
+        self._tracks = []
+        try:
+            for value in values:
+                self.add_track(value)
+        except Exception as e:
+            self._tracks = oldTracks
+            raise e
+
+    @staticmethod
+    def _build(stream, format) -&gt; &#34;Data3D&#34;:
+        format = Data3dBlockFormat(format)
+        nFrames = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nTracks = u32.bread(stream)
+        volume = Volume.bread(stream)
+        rotationMatrix = MAT3X3F.bread(stream)
+        translationVector = VEC3F.bread(stream)
+        flag = Flags(u32.bread(stream))
+
+        d = Data3D(
+            frequency,
+            nFrames,
+            volume,
+            rotationMatrix,
+            translationVector,
+            startTime,
+            flag,
+            format,
+        )
+
+        if format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
+            nLinks = i32.bread(stream)
+            i32.skip(stream, 1)
+            d.links = LinkType.bread(stream, nLinks)
+
+        if format in [
+            Data3dBlockFormat.byTrack,
+            Data3dBlockFormat.byTrackWithoutLinks,
+        ]:
+            d._tracks = [MarkerTrack._build(stream, nFrames) for _ in range(nTracks)]
+        else:
+            raise NotImplementedError(f&#34;Data3D format {format} not implemented yet&#34;)
+        return d
+
+    def __getitem__(self, key: Union[int, str]) -&gt; MarkerTrack:
+        if isinstance(key, int):
+            return self._tracks[key]
+        elif isinstance(key, str):
+            try:
+                return next(track for track in self._tracks if track.label == key)
+            except StopIteration:
+                raise KeyError(f&#34;Track with label {key} not found&#34;)
+        raise TypeError(f&#34;Invalid key type {type(key)}&#34;)
+
+    def __iter__(self) -&gt; Iterator[MarkerTrack]:
+        return iter(self._tracks)
+
+    def __len__(self) -&gt; int:
+        return len(self._tracks)
+
+    def __eq__(self, other) -&gt; bool:
+        buff1 = BytesIO()
+        buff2 = BytesIO()
+        self._write(buff1)
+        other._write(buff2)
+        return buff1.getvalue() == buff2.getvalue()
+
+    def __contains__(self, value: Union[MarkerTrack, str]) -&gt; bool:
+        if isinstance(value, MarkerTrack):
+            return value in self._tracks
+        elif isinstance(value, str):
+            return any(track.label == value for track in self._tracks)
+        raise TypeError(f&#34;Invalid value type {type(value)}&#34;)
+
+    @property
+    def nTracks(self) -&gt; int:
+        &#34;&#34;&#34;Number of tracks in the data block
+
+        Returns:
+            int: number of tracks
+        &#34;&#34;&#34;
+        return len(self._tracks)
+
+    def _write(self, file: BinaryIO) -&gt; None:
+        if self.format not in [
+            Data3dBlockFormat.byTrack,
+            Data3dBlockFormat.byTrackWithoutLinks,
+        ]:
+            raise NotImplementedError(
+                f&#34;Data3D format {self.format} not implemented yet&#34;
+            )
+
+        # nFrames
+        i32.bwrite(file, self.nFrames)
+        # frequency
+        i32.bwrite(file, self.frequency)
+        # startTime
+        f32.bwrite(file, self.startTime)
+        # nTracks
+        u32.bwrite(file, len(self._tracks))
+
+        # volume
+        Volume.bwrite(file, self.volume)
+        # rotationMatrix
+        MAT3X3F.bwrite(file, self.rotationMatrix)
+        # translationVector
+        VEC3F.bwrite(file, self.translationVector)
+        # flags
+        u32.bwrite(file, self.flag.value)
+
+        if self.format in [
+            Data3dBlockFormat.byFrame,
+            Data3dBlockFormat.byTrack,
+        ]:
+            links = self.links if hasattr(self, &#34;links&#34;) else []
+            nLinks = len(links)
+
+            # nLinks
+            i32.bwrite(file, nLinks)
+            # padding
+            i32.bpad(file)
+            # links
+            LinkType.bwrite(file, links)
+
+        for track in self._tracks:
+            track._write(file)
+
+    @property
+    def nBytes(self) -&gt; int:
+        base = (
+            4  # nFrames
+            + 4  # frequency
+            + 4  # startTime
+            + 4  # nTracks
+            + Volume.btype.itemsize  # volume
+            + MAT3X3F.btype.itemsize  # rotationMatrix
+            + VEC3F.btype.itemsize  # translationVector
+            + 4  # flags
+        )
+
+        if self.format in [
+            Data3dBlockFormat.byFrame,
+            Data3dBlockFormat.byTrack,
+        ]:
+            links_size = (
+                4
+                + 4
+                + (
+                    LinkType.btype.itemsize * len(self.links)
+                    if hasattr(self, &#34;links&#34;)
+                    else 0
+                )
+            )
+            base += links_size
+
+        for track in self._tracks:
+            base += track.nBytes
+
+        return base
+
+    def __repr__(self) -&gt; str:
+        return (
+            f&#34;&lt;Data3D: {self.nFrames} frames, {self.frequency} Hz,&#34;
+            f&#34; {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.Data3D.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.Data3D.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    base = (
+        4  # nFrames
+        + 4  # frequency
+        + 4  # startTime
+        + 4  # nTracks
+        + Volume.btype.itemsize  # volume
+        + MAT3X3F.btype.itemsize  # rotationMatrix
+        + VEC3F.btype.itemsize  # translationVector
+        + 4  # flags
+    )
+
+    if self.format in [
+        Data3dBlockFormat.byFrame,
+        Data3dBlockFormat.byTrack,
+    ]:
+        links_size = (
+            4
+            + 4
+            + (
+                LinkType.btype.itemsize * len(self.links)
+                if hasattr(self, &#34;links&#34;)
+                else 0
+            )
+        )
+        base += links_size
+
+    for track in self._tracks:
+        base += track.nBytes
+
+    return base</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Data3D.nTracks"><code class="name">var <span class="ident">nTracks</span> : int</code></dt>
+<dd>
+<div class="desc"><p>Number of tracks in the data block</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>number of tracks</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nTracks(self) -&gt; int:
+    &#34;&#34;&#34;Number of tracks in the data block
+
+    Returns:
+        int: number of tracks
+    &#34;&#34;&#34;
+    return len(self._tracks)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Data3D.tracks"><code class="name">var <span class="ident">tracks</span> : List[<a title="basictdf.tdfData3D.MarkerTrack" href="tdfData3D.html#basictdf.tdfData3D.MarkerTrack">MarkerTrack</a>]</code></dt>
+<dd>
+<div class="desc"><p>Returns a list of all tracks in the data block</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[<a title="basictdf.MarkerTrack" href="#basictdf.MarkerTrack">MarkerTrack</a>]</code></dt>
+<dd>list of all tracks in the data block</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def tracks(self) -&gt; List[MarkerTrack]:
+    &#34;&#34;&#34;Returns a list of all tracks in the data block
+
+    Returns:
+        List[MarkerTrack]: list of all tracks in the data block
+    &#34;&#34;&#34;
+    return self._tracks</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.Data3D.add_track"><code class="name flex">
+<span>def <span class="ident">add_track</span></span>(<span>self, track: <a title="basictdf.tdfData3D.MarkerTrack" href="tdfData3D.html#basictdf.tdfData3D.MarkerTrack">MarkerTrack</a>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a track to the data block</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>track</code></strong> :&ensp;<code><a title="basictdf.MarkerTrack" href="#basictdf.MarkerTrack">MarkerTrack</a></code></dt>
+<dd>track to add</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>Track is not of type MarkerTrack</dd>
+<dt><code>ValueError</code></dt>
+<dd>Track has a different number of frames than the data block</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_track(self, track: MarkerTrack) -&gt; None:
+    &#34;&#34;&#34;Adds a track to the data block
+
+    Args:
+        track (MarkerTrack): track to add
+
+    Raises:
+        TypeError: Track is not of type MarkerTrack
+        ValueError: Track has a different number of frames than the data block
+    &#34;&#34;&#34;
+    if not isinstance(track, MarkerTrack):
+        raise TypeError(&#34;Track must be of type Track&#34;)
+    if track.nFrames != self.nFrames:
+        raise ValueError(
+            (
+                f&#34;Track with label {track.label} has&#34;
+                f&#34; {track.nFrames} frames, expected {self.nFrames} frames&#34;
+            )
+        )
+    self._tracks.append(track)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.EMG"><code class="flex name class">
+<span>class <span class="ident">EMG</span></span>
+<span>(</span><span>frequency, nSamples, startTime=0.0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Electromyography data block</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EMG(Block):
+    &#34;&#34;&#34;Electromyography data block&#34;&#34;&#34;
+
+    type = BlockType.electromyographicData
+
+    def __init__(self, frequency, nSamples, startTime=0.0):
+        super().__init__()
+        self.frequency = frequency
+        self.startTime = startTime
+        self.nSamples = nSamples
+        self._signals = []
+        self._emgMap = []
+
+    @staticmethod
+    def _build(stream, format):
+        format = EMGBlockFormat(format)
+        nSignals = i32.bread(stream)
+        frequency = i32.bread(stream)
+        startTime = f32.bread(stream)
+        nSamples = i32.bread(stream) + 49  # Why 49??? Whyyyy????
+        emgMap = i16.bread(stream, n=nSignals)
+
+        d = EMG(frequency, nSamples, startTime)
+        if format == EMGBlockFormat.byTrack:
+            # d._signals = [EMGTrack.build(stream, nSamples) for _ in range(nSignals)]
+            for n in range(nSignals):
+                emgSignal = EMGTrack.build(stream, nSamples)
+                d.addSignal(emgSignal, channel=emgMap[n])
+        else:
+            raise NotImplementedError(f&#34;EMG format {format} not implemented yet&#34;)
+        return d
+
+    def _write(self, file):
+        if self.format != EMGBlockFormat.byTrack:
+            raise NotImplementedError(f&#34;EMG format {self.format} not implemented yet&#34;)
+
+        # nSignals
+        i32.bwrite(file, len(self._signals))
+
+        # frequency
+        i32.bwrite(file, self.frequency)
+
+        # startTime
+        f32.bwrite(file, self.startTime)
+
+        # emgMap
+        i16.bwrite(file, self._emgMap)
+
+        # nSamples
+        i32.bwrite(file, self.nSamples - 49)  # That 49 again
+
+        # signals
+        for signal in self._signals:
+            signal.write(file)
+
+    def __getitem__(self, key) -&gt; EMGTrack:
+        if isinstance(key, int):
+            return self._signals[key]
+        elif isinstance(key, str):
+            try:
+                return next(signal for signal in self._signals if signal.label == key)
+            except StopIteration:
+                raise KeyError(f&#34;EMG signal with label {key} not found&#34;)
+        raise TypeError(f&#34;Invalid key type {type(key)}&#34;)
+
+    def __contains__(self, value: Union[EMGTrack, str]) -&gt; bool:
+        if isinstance(value, str):
+            return any(signal.label == value for signal in self._signals)
+        elif isinstance(value, EMGTrack):
+            return value in self._signals
+        raise TypeError(f&#34;Invalid value type {type(value)}&#34;)
+
+    def __iter__(self) -&gt; Iterator[EMGTrack]:
+        return iter(self._signals)
+
+    def __len__(self) -&gt; int:
+        return len(self._signals)
+
+    def __eq__(self, other) -&gt; bool:
+        buff1 = BytesIO()
+        buff2 = BytesIO()
+        self.write(buff1)
+        other.write(buff2)
+        return buff1.getvalue() == buff2.getvalue()
+
+    def addSignal(self, signal: EMGTrack, channel=None):
+        &#34;&#34;&#34;
+        adds a signal to the EMG block. If the channel is not specified,
+        it is set to the next one  available
+        &#34;&#34;&#34;
+        if not isinstance(signal, EMGTrack):
+            raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
+        if signal.nSamples != self.nSamples:
+            raise ValueError(
+                (
+                    f&#34;EMGTrack with label {signal.label} has {signal.nSamples} &#34;
+                    f&#34;samples, expected {self.nSamples}&#34;
+                )
+            )
+
+        if channel is None:
+            if len(self._emgMap) == 0:
+                next_channel = 0
+            else:
+                next_channel = max(self._emgMap) + 1
+            self._emgMap.append(next_channel)
+        else:
+            if channel in self._emgMap:
+                raise ValueError(f&#34;Channel {channel} already in use&#34;)
+            self._emgMap.append(channel)
+        self._signals.append(signal)
+
+    def removeSignal(self, label: str):
+        try:
+            pos = next(i for i, v in enumerate(self._signals) if v == label)
+        except StopIteration:
+            raise KeyError(f&#34;EMG signal with label {label} not found&#34;)
+
+        del self._signals[pos]
+        del self._emgMap[pos]
+
+    @property
+    def nBytes(self) -&gt; int:
+        base = 4 + 4 + 4 + 2 * len(self._signals) + 4
+        for signal in self._signals:
+            base += signal.nBytes
+        return base
+
+    @property
+    def nSignals(self) -&gt; int:
+        return len(self._signals)
+
+    def __repr__(self):
+        return (
+            f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, &#34;
+            f&#34;nSignals={self.nSignals}, startTime={self.startTime},)&#34;
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.EMG.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.EMG.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    base = 4 + 4 + 4 + 2 * len(self._signals) + 4
+    for signal in self._signals:
+        base += signal.nBytes
+    return base</code></pre>
+</details>
+</dd>
+<dt id="basictdf.EMG.nSignals"><code class="name">var <span class="ident">nSignals</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nSignals(self) -&gt; int:
+    return len(self._signals)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.EMG.addSignal"><code class="name flex">
+<span>def <span class="ident">addSignal</span></span>(<span>self, signal: <a title="basictdf.tdfEMG.EMGTrack" href="tdfEMG.html#basictdf.tdfEMG.EMGTrack">EMGTrack</a>, channel=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>adds a signal to the EMG block. If the channel is not specified,
+it is set to the next one
+available</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addSignal(self, signal: EMGTrack, channel=None):
+    &#34;&#34;&#34;
+    adds a signal to the EMG block. If the channel is not specified,
+    it is set to the next one  available
+    &#34;&#34;&#34;
+    if not isinstance(signal, EMGTrack):
+        raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
+    if signal.nSamples != self.nSamples:
+        raise ValueError(
+            (
+                f&#34;EMGTrack with label {signal.label} has {signal.nSamples} &#34;
+                f&#34;samples, expected {self.nSamples}&#34;
+            )
+        )
+
+    if channel is None:
+        if len(self._emgMap) == 0:
+            next_channel = 0
+        else:
+            next_channel = max(self._emgMap) + 1
+        self._emgMap.append(next_channel)
+    else:
+        if channel in self._emgMap:
+            raise ValueError(f&#34;Channel {channel} already in use&#34;)
+        self._emgMap.append(channel)
+    self._signals.append(signal)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.EMG.removeSignal"><code class="name flex">
+<span>def <span class="ident">removeSignal</span></span>(<span>self, label: str)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removeSignal(self, label: str):
+    try:
+        pos = next(i for i, v in enumerate(self._signals) if v == label)
+    except StopIteration:
+        raise KeyError(f&#34;EMG signal with label {label} not found&#34;)
+
+    del self._signals[pos]
+    del self._emgMap[pos]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.EMGTrack"><code class="flex name class">
+<span>class <span class="ident">EMGTrack</span></span>
+<span>(</span><span>label: str, trackData: numpy.ndarray)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EMGTrack:
+    def __init__(self, label: str, trackData: np.ndarray):
+        self.label = label
+        self.data = trackData
+
+    @property
+    def nSamples(self) -&gt; int:
+        &#34;&#34;&#34;
+        Returns:
+            int: number of samples of the track
+        &#34;&#34;&#34;
+        return self.data.shape[0]
+
+    @property
+    def _segments(self):
+        maskedTrackData = np.ma.masked_invalid(self.data)
+        return np.ma.clump_unmasked(maskedTrackData.T)
+
+    @staticmethod
+    def build(stream, nSamples):
+        label = BTSString.bread(stream, 256)
+        nSegments = i32.bread(stream)
+        i32.skip(stream)  # padding
+        segmentData = SegmentData.bread(stream, nSegments)
+        trackData = np.empty(nSamples, dtype=&#34;&lt;f4&#34;)
+        trackData[:] = np.nan
+        for startFrame, nFrames in segmentData:
+            trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
+        return EMGTrack(label, trackData)
+
+    def write(self, file):
+        # label
+        BTSString.bwrite(file, 256, self.label)
+
+        segments = self._segments
+
+        # nSegments
+        i32.bwrite(file, len(segments))
+
+        # padding
+        i32.bpad(file, 1)
+
+        for segment in segments:
+            # startFrame
+            i32.bwrite(file, segment.start)
+            # nFrames
+            i32.bwrite(file, segment.stop - segment.start)
+
+        for segment in segments:
+            # data
+            f32.bwrite(file, self.data[segment])
+
+    @property
+    def nBytes(self):
+        base = 256 + 4 + 4
+        for segment in self._segments:
+            base += 4 + 4 + (segment.stop - segment.start) * f32.btype.itemsize
+        return base
+
+    def __eq__(self, other):
+        return self.label == other.label and np.all(self.data == other.data)
+
+    def __repr__(self):
+        return (
+            f&#34;EMGTrack(label={self.label}, nSamples={self.nSamples},&#34;
+            f&#34;segments={len(self._segments)})&#34;
+        )</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="basictdf.EMGTrack.build"><code class="name flex">
+<span>def <span class="ident">build</span></span>(<span>stream, nSamples)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def build(stream, nSamples):
+    label = BTSString.bread(stream, 256)
+    nSegments = i32.bread(stream)
+    i32.skip(stream)  # padding
+    segmentData = SegmentData.bread(stream, nSegments)
+    trackData = np.empty(nSamples, dtype=&#34;&lt;f4&#34;)
+    trackData[:] = np.nan
+    for startFrame, nFrames in segmentData:
+        trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
+    return EMGTrack(label, trackData)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.EMGTrack.nBytes"><code class="name">var <span class="ident">nBytes</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self):
+    base = 256 + 4 + 4
+    for segment in self._segments:
+        base += 4 + 4 + (segment.stop - segment.start) * f32.btype.itemsize
+    return base</code></pre>
+</details>
+</dd>
+<dt id="basictdf.EMGTrack.nSamples"><code class="name">var <span class="ident">nSamples</span> : int</code></dt>
+<dd>
+<div class="desc"><h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>number of samples of the track</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nSamples(self) -&gt; int:
+    &#34;&#34;&#34;
+    Returns:
+        int: number of samples of the track
+    &#34;&#34;&#34;
+    return self.data.shape[0]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.EMGTrack.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self, file)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write(self, file):
+    # label
+    BTSString.bwrite(file, 256, self.label)
+
+    segments = self._segments
+
+    # nSegments
+    i32.bwrite(file, len(segments))
+
+    # padding
+    i32.bpad(file, 1)
+
+    for segment in segments:
+        # startFrame
+        i32.bwrite(file, segment.start)
+        # nFrames
+        i32.bwrite(file, segment.stop - segment.start)
+
+    for segment in segments:
+        # data
+        f32.bwrite(file, self.data[segment])</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.Event"><code class="flex name class">
+<span>class <span class="ident">Event</span></span>
+<span>(</span><span>label, values=[], type=EventsDataType.singleEvent)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class representing a single event or a sequence of events.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Event:
+    &#34;&#34;&#34;
+    A class representing a single event or a sequence of events.
+    &#34;&#34;&#34;
+
+    def __init__(self, label, values=[], type=EventsDataType.singleEvent) -&gt; None:
+        self.label = label
+        self.type = type
+        if not is_iterable(values):
+            raise TypeError(&#34;Values must be iterable&#34;)
+        if isinstance(values, np.ndarray) and values.dtype == np.dtype(&#34;&lt;f4&#34;):
+            self.values = values
+        else:
+            self.values = np.array(values, dtype=&#34;&lt;f4&#34;)
+
+        if len(values) &gt; 1 and type == EventsDataType.singleEvent:
+            raise TypeError(&#34;Can&#39;t have more than one value for a single event&#34;)
+
+    def _write(self, stream) -&gt; None:
+        BTSString.bwrite(stream, 256, self.label)
+        u32.bwrite(stream, self.type.value)  # type
+        u32.bwrite(stream, len(self.values))  # nItems
+        f32.bwrite(stream, self.values)
+
+    @staticmethod
+    def _build(stream) -&gt; &#34;Event&#34;:
+        label = BTSString.bread(stream, 256)
+        type_ = EventsDataType(u32.bread(stream))
+        nItems = i32.bread(stream)
+        values = np.array([f32.bread(stream) for _ in range(nItems)])
+        return Event(label, values, type_)
+
+    def __len__(self) -&gt; int:
+        return len(self.values)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return 256 + 4 + 4 + len(self.values) * 4
+
+    def __repr__(self) -&gt; str:
+        return f&#34;Event(label={self.label}, type={self.type}, items={self.values})&#34;</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.Event.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    return 256 + 4 + 4 + len(self.values) * 4</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.EventsDataType"><code class="flex name class">
+<span>class <span class="ident">EventsDataType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EventsDataType(Enum):
+    singleEvent = 0
+    eventSequence = 1</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.EventsDataType.eventSequence"><code class="name">var <span class="ident">eventSequence</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="basictdf.EventsDataType.singleEvent"><code class="name">var <span class="ident">singleEvent</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.MarkerTrack"><code class="flex name class">
+<span>class <span class="ident">MarkerTrack</span></span>
+<span>(</span><span>label: str, track_data: numpy.ndarray)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A track that collects all the data of a physical marker, such as name and position.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MarkerTrack:
+    &#34;&#34;&#34;
+    A track that collects all the data of a physical marker, such as name and position.
+    &#34;&#34;&#34;
+
+    def __init__(self, label: str, track_data: np.ndarray) -&gt; None:
+        self.label = label
+        &#34;The name of the marker&#34;
+        self.data = track_data
+        &#34;The actual marker data&#34;
+
+    @property
+    def X(self) -&gt; np.ndarray:
+        &#34;&#34;&#34;
+        Convenience property that returns or sets the
+        X component of the marker position.
+        &#34;&#34;&#34;
+        return self.data[:, 0]
+
+    @property
+    def Y(self) -&gt; np.ndarray:
+        &#34;&#34;&#34;
+        Convenience property that returns or sets the
+        Y component of the marker position.
+        &#34;&#34;&#34;
+        return self.data[:, 1]
+
+    @property
+    def Z(self) -&gt; np.ndarray:
+        &#34;&#34;&#34;
+        Convenience property that returns or sets the
+        Z component of the marker position.
+        &#34;&#34;&#34;
+        return self.data[:, 2]
+
+    @X.setter
+    def X(self, value) -&gt; None:
+        self.data[:, 0] = value
+
+    @Y.setter
+    def Y(self, value) -&gt; None:
+        self.data[:, 1] = value
+
+    @Z.setter
+    def Z(self, value) -&gt; None:
+        self.data[:, 2] = value
+
+    @property
+    def nFrames(self) -&gt; int:
+        &#34;&#34;&#34;
+        Returns:
+            int: number of frames in the track
+        &#34;&#34;&#34;
+        return self.data.shape[0]
+
+    @property
+    def _segments(self):
+        maskedTrackData = np.ma.masked_invalid(self.data)
+        return np.ma.clump_unmasked(maskedTrackData.T[0])
+
+    @staticmethod
+    def _build(stream, nFrames: int) -&gt; &#34;MarkerTrack&#34;:
+        trackData = np.empty(nFrames, dtype=TrackType.btype)
+        trackData[:] = np.NaN
+
+        label = BTSString.bread(stream, 256)
+        nSegments = i32.bread(stream)
+        i32.skip(stream)
+        segmentData = SegmentData.bread(stream, nSegments)
+        for startFrame, nFrames in segmentData:
+            dat = TrackType.bread(stream, nFrames)
+            trackData[startFrame : startFrame + nFrames] = dat
+        return MarkerTrack(label, trackData)
+
+    def _write(self, file) -&gt; None:
+        # label
+        BTSString.bwrite(file, 256, self.label)
+
+        segments = self._segments
+
+        # nSegments
+        i32.bwrite(file, len(segments))
+
+        # padding
+        i32.bpad(file, 1)
+
+        for segment in segments:
+            # startFrame
+            i32.bwrite(file, np.array(segment.start))
+            # nFrames
+            i32.bwrite(file, np.array(segment.stop - segment.start))
+
+        for segment in segments:
+            # trackData
+            TrackType.bwrite(file, self.data[segment])
+
+    @property
+    def nBytes(self) -&gt; int:
+        &#34;&#34;&#34;
+        Returns:
+            int: size of the track in bytes
+        &#34;&#34;&#34;
+        base = 256 + 4 + 4
+        for segment in self._segments:
+            base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
+        return base
+
+    def __repr__(self) -&gt; str:
+        return f&#34;Track(label={self.label}, nFrames={self.nFrames})&#34;
+
+    def __eq__(self, other):
+        return self.label == other.label and np.all(self.data == other.data)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.MarkerTrack.X"><code class="name">var <span class="ident">X</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"><p>Convenience property that returns or sets the
+X component of the marker position.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def X(self) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Convenience property that returns or sets the
+    X component of the marker position.
+    &#34;&#34;&#34;
+    return self.data[:, 0]</code></pre>
+</details>
+</dd>
+<dt id="basictdf.MarkerTrack.Y"><code class="name">var <span class="ident">Y</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"><p>Convenience property that returns or sets the
+Y component of the marker position.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def Y(self) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Convenience property that returns or sets the
+    Y component of the marker position.
+    &#34;&#34;&#34;
+    return self.data[:, 1]</code></pre>
+</details>
+</dd>
+<dt id="basictdf.MarkerTrack.Z"><code class="name">var <span class="ident">Z</span> : numpy.ndarray</code></dt>
+<dd>
+<div class="desc"><p>Convenience property that returns or sets the
+Z component of the marker position.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def Z(self) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Convenience property that returns or sets the
+    Z component of the marker position.
+    &#34;&#34;&#34;
+    return self.data[:, 2]</code></pre>
+</details>
+</dd>
+<dt id="basictdf.MarkerTrack.data"><code class="name">var <span class="ident">data</span></code></dt>
+<dd>
+<div class="desc"><p>The actual marker data</p></div>
+</dd>
+<dt id="basictdf.MarkerTrack.label"><code class="name">var <span class="ident">label</span></code></dt>
+<dd>
+<div class="desc"><p>The name of the marker</p></div>
+</dd>
+<dt id="basictdf.MarkerTrack.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"><h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>size of the track in bytes</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    &#34;&#34;&#34;
+    Returns:
+        int: size of the track in bytes
+    &#34;&#34;&#34;
+    base = 256 + 4 + 4
+    for segment in self._segments:
+        base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
+    return base</code></pre>
+</details>
+</dd>
+<dt id="basictdf.MarkerTrack.nFrames"><code class="name">var <span class="ident">nFrames</span> : int</code></dt>
+<dd>
+<div class="desc"><h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>number of frames in the track</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nFrames(self) -&gt; int:
+    &#34;&#34;&#34;
+    Returns:
+        int: number of frames in the track
+    &#34;&#34;&#34;
+    return self.data.shape[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.Tdf"><code class="flex name class">
+<span>class <span class="ident">Tdf</span></span>
+<span>(</span><span>filename: Union[pathlib.Path, str])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Tdf:
+    SIGNATURE = b&#34;\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08&#34;
+
+    def __init__(self, filename: Union[Path, str]) -&gt; None:
+        self.filePath = Path(filename)
+
+        if not self.filePath.exists():
+            raise FileNotFoundError(f&#34;File {self.filePath} not found&#34;)
+
+        self._mode = &#34;rb&#34;
+        self._inside_context = False
+
+    def allow_write(self):
+        &#34;&#34;&#34;Allow writing to the file.&#34;&#34;&#34;
+        self._mode = &#34;r+b&#34;
+        return self
+
+    def __enter__(self) -&gt; &#34;Tdf&#34;:
+        self._inside_context = True
+        self.handler: IO[bytes] = self.filePath.open(self._mode)
+
+        self.signature = self.handler.read(len(self.SIGNATURE))
+
+        if self.signature != self.SIGNATURE:
+            raise Exception(&#34;Invalid TDF file&#34;)
+
+        self.version = u32.bread(self.handler)
+        self.nEntries = i32.bread(self.handler)
+
+        # pad 8 bytes
+        i32.skip(self.handler, 2)
+
+        self.creation_date = BTSDate.bread(self.handler)
+        self.last_modification_date = BTSDate.bread(self.handler)
+        self.last_access_date = BTSDate.bread(self.handler)
+
+        # pad 20 bytes
+        i32.skip(self.handler, 5)
+
+        self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -&gt; None:
+        self._inside_context = False
+        self._mode = &#34;rb&#34;
+        self.handler.close()
+
+    @property
+    @provide_context_if_needed
+    def blocks(self) -&gt; List[Block]:
+        &#34;&#34;&#34;Get all blocks in the file.&#34;&#34;&#34;
+        return [self.get_block(entry.type) for entry in self.entries]
+
+    @provide_context_if_needed
+    def get_block(self, index_or_type: Union[BlockType, int]) -&gt; Optional[Type[Block]]:
+        &#34;&#34;&#34;Get a block from the TDF file.&#34;&#34;&#34;
+
+        if isinstance(index_or_type, int):
+            if 0 &lt;= index_or_type &lt; len(self.entries):
+                entry = self.entries[index_or_type]
+            else:
+                raise IndexError(f&#34;Index {index_or_type} out of range&#34;)
+
+        elif isinstance(index_or_type, BlockType):
+            entry = next((e for e in self.entries if e.type == index_or_type), None)
+            if entry is None:
+                raise Exception(f&#34;Block {index_or_type} not found&#34;)
+
+        else:
+            raise TypeError(f&#34;Expected int or BlockType, got {type(index_or_type)}&#34;)
+
+        self.handler.seek(entry.offset, 0)
+        block_class = _get_block_class(entry.type)
+        return block_class._build(self.handler, entry.format)
+
+    def __getitem__(
+        self, index_or_type: Union[BlockType, int]
+    ) -&gt; Optional[Type[Block]]:
+        return self.get_block(index_or_type)
+
+    @property
+    @provide_context_if_needed
+    def data3D(self) -&gt; Optional[Data3D]:
+        &#34;&#34;&#34;
+        Convenience property to get/set the 3D data block.
+        &#34;&#34;&#34;
+        return self.get_block(BlockType.data3D)
+
+    @data3D.setter
+    @raise_if_outside_context
+    def data3D(self, data: Data3D) -&gt; None:
+        self.replace_block(data) if self.has_data3D else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_data3D(self) -&gt; bool:
+        &#34;&#34;&#34;Check if the file has a 3D data block.&#34;&#34;&#34;
+        return any(entry.type == BlockType.data3D for entry in self.entries)
+
+    @property
+    @provide_context_if_needed
+    def force_and_torque(self) -&gt; Optional[ForceTorque3D]:
+        &#34;&#34;&#34;Convenience property to get/set the force and torque data block.&#34;&#34;&#34;
+        return self.get_block(BlockType.forceAndTorqueData)
+
+    @force_and_torque.setter
+    @raise_if_outside_write_context
+    def force_and_torque(self, data: ForceTorque3D) -&gt; None:
+        self.replace_block(data) if self.has_force_and_torque else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_force_and_torque(self) -&gt; bool:
+        &#34;&#34;&#34;Check if the file has a force and torque data block.&#34;&#34;&#34;
+        return any(entry.type == BlockType.forceAndTorqueData for entry in self.entries)
+
+    @property
+    @provide_context_if_needed
+    def events(self) -&gt; Optional[TemporalEventsData]:
+        &#34;&#34;&#34;Convenience property to get/set the events data block.&#34;&#34;&#34;
+        return self.get_block(BlockType.temporalEventsData)
+
+    @events.setter
+    @raise_if_outside_write_context
+    def events(self, data: TemporalEventsData) -&gt; None:
+        self.replace_block(data) if self.has_events else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_events(self) -&gt; bool:
+        &#34;&#34;&#34;Check if the TDF file has an events block&#34;&#34;&#34;
+        return any(i for i in self.entries if i.type == BlockType.temporalEventsData)
+
+    @property
+    @provide_context_if_needed
+    def emg(self) -&gt; Optional[EMG]:
+        &#34;&#34;&#34;Convenience property to get/set the EMG data block.&#34;&#34;&#34;
+        return self.get_block(EMG.type)
+
+    @emg.setter
+    @raise_if_outside_write_context
+    def emg(self, data: EMG) -&gt; None:
+        self.replace_block(data) if self.has_emg else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def has_emg(self) -&gt; bool:
+        &#34;&#34;&#34;Check if the TDF file has an EMG block&#34;&#34;&#34;
+        return any(
+            entry.type == BlockType.electromyographicData for entry in self.entries
+        )
+
+    @property
+    @provide_context_if_needed
+    def calibrationData(self) -&gt; Optional[CalibrationDataBlock]:
+        &#34;&#34;&#34;Convenience property to get/set the calibration data block.&#34;&#34;&#34;
+        return self.get_block(CalibrationDataBlock.type)
+
+    @raise_if_outside_write_context
+    def add_block(
+        self, newBlock: Block, comment: str = &#34;Generated by basicTDF&#34;
+    ) -&gt; None:
+        &#34;&#34;&#34;Adds a block to the TDF file
+
+        Args:
+            newBlock (Block): the block to be added.
+            comment (str, optional): A description for the block entry.
+            Defaults to &#34;Generated by basicTDF&#34;.
+
+        Raises:
+            PermissionError: the TDF is read only
+            ValueError: there&#39;s already a block of the same type
+            ValueError: block limit reached (14 as per BTS&#39;s implementation)
+            IOError: unused empty blocks in the middle of the file
+        &#34;&#34;&#34;
+        if self._mode == &#34;rb&#34;:
+            raise PermissionError(
+                &#34;Can&#39;t add blocks, this file was opened in read-only mode&#34;
+            )
+
+        try:
+            if self.get_block(newBlock.type):
+                raise ValueError(
+                    (
+                        f&#34;There&#39;s already a block of this type {newBlock.type}&#34;
+                        &#34; .Remove it first&#34;
+                    )
+                )
+        except Exception:
+            pass
+
+        # find first unused slot
+        try:
+            unusedBlockPos = next(
+                n for n, i in enumerate(self.entries) if i.type == BlockType.unusedSlot
+            )
+        except StopIteration:
+            raise ValueError(f&#34;Block limit reached ({len(self.entries)})&#34;)
+
+        # write new entry with the offset of that unused slot
+        new_entry = TdfEntry(
+            type=newBlock.type,
+            format=newBlock.format.value,
+            offset=self.entries[unusedBlockPos].offset,
+            size=newBlock.nBytes,
+            creation_date=newBlock.creation_date,
+            last_modification_date=newBlock.last_modification_date,
+            last_access_date=datetime.now(),
+            comment=comment,
+        )
+
+        # replace the entry
+        self.entries[unusedBlockPos] = new_entry
+
+        # write new entry
+        self.handler.seek(64 + 288 * unusedBlockPos, 0)
+        new_entry._write(self.handler)
+
+        # update all unused slots&#39;s offset
+        for n, entry in enumerate(
+            self.entries[unusedBlockPos + 1 :], start=unusedBlockPos + 1
+        ):
+            if entry.type == BlockType.unusedSlot:
+                entry.offset = new_entry.offset + new_entry.size
+                self.handler.seek(64 + 288 * n, 0)
+                entry._write(self.handler)
+            else:
+                raise IOError(&#34;All unused slots must be at the end of the file&#34;)
+
+        # write new block
+        self.handler.seek(new_entry.offset, 0)
+        newBlock._write(self.handler)
+
+        # ensure the file is the correct size
+        # and that the changes are written to disk
+        self.handler.flush()
+
+    @raise_if_outside_write_context
+    def remove_block(self, type: Block) -&gt; None:
+        &#34;&#34;&#34;Remove a block of the given type from the file. Removing a block
+        implies:
+
+        - Removing the entry
+        - Updating all subsequent unused slots&#39;s offset
+          (subtracting the size of the removed block)
+        - Inserting a new unused slot entry at the end
+          (with the previous slot offset + size as offset)
+        - If there is info after the block, move it
+          block_to_remove.size up
+
+        &#34;&#34;&#34;
+        if &#34;+&#34; not in self._mode:
+            raise ValueError(
+                &#34;Can&#39;t remove blocks, this file was opened in read-only mode&#34;
+            )
+
+        # find block
+        try:
+            oldEntryPos, oldEntry = next(
+                (n, i) for n, i in enumerate(self.entries) if i.type == type
+            )
+        except StopIteration:
+            raise ValueError(f&#34;No block of type {type} found&#34;)
+
+        # calculate new offset for the next unused slot
+        newOffset = (
+            self.entries[-1].offset if oldEntryPos != 0 else (64 + 288 * self.nEntries)
+        )
+
+        # delete entry
+        self.entries.remove(oldEntry)
+        self.handler.seek(64 + 288 * oldEntryPos, 0)
+        # update all the offsets of the entries preceding the removed one
+        for entry in self.entries[oldEntryPos:]:
+            entry.offset -= oldEntry.size
+            entry._write(self.handler)
+
+        # add new unused slot at the end
+        date = datetime.now()
+        newEntry = TdfEntry(
+            type=BlockType.unusedSlot,
+            format=0,
+            offset=newOffset,
+            size=0,
+            creation_date=date,
+            last_modification_date=date,
+            last_access_date=date,
+            comment=&#34;Generated by basicTDF&#34;,
+        )
+        self.entries.append(newEntry)
+        newEntry._write(self.handler)
+
+        self.handler.seek(oldEntry.offset + oldEntry.size, 0)
+        temp = self.handler.read()
+        self.handler.seek(oldEntry.offset, 0)
+        self.handler.write(temp)
+        self.handler.truncate()
+        self.handler.flush()
+
+    @staticmethod
+    def new(filename: str) -&gt; &#34;Tdf&#34;:
+        &#34;&#34;&#34;Creates a new TDF file&#34;&#34;&#34;
+        filePath = Path(filename)
+        if filePath.exists():
+            raise FileExistsError(&#34;File already exists&#34;)
+
+        nEntries = 14
+        date = datetime.now()
+        with filePath.open(&#34;wb&#34;) as f:
+            # signature
+            f.write(Tdf.SIGNATURE)
+            # version
+            i32.bwrite(f, 1)
+            # nEntries
+            i32.bwrite(f, nEntries)
+            # reserved
+            i32.bpad(f, 2)
+            # creation date
+            BTSDate.bwrite(f, date)
+            # last modification date
+            BTSDate.bwrite(f, date)
+            # last access date
+            BTSDate.bwrite(f, date)
+            # reserved
+            i32.bpad(f, 5)
+
+            # start entries
+            entryOffset = 64
+
+            # all entries start with offset to the where entries stop
+            blockOffset = entryOffset + nEntries * 288
+
+            for _ in range(nEntries):
+                # type
+                u32.bwrite(f, 0)
+                # format
+                u32.bwrite(f, 0)
+                # offset
+                i32.bwrite(f, blockOffset)
+                # size
+                i32.bwrite(f, 0)
+                # creation date
+                BTSDate.bwrite(f, date)
+                # last modification date
+                BTSDate.bwrite(f, date)
+                # last access date
+                BTSDate.bwrite(f, date)
+                # reserved
+                i32.bpad(f, 1)
+                # comment
+                BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
+
+        return Tdf(filePath)
+
+    @raise_if_outside_write_context
+    def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; None:
+        &#34;&#34;&#34;Replace a block of the same type with a new one. This is done by
+        removing the old block and adding the new one.&#34;&#34;&#34;
+
+        old_entry = next((i for i in self.entries if i.type == newBlock.type), None)
+
+        if old_entry is None:
+            raise ValueError(f&#34;No block of type {newBlock.type} found&#34;)
+
+        comment = comment if comment is not None else old_entry.comment
+
+        self.remove_block(newBlock.type)
+        self.add_block(newBlock, comment)
+
+    @property
+    def nBytes(self) -&gt; int:
+        &#34;&#34;&#34;Return the size of the TDF file in bytes&#34;&#34;&#34;
+        return self.filePath.stat().st_size
+
+    def __len__(self) -&gt; int:
+        &#34;&#34;&#34;Return the number of blocks in the TDF file
+        that are not of type unusedSlot
+        &#34;&#34;&#34;
+        return sum(1 for i in self.entries if i.type != BlockType.unusedSlot)
+
+    @provide_context_if_needed
+    def __repr__(self) -&gt; str:
+        return f&#34;Tdf({self.filePath}, nEntries={self.nEntries}, nBytes={self.nBytes}&#34;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.Tdf.SIGNATURE"><code class="name">var <span class="ident">SIGNATURE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="basictdf.Tdf.new"><code class="name flex">
+<span>def <span class="ident">new</span></span>(<span>filename: str) ‑> <a title="basictdf.basictdf.Tdf" href="basictdf.html#basictdf.basictdf.Tdf">Tdf</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a new TDF file</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def new(filename: str) -&gt; &#34;Tdf&#34;:
+    &#34;&#34;&#34;Creates a new TDF file&#34;&#34;&#34;
+    filePath = Path(filename)
+    if filePath.exists():
+        raise FileExistsError(&#34;File already exists&#34;)
+
+    nEntries = 14
+    date = datetime.now()
+    with filePath.open(&#34;wb&#34;) as f:
+        # signature
+        f.write(Tdf.SIGNATURE)
+        # version
+        i32.bwrite(f, 1)
+        # nEntries
+        i32.bwrite(f, nEntries)
+        # reserved
+        i32.bpad(f, 2)
+        # creation date
+        BTSDate.bwrite(f, date)
+        # last modification date
+        BTSDate.bwrite(f, date)
+        # last access date
+        BTSDate.bwrite(f, date)
+        # reserved
+        i32.bpad(f, 5)
+
+        # start entries
+        entryOffset = 64
+
+        # all entries start with offset to the where entries stop
+        blockOffset = entryOffset + nEntries * 288
+
+        for _ in range(nEntries):
+            # type
+            u32.bwrite(f, 0)
+            # format
+            u32.bwrite(f, 0)
+            # offset
+            i32.bwrite(f, blockOffset)
+            # size
+            i32.bwrite(f, 0)
+            # creation date
+            BTSDate.bwrite(f, date)
+            # last modification date
+            BTSDate.bwrite(f, date)
+            # last access date
+            BTSDate.bwrite(f, date)
+            # reserved
+            i32.bpad(f, 1)
+            # comment
+            BTSString.bwrite(f, 256, &#34;Generated by basicTDF&#34;)
+
+    return Tdf(filePath)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.Tdf.blocks"><code class="name">var <span class="ident">blocks</span> : List[<a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a>]</code></dt>
+<dd>
+<div class="desc"><p>Get all blocks in the file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def blocks(self) -&gt; List[Block]:
+    &#34;&#34;&#34;Get all blocks in the file.&#34;&#34;&#34;
+    return [self.get_block(entry.type) for entry in self.entries]</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.calibrationData"><code class="name">var <span class="ident">calibrationData</span> : Optional[<a title="basictdf.tdfCalibrationData.CalibrationDataBlock" href="tdfCalibrationData.html#basictdf.tdfCalibrationData.CalibrationDataBlock">CalibrationDataBlock</a>]</code></dt>
+<dd>
+<div class="desc"><p>Convenience property to get/set the calibration data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def calibrationData(self) -&gt; Optional[CalibrationDataBlock]:
+    &#34;&#34;&#34;Convenience property to get/set the calibration data block.&#34;&#34;&#34;
+    return self.get_block(CalibrationDataBlock.type)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.data3D"><code class="name">var <span class="ident">data3D</span> : Optional[<a title="basictdf.tdfData3D.Data3D" href="tdfData3D.html#basictdf.tdfData3D.Data3D">Data3D</a>]</code></dt>
+<dd>
+<div class="desc"><p>Convenience property to get/set the 3D data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def data3D(self) -&gt; Optional[Data3D]:
+    &#34;&#34;&#34;
+    Convenience property to get/set the 3D data block.
+    &#34;&#34;&#34;
+    return self.get_block(BlockType.data3D)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.emg"><code class="name">var <span class="ident">emg</span> : Optional[<a title="basictdf.tdfEMG.EMG" href="tdfEMG.html#basictdf.tdfEMG.EMG">EMG</a>]</code></dt>
+<dd>
+<div class="desc"><p>Convenience property to get/set the EMG data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def emg(self) -&gt; Optional[EMG]:
+    &#34;&#34;&#34;Convenience property to get/set the EMG data block.&#34;&#34;&#34;
+    return self.get_block(EMG.type)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.events"><code class="name">var <span class="ident">events</span> : Optional[<a title="basictdf.tdfEvents.TemporalEventsData" href="tdfEvents.html#basictdf.tdfEvents.TemporalEventsData">TemporalEventsData</a>]</code></dt>
+<dd>
+<div class="desc"><p>Convenience property to get/set the events data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def events(self) -&gt; Optional[TemporalEventsData]:
+    &#34;&#34;&#34;Convenience property to get/set the events data block.&#34;&#34;&#34;
+    return self.get_block(BlockType.temporalEventsData)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.force_and_torque"><code class="name">var <span class="ident">force_and_torque</span> : Optional[<a title="basictdf.tdfForce3D.ForceTorque3D" href="tdfForce3D.html#basictdf.tdfForce3D.ForceTorque3D">ForceTorque3D</a>]</code></dt>
+<dd>
+<div class="desc"><p>Convenience property to get/set the force and torque data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def force_and_torque(self) -&gt; Optional[ForceTorque3D]:
+    &#34;&#34;&#34;Convenience property to get/set the force and torque data block.&#34;&#34;&#34;
+    return self.get_block(BlockType.forceAndTorqueData)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.has_data3D"><code class="name">var <span class="ident">has_data3D</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>Check if the file has a 3D data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def has_data3D(self) -&gt; bool:
+    &#34;&#34;&#34;Check if the file has a 3D data block.&#34;&#34;&#34;
+    return any(entry.type == BlockType.data3D for entry in self.entries)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.has_emg"><code class="name">var <span class="ident">has_emg</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>Check if the TDF file has an EMG block</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def has_emg(self) -&gt; bool:
+    &#34;&#34;&#34;Check if the TDF file has an EMG block&#34;&#34;&#34;
+    return any(
+        entry.type == BlockType.electromyographicData for entry in self.entries
+    )</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.has_events"><code class="name">var <span class="ident">has_events</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>Check if the TDF file has an events block</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def has_events(self) -&gt; bool:
+    &#34;&#34;&#34;Check if the TDF file has an events block&#34;&#34;&#34;
+    return any(i for i in self.entries if i.type == BlockType.temporalEventsData)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.has_force_and_torque"><code class="name">var <span class="ident">has_force_and_torque</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>Check if the file has a force and torque data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+@provide_context_if_needed
+def has_force_and_torque(self) -&gt; bool:
+    &#34;&#34;&#34;Check if the file has a force and torque data block.&#34;&#34;&#34;
+    return any(entry.type == BlockType.forceAndTorqueData for entry in self.entries)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"><p>Return the size of the TDF file in bytes</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    &#34;&#34;&#34;Return the size of the TDF file in bytes&#34;&#34;&#34;
+    return self.filePath.stat().st_size</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.Tdf.add_block"><code class="name flex">
+<span>def <span class="ident">add_block</span></span>(<span>self, newBlock: <a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a>, comment: str = 'Generated by basicTDF') ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a block to the TDF file</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>newBlock</code></strong> :&ensp;<code>Block</code></dt>
+<dd>the block to be added.</dd>
+<dt><strong><code>comment</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>A description for the block entry.</dd>
+</dl>
+<p>Defaults to "Generated by basicTDF".</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>PermissionError</code></dt>
+<dd>the TDF is read only</dd>
+<dt><code>ValueError</code></dt>
+<dd>there's already a block of the same type</dd>
+<dt><code>ValueError</code></dt>
+<dd>block limit reached (14 as per BTS's implementation)</dd>
+<dt><code>IOError</code></dt>
+<dd>unused empty blocks in the middle of the file</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@raise_if_outside_write_context
+def add_block(
+    self, newBlock: Block, comment: str = &#34;Generated by basicTDF&#34;
+) -&gt; None:
+    &#34;&#34;&#34;Adds a block to the TDF file
+
+    Args:
+        newBlock (Block): the block to be added.
+        comment (str, optional): A description for the block entry.
+        Defaults to &#34;Generated by basicTDF&#34;.
+
+    Raises:
+        PermissionError: the TDF is read only
+        ValueError: there&#39;s already a block of the same type
+        ValueError: block limit reached (14 as per BTS&#39;s implementation)
+        IOError: unused empty blocks in the middle of the file
+    &#34;&#34;&#34;
+    if self._mode == &#34;rb&#34;:
+        raise PermissionError(
+            &#34;Can&#39;t add blocks, this file was opened in read-only mode&#34;
+        )
+
+    try:
+        if self.get_block(newBlock.type):
+            raise ValueError(
+                (
+                    f&#34;There&#39;s already a block of this type {newBlock.type}&#34;
+                    &#34; .Remove it first&#34;
+                )
+            )
+    except Exception:
+        pass
+
+    # find first unused slot
+    try:
+        unusedBlockPos = next(
+            n for n, i in enumerate(self.entries) if i.type == BlockType.unusedSlot
+        )
+    except StopIteration:
+        raise ValueError(f&#34;Block limit reached ({len(self.entries)})&#34;)
+
+    # write new entry with the offset of that unused slot
+    new_entry = TdfEntry(
+        type=newBlock.type,
+        format=newBlock.format.value,
+        offset=self.entries[unusedBlockPos].offset,
+        size=newBlock.nBytes,
+        creation_date=newBlock.creation_date,
+        last_modification_date=newBlock.last_modification_date,
+        last_access_date=datetime.now(),
+        comment=comment,
+    )
+
+    # replace the entry
+    self.entries[unusedBlockPos] = new_entry
+
+    # write new entry
+    self.handler.seek(64 + 288 * unusedBlockPos, 0)
+    new_entry._write(self.handler)
+
+    # update all unused slots&#39;s offset
+    for n, entry in enumerate(
+        self.entries[unusedBlockPos + 1 :], start=unusedBlockPos + 1
+    ):
+        if entry.type == BlockType.unusedSlot:
+            entry.offset = new_entry.offset + new_entry.size
+            self.handler.seek(64 + 288 * n, 0)
+            entry._write(self.handler)
+        else:
+            raise IOError(&#34;All unused slots must be at the end of the file&#34;)
+
+    # write new block
+    self.handler.seek(new_entry.offset, 0)
+    newBlock._write(self.handler)
+
+    # ensure the file is the correct size
+    # and that the changes are written to disk
+    self.handler.flush()</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.allow_write"><code class="name flex">
+<span>def <span class="ident">allow_write</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Allow writing to the file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def allow_write(self):
+    &#34;&#34;&#34;Allow writing to the file.&#34;&#34;&#34;
+    self._mode = &#34;r+b&#34;
+    return self</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.get_block"><code class="name flex">
+<span>def <span class="ident">get_block</span></span>(<span>self, index_or_type: Union[<a title="basictdf.tdfBlock.BlockType" href="tdfBlock.html#basictdf.tdfBlock.BlockType">BlockType</a>, int]) ‑> Optional[Type[<a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a>]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get a block from the TDF file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@provide_context_if_needed
+def get_block(self, index_or_type: Union[BlockType, int]) -&gt; Optional[Type[Block]]:
+    &#34;&#34;&#34;Get a block from the TDF file.&#34;&#34;&#34;
+
+    if isinstance(index_or_type, int):
+        if 0 &lt;= index_or_type &lt; len(self.entries):
+            entry = self.entries[index_or_type]
+        else:
+            raise IndexError(f&#34;Index {index_or_type} out of range&#34;)
+
+    elif isinstance(index_or_type, BlockType):
+        entry = next((e for e in self.entries if e.type == index_or_type), None)
+        if entry is None:
+            raise Exception(f&#34;Block {index_or_type} not found&#34;)
+
+    else:
+        raise TypeError(f&#34;Expected int or BlockType, got {type(index_or_type)}&#34;)
+
+    self.handler.seek(entry.offset, 0)
+    block_class = _get_block_class(entry.type)
+    return block_class._build(self.handler, entry.format)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.remove_block"><code class="name flex">
+<span>def <span class="ident">remove_block</span></span>(<span>self, type: <a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove a block of the given type from the file. Removing a block
+implies:</p>
+<ul>
+<li>Removing the entry</li>
+<li>Updating all subsequent unused slots's offset
+(subtracting the size of the removed block)</li>
+<li>Inserting a new unused slot entry at the end
+(with the previous slot offset + size as offset)</li>
+<li>If there is info after the block, move it
+block_to_remove.size up</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@raise_if_outside_write_context
+def remove_block(self, type: Block) -&gt; None:
+    &#34;&#34;&#34;Remove a block of the given type from the file. Removing a block
+    implies:
+
+    - Removing the entry
+    - Updating all subsequent unused slots&#39;s offset
+      (subtracting the size of the removed block)
+    - Inserting a new unused slot entry at the end
+      (with the previous slot offset + size as offset)
+    - If there is info after the block, move it
+      block_to_remove.size up
+
+    &#34;&#34;&#34;
+    if &#34;+&#34; not in self._mode:
+        raise ValueError(
+            &#34;Can&#39;t remove blocks, this file was opened in read-only mode&#34;
+        )
+
+    # find block
+    try:
+        oldEntryPos, oldEntry = next(
+            (n, i) for n, i in enumerate(self.entries) if i.type == type
+        )
+    except StopIteration:
+        raise ValueError(f&#34;No block of type {type} found&#34;)
+
+    # calculate new offset for the next unused slot
+    newOffset = (
+        self.entries[-1].offset if oldEntryPos != 0 else (64 + 288 * self.nEntries)
+    )
+
+    # delete entry
+    self.entries.remove(oldEntry)
+    self.handler.seek(64 + 288 * oldEntryPos, 0)
+    # update all the offsets of the entries preceding the removed one
+    for entry in self.entries[oldEntryPos:]:
+        entry.offset -= oldEntry.size
+        entry._write(self.handler)
+
+    # add new unused slot at the end
+    date = datetime.now()
+    newEntry = TdfEntry(
+        type=BlockType.unusedSlot,
+        format=0,
+        offset=newOffset,
+        size=0,
+        creation_date=date,
+        last_modification_date=date,
+        last_access_date=date,
+        comment=&#34;Generated by basicTDF&#34;,
+    )
+    self.entries.append(newEntry)
+    newEntry._write(self.handler)
+
+    self.handler.seek(oldEntry.offset + oldEntry.size, 0)
+    temp = self.handler.read()
+    self.handler.seek(oldEntry.offset, 0)
+    self.handler.write(temp)
+    self.handler.truncate()
+    self.handler.flush()</code></pre>
+</details>
+</dd>
+<dt id="basictdf.Tdf.replace_block"><code class="name flex">
+<span>def <span class="ident">replace_block</span></span>(<span>self, newBlock: <a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a>, comment: Optional[str] = None) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Replace a block of the same type with a new one. This is done by
+removing the old block and adding the new one.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@raise_if_outside_write_context
+def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; None:
+    &#34;&#34;&#34;Replace a block of the same type with a new one. This is done by
+    removing the old block and adding the new one.&#34;&#34;&#34;
+
+    old_entry = next((i for i in self.entries if i.type == newBlock.type), None)
+
+    if old_entry is None:
+        raise ValueError(f&#34;No block of type {newBlock.type} found&#34;)
+
+    comment = comment if comment is not None else old_entry.comment
+
+    self.remove_block(newBlock.type)
+    self.add_block(newBlock, comment)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.TemporalEventsData"><code class="flex name class">
+<span>class <span class="ident">TemporalEventsData</span></span>
+<span>(</span><span>format=TemporalEventsDataFormat.standard, start_time=0.0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class to represent a TDF temporal events data block.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TemporalEventsData(Block):
+    &#34;&#34;&#34;
+    A class to represent a TDF temporal events data block.
+    &#34;&#34;&#34;
+
+    type = BlockType.temporalEventsData
+
+    def __init__(self, format=TemporalEventsDataFormat.standard, start_time=0.0):
+        super().__init__()
+        self.format = format
+        self.start_time = start_time
+        self.events = []
+
+    @staticmethod
+    def _build(stream, format) -&gt; &#34;TemporalEventsData&#34;:
+        format = TemporalEventsDataFormat(format)
+        nEvents = i32.bread(stream)
+        start_time = f32.bread(stream)
+
+        t = TemporalEventsData(format, start_time)
+        t.events = [Event._build(stream) for _ in range(nEvents)]
+
+        return t
+
+    def _write(self, stream) -&gt; None:
+        i32.bwrite(stream, len(self.events))
+        f32.bwrite(stream, self.start_time)
+        for event in self.events:
+            event._write(stream)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return 4 + 4 + sum(i.nBytes for i in self.events)
+
+    def __len__(self) -&gt; int:
+        return len(self.events)
+
+    def __getitem__(self, item: Union[int, str]) -&gt; Event:
+        if isinstance(item, int):
+            return self.events[item]
+        elif isinstance(item, str):
+            try:
+                return next(e for e in self.events if e.label == item)
+            except StopIteration:
+                raise KeyError(f&#34;Event with label {item} not found&#34;)
+        raise TypeError(f&#34;Invalid key type: {type(item)}&#34;)
+
+    def __iter__(self) -&gt; Iterator[Event]:
+        return iter(self.events)
+
+    def __contains__(self, value: Union[Event, str]) -&gt; bool:
+        if isinstance(value, Event):
+            return value in self.events
+        elif isinstance(value, str):
+            return any(value == event.label for event in self.events)
+        raise TypeError(f&#34;Invalid key type: {type(value)}&#34;)
+
+    def __repr__(self) -&gt; str:
+        return (
+            f&#34;TemporalEventsData(format={self.format}, nEvents={len(self.events)}, &#34;
+            f&#34;start_time={self.start_time}, events={self.events}) size={self.nBytes}&#34;
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.TemporalEventsData.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.TemporalEventsData.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    return 4 + 4 + sum(i.nBytes for i in self.events)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -262,6 +2498,94 @@ __pdoc__[&#34;basictdf.tdfTypes&#34;] = False</code></pre>
 <li><code><a title="basictdf.tdfEvents" href="tdfEvents.html">basictdf.tdfEvents</a></code></li>
 <li><code><a title="basictdf.tdfForce3D" href="tdfForce3D.html">basictdf.tdfForce3D</a></code></li>
 <li><code><a title="basictdf.tdfOpticalSystem" href="tdfOpticalSystem.html">basictdf.tdfOpticalSystem</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="basictdf.Data3D" href="#basictdf.Data3D">Data3D</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.Data3D.add_track" href="#basictdf.Data3D.add_track">add_track</a></code></li>
+<li><code><a title="basictdf.Data3D.nBytes" href="#basictdf.Data3D.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.Data3D.nTracks" href="#basictdf.Data3D.nTracks">nTracks</a></code></li>
+<li><code><a title="basictdf.Data3D.tracks" href="#basictdf.Data3D.tracks">tracks</a></code></li>
+<li><code><a title="basictdf.Data3D.type" href="#basictdf.Data3D.type">type</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.EMG" href="#basictdf.EMG">EMG</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.EMG.addSignal" href="#basictdf.EMG.addSignal">addSignal</a></code></li>
+<li><code><a title="basictdf.EMG.nBytes" href="#basictdf.EMG.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.EMG.nSignals" href="#basictdf.EMG.nSignals">nSignals</a></code></li>
+<li><code><a title="basictdf.EMG.removeSignal" href="#basictdf.EMG.removeSignal">removeSignal</a></code></li>
+<li><code><a title="basictdf.EMG.type" href="#basictdf.EMG.type">type</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.EMGTrack" href="#basictdf.EMGTrack">EMGTrack</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.EMGTrack.build" href="#basictdf.EMGTrack.build">build</a></code></li>
+<li><code><a title="basictdf.EMGTrack.nBytes" href="#basictdf.EMGTrack.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.EMGTrack.nSamples" href="#basictdf.EMGTrack.nSamples">nSamples</a></code></li>
+<li><code><a title="basictdf.EMGTrack.write" href="#basictdf.EMGTrack.write">write</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.Event" href="#basictdf.Event">Event</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.Event.nBytes" href="#basictdf.Event.nBytes">nBytes</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.EventsDataType" href="#basictdf.EventsDataType">EventsDataType</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.EventsDataType.eventSequence" href="#basictdf.EventsDataType.eventSequence">eventSequence</a></code></li>
+<li><code><a title="basictdf.EventsDataType.singleEvent" href="#basictdf.EventsDataType.singleEvent">singleEvent</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.MarkerTrack" href="#basictdf.MarkerTrack">MarkerTrack</a></code></h4>
+<ul class="two-column">
+<li><code><a title="basictdf.MarkerTrack.X" href="#basictdf.MarkerTrack.X">X</a></code></li>
+<li><code><a title="basictdf.MarkerTrack.Y" href="#basictdf.MarkerTrack.Y">Y</a></code></li>
+<li><code><a title="basictdf.MarkerTrack.Z" href="#basictdf.MarkerTrack.Z">Z</a></code></li>
+<li><code><a title="basictdf.MarkerTrack.data" href="#basictdf.MarkerTrack.data">data</a></code></li>
+<li><code><a title="basictdf.MarkerTrack.label" href="#basictdf.MarkerTrack.label">label</a></code></li>
+<li><code><a title="basictdf.MarkerTrack.nBytes" href="#basictdf.MarkerTrack.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.MarkerTrack.nFrames" href="#basictdf.MarkerTrack.nFrames">nFrames</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.Tdf" href="#basictdf.Tdf">Tdf</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.Tdf.SIGNATURE" href="#basictdf.Tdf.SIGNATURE">SIGNATURE</a></code></li>
+<li><code><a title="basictdf.Tdf.add_block" href="#basictdf.Tdf.add_block">add_block</a></code></li>
+<li><code><a title="basictdf.Tdf.allow_write" href="#basictdf.Tdf.allow_write">allow_write</a></code></li>
+<li><code><a title="basictdf.Tdf.blocks" href="#basictdf.Tdf.blocks">blocks</a></code></li>
+<li><code><a title="basictdf.Tdf.calibrationData" href="#basictdf.Tdf.calibrationData">calibrationData</a></code></li>
+<li><code><a title="basictdf.Tdf.data3D" href="#basictdf.Tdf.data3D">data3D</a></code></li>
+<li><code><a title="basictdf.Tdf.emg" href="#basictdf.Tdf.emg">emg</a></code></li>
+<li><code><a title="basictdf.Tdf.events" href="#basictdf.Tdf.events">events</a></code></li>
+<li><code><a title="basictdf.Tdf.force_and_torque" href="#basictdf.Tdf.force_and_torque">force_and_torque</a></code></li>
+<li><code><a title="basictdf.Tdf.get_block" href="#basictdf.Tdf.get_block">get_block</a></code></li>
+<li><code><a title="basictdf.Tdf.has_data3D" href="#basictdf.Tdf.has_data3D">has_data3D</a></code></li>
+<li><code><a title="basictdf.Tdf.has_emg" href="#basictdf.Tdf.has_emg">has_emg</a></code></li>
+<li><code><a title="basictdf.Tdf.has_events" href="#basictdf.Tdf.has_events">has_events</a></code></li>
+<li><code><a title="basictdf.Tdf.has_force_and_torque" href="#basictdf.Tdf.has_force_and_torque">has_force_and_torque</a></code></li>
+<li><code><a title="basictdf.Tdf.nBytes" href="#basictdf.Tdf.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.Tdf.new" href="#basictdf.Tdf.new">new</a></code></li>
+<li><code><a title="basictdf.Tdf.remove_block" href="#basictdf.Tdf.remove_block">remove_block</a></code></li>
+<li><code><a title="basictdf.Tdf.replace_block" href="#basictdf.Tdf.replace_block">replace_block</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.TemporalEventsData" href="#basictdf.TemporalEventsData">TemporalEventsData</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.TemporalEventsData.nBytes" href="#basictdf.TemporalEventsData.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.TemporalEventsData.type" href="#basictdf.TemporalEventsData.type">type</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

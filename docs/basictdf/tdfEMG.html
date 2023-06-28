@@ -29,15 +29,14 @@
 </summary>
 <pre><code class="python">__doc__ = &#34;Electromyography data module.&#34;
 
+from enum import Enum
 from io import BytesIO
 from typing import Iterator, Union
 
-from basictdf.tdfBlock import Block, BlockType
-from enum import Enum
-from basictdf.tdfTypes import BTSString, i32, f32, TdfType, i16
-
 import numpy as np
 
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import BTSString, TdfType, f32, i16, i32
 
 SegmentData = TdfType(np.dtype([(&#34;startFrame&#34;, &#34;&lt;i4&#34;), (&#34;nFrames&#34;, &#34;&lt;i4&#34;)]))
 
@@ -111,7 +110,10 @@ class EMGTrack:
         return self.label == other.label and np.all(self.data == other.data)
 
     def __repr__(self):
-        return f&#34;EMGTrack(label={self.label}, nSamples={self.nSamples},segments={len(self._segments)})&#34;
+        return (
+            f&#34;EMGTrack(label={self.label}, nSamples={self.nSamples},&#34;
+            f&#34;segments={len(self._segments)})&#34;
+        )
 
 
 class EMG(Block):
@@ -201,13 +203,17 @@ class EMG(Block):
 
     def addSignal(self, signal: EMGTrack, channel=None):
         &#34;&#34;&#34;
-        adds a signal to the EMG block. If the channel is not specified, it is set to the next one  available
+        adds a signal to the EMG block. If the channel is not specified,
+        it is set to the next one  available
         &#34;&#34;&#34;
         if not isinstance(signal, EMGTrack):
             raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
         if signal.nSamples != self.nSamples:
             raise ValueError(
-                f&#34;EMGTrack with label {signal.label} has {signal.nSamples} samples, expected {self.nSamples}&#34;
+                (
+                    f&#34;EMGTrack with label {signal.label} has {signal.nSamples} &#34;
+                    f&#34;samples, expected {self.nSamples}&#34;
+                )
             )
 
         if channel is None:
@@ -243,7 +249,10 @@ class EMG(Block):
         return len(self._signals)
 
     def __repr__(self):
-        return f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, nSignals={self.nSignals}, startTime={self.startTime},)&#34;</code></pre>
+        return (
+            f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, &#34;
+            f&#34;nSignals={self.nSignals}, startTime={self.startTime},)&#34;
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -352,13 +361,17 @@ class EMG(Block):
 
     def addSignal(self, signal: EMGTrack, channel=None):
         &#34;&#34;&#34;
-        adds a signal to the EMG block. If the channel is not specified, it is set to the next one  available
+        adds a signal to the EMG block. If the channel is not specified,
+        it is set to the next one  available
         &#34;&#34;&#34;
         if not isinstance(signal, EMGTrack):
             raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
         if signal.nSamples != self.nSamples:
             raise ValueError(
-                f&#34;EMGTrack with label {signal.label} has {signal.nSamples} samples, expected {self.nSamples}&#34;
+                (
+                    f&#34;EMGTrack with label {signal.label} has {signal.nSamples} &#34;
+                    f&#34;samples, expected {self.nSamples}&#34;
+                )
             )
 
         if channel is None:
@@ -394,7 +407,10 @@ class EMG(Block):
         return len(self._signals)
 
     def __repr__(self):
-        return f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, nSignals={self.nSignals}, startTime={self.startTime},)&#34;</code></pre>
+        return (
+            f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, &#34;
+            f&#34;nSignals={self.nSignals}, startTime={self.startTime},)&#34;
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -444,7 +460,8 @@ def nSignals(self) -&gt; int:
 <span>def <span class="ident">addSignal</span></span>(<span>self, signal: <a title="basictdf.tdfEMG.EMGTrack" href="#basictdf.tdfEMG.EMGTrack">EMGTrack</a>, channel=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a signal to the EMG block. If the channel is not specified, it is set to the next one
+<div class="desc"><p>adds a signal to the EMG block. If the channel is not specified,
+it is set to the next one
 available</p></div>
 <details class="source">
 <summary>
@@ -452,13 +469,17 @@ available</p></div>
 </summary>
 <pre><code class="python">def addSignal(self, signal: EMGTrack, channel=None):
     &#34;&#34;&#34;
-    adds a signal to the EMG block. If the channel is not specified, it is set to the next one  available
+    adds a signal to the EMG block. If the channel is not specified,
+    it is set to the next one  available
     &#34;&#34;&#34;
     if not isinstance(signal, EMGTrack):
         raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
     if signal.nSamples != self.nSamples:
         raise ValueError(
-            f&#34;EMGTrack with label {signal.label} has {signal.nSamples} samples, expected {self.nSamples}&#34;
+            (
+                f&#34;EMGTrack with label {signal.label} has {signal.nSamples} &#34;
+                f&#34;samples, expected {self.nSamples}&#34;
+            )
         )
 
     if channel is None:
@@ -603,7 +624,10 @@ available</p></div>
         return self.label == other.label and np.all(self.data == other.data)
 
     def __repr__(self):
-        return f&#34;EMGTrack(label={self.label}, nSamples={self.nSamples},segments={len(self._segments)})&#34;</code></pre>
+        return (
+            f&#34;EMGTrack(label={self.label}, nSamples={self.nSamples},&#34;
+            f&#34;segments={len(self._segments)})&#34;
+        )</code></pre>
 </details>
 <h3>Static methods</h3>
 <dl>

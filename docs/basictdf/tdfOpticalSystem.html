@@ -33,9 +33,11 @@ Optical System Configuration Data module.
 from enum import Enum
 from io import BytesIO
 from typing import BinaryIO, Iterator, List, Union
-from basictdf.tdfBlock import Block, BlockType
-from basictdf.tdfTypes import BTSString, i32, CameraViewPort
+
 import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import BTSString, CameraViewPort, i32
 
 
 class OpticalChannelData:
@@ -120,7 +122,10 @@ class OpticalChannelData:
         return 4 + 4 + 32 + 32 + 32 + self.camera_viewport.nBytes
 
     def __repr__(self) -&gt; str:
-        return f&#34;OpticalChannelData(camera_name={self.camera_name}, camera_type={self.camera_type})&#34;
+        return (
+            f&#34;OpticalChannelData(camera_name={self.camera_name},&#34;
+            f&#34; camera_type={self.camera_type})&#34;
+        )
 
     def __eq__(self, other) -&gt; bool:
         if not isinstance(other, OpticalChannelData):
@@ -318,7 +323,10 @@ class OpticalSetupBlock(Block):
         return 4 + 4 + 32 + 32 + 32 + self.camera_viewport.nBytes
 
     def __repr__(self) -&gt; str:
-        return f&#34;OpticalChannelData(camera_name={self.camera_name}, camera_type={self.camera_type})&#34;
+        return (
+            f&#34;OpticalChannelData(camera_name={self.camera_name},&#34;
+            f&#34; camera_type={self.camera_type})&#34;
+        )
 
     def __eq__(self, other) -&gt; bool:
         if not isinstance(other, OpticalChannelData):

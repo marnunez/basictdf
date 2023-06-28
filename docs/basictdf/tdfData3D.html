@@ -30,21 +30,23 @@
 <pre><code class="python">__doc__ = &#34;&#34;&#34;
 Marker data module.
 &#34;&#34;&#34;
+from enum import Enum
 from io import BytesIO
 from typing import BinaryIO, Iterable, Iterator, List, Union
+
+import numpy as np
+
 from basictdf.tdfBlock import Block, BlockType
-from enum import Enum
 from basictdf.tdfTypes import (
+    MAT3X3F,
+    VEC3F,
     BTSString,
+    TdfType,
+    Volume,
+    f32,
     i32,
     u32,
-    Volume,
-    VEC3F,
-    MAT3X3F,
-    f32,
-    TdfType,
 )
-import numpy as np
 
 
 class Data3dBlockFormat(Enum):
@@ -88,21 +90,24 @@ class MarkerTrack:
     @property
     def X(self) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Convenience property that returns or sets the X component of the marker position.
+        Convenience property that returns or sets the
+        X component of the marker position.
         &#34;&#34;&#34;
         return self.data[:, 0]
 
     @property
     def Y(self) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Convenience property that returns or sets the Y component of the marker position.
+        Convenience property that returns or sets the
+        Y component of the marker position.
         &#34;&#34;&#34;
         return self.data[:, 1]
 
     @property
     def Z(self) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Convenience property that returns or sets the Z component of the marker position.
+        Convenience property that returns or sets the
+        Z component of the marker position.
         &#34;&#34;&#34;
         return self.data[:, 2]
 
@@ -206,10 +211,11 @@ class Data3D(Block):
             nFrames (int): number of frames in the data block
             volume (Union[Volume,np.ndarray]): acquisition volume
             rotationMatrix (np.ndarray): rotation matrix
-            translationVector (np.ndarray): tralslation vector
+            translationVector (np.ndarray): translation vector
             startTime (float, optional): Acquisition start time. Defaults to 0.0.
             flag (Flags, optional): Data 3D block flags. Defaults to Flags.rawData.
-            format (Data3dBlockFormat, optional): Data3D format. Defaults to Data3dBlockFormat.byTrack.
+            format (Data3dBlockFormat, optional): Data3D format.
+             Defaults to Data3dBlockFormat.byTrack.
 
         Raises:
             ValueError: the volume is not an array of 3 floats
@@ -265,7 +271,10 @@ class Data3D(Block):
             raise TypeError(&#34;Track must be of type Track&#34;)
         if track.nFrames != self.nFrames:
             raise ValueError(
-                f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
+                (
+                    f&#34;Track with label {track.label} has&#34;
+                    f&#34; {track.nFrames} frames, expected {self.nFrames} frames&#34;
+                )
             )
         self._tracks.append(track)
 
@@ -425,7 +434,10 @@ class Data3D(Block):
             + 4  # flags
         )
 
-        if self.format in [Data3dBlockFormat.byFrame, Data3dBlockFormat.byTrack]:
+        if self.format in [
+            Data3dBlockFormat.byFrame,
+            Data3dBlockFormat.byTrack,
+        ]:
             links_size = (
                 4
                 + 4
@@ -443,7 +455,10 @@ class Data3D(Block):
         return base
 
     def __repr__(self) -&gt; str:
-        return f&#34;&lt;Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;</code></pre>
+        return (
+            f&#34;&lt;Data3D: {self.nFrames} frames, {self.frequency} Hz,&#34;
+            f&#34; {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -474,14 +489,15 @@ inheritance.</p>
 <dt><strong><code>rotationMatrix</code></strong> :&ensp;<code>np.ndarray</code></dt>
 <dd>rotation matrix</dd>
 <dt><strong><code>translationVector</code></strong> :&ensp;<code>np.ndarray</code></dt>
-<dd>tralslation vector</dd>
+<dd>translation vector</dd>
 <dt><strong><code>startTime</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Acquisition start time. Defaults to 0.0.</dd>
 <dt><strong><code>flag</code></strong> :&ensp;<code><a title="basictdf.tdfData3D.Flags" href="#basictdf.tdfData3D.Flags">Flags</a></code>, optional</dt>
 <dd>Data 3D block flags. Defaults to Flags.rawData.</dd>
 <dt><strong><code>format</code></strong> :&ensp;<code><a title="basictdf.tdfData3D.Data3dBlockFormat" href="#basictdf.tdfData3D.Data3dBlockFormat">Data3dBlockFormat</a></code>, optional</dt>
-<dd>Data3D format. Defaults to Data3dBlockFormat.byTrack.</dd>
+<dd>Data3D format.</dd>
 </dl>
+<p>Defaults to Data3dBlockFormat.byTrack.</p>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>ValueError</code></dt>
@@ -516,10 +532,11 @@ inheritance.</p>
             nFrames (int): number of frames in the data block
             volume (Union[Volume,np.ndarray]): acquisition volume
             rotationMatrix (np.ndarray): rotation matrix
-            translationVector (np.ndarray): tralslation vector
+            translationVector (np.ndarray): translation vector
             startTime (float, optional): Acquisition start time. Defaults to 0.0.
             flag (Flags, optional): Data 3D block flags. Defaults to Flags.rawData.
-            format (Data3dBlockFormat, optional): Data3D format. Defaults to Data3dBlockFormat.byTrack.
+            format (Data3dBlockFormat, optional): Data3D format.
+             Defaults to Data3dBlockFormat.byTrack.
 
         Raises:
             ValueError: the volume is not an array of 3 floats
@@ -575,7 +592,10 @@ inheritance.</p>
             raise TypeError(&#34;Track must be of type Track&#34;)
         if track.nFrames != self.nFrames:
             raise ValueError(
-                f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
+                (
+                    f&#34;Track with label {track.label} has&#34;
+                    f&#34; {track.nFrames} frames, expected {self.nFrames} frames&#34;
+                )
             )
         self._tracks.append(track)
 
@@ -735,7 +755,10 @@ inheritance.</p>
             + 4  # flags
         )
 
-        if self.format in [Data3dBlockFormat.byFrame, Data3dBlockFormat.byTrack]:
+        if self.format in [
+            Data3dBlockFormat.byFrame,
+            Data3dBlockFormat.byTrack,
+        ]:
             links_size = (
                 4
                 + 4
@@ -753,7 +776,10 @@ inheritance.</p>
         return base
 
     def __repr__(self) -&gt; str:
-        return f&#34;&lt;Data3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;</code></pre>
+        return (
+            f&#34;&lt;Data3D: {self.nFrames} frames, {self.frequency} Hz,&#34;
+            f&#34; {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -789,7 +815,10 @@ def nBytes(self) -&gt; int:
         + 4  # flags
     )
 
-    if self.format in [Data3dBlockFormat.byFrame, Data3dBlockFormat.byTrack]:
+    if self.format in [
+        Data3dBlockFormat.byFrame,
+        Data3dBlockFormat.byTrack,
+    ]:
         links_size = (
             4
             + 4
@@ -889,7 +918,10 @@ def tracks(self) -&gt; List[MarkerTrack]:
         raise TypeError(&#34;Track must be of type Track&#34;)
     if track.nFrames != self.nFrames:
         raise ValueError(
-            f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
+            (
+                f&#34;Track with label {track.label} has&#34;
+                f&#34; {track.nFrames} frames, expected {self.nFrames} frames&#34;
+            )
         )
     self._tracks.append(track)</code></pre>
 </details>
@@ -1003,21 +1035,24 @@ def tracks(self) -&gt; List[MarkerTrack]:
     @property
     def X(self) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Convenience property that returns or sets the X component of the marker position.
+        Convenience property that returns or sets the
+        X component of the marker position.
         &#34;&#34;&#34;
         return self.data[:, 0]
 
     @property
     def Y(self) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Convenience property that returns or sets the Y component of the marker position.
+        Convenience property that returns or sets the
+        Y component of the marker position.
         &#34;&#34;&#34;
         return self.data[:, 1]
 
     @property
     def Z(self) -&gt; np.ndarray:
         &#34;&#34;&#34;
-        Convenience property that returns or sets the Z component of the marker position.
+        Convenience property that returns or sets the
+        Z component of the marker position.
         &#34;&#34;&#34;
         return self.data[:, 2]
 
@@ -1103,7 +1138,8 @@ def tracks(self) -&gt; List[MarkerTrack]:
 <dl>
 <dt id="basictdf.tdfData3D.MarkerTrack.X"><code class="name">var <span class="ident">X</span> : numpy.ndarray</code></dt>
 <dd>
-<div class="desc"><p>Convenience property that returns or sets the X component of the marker position.</p></div>
+<div class="desc"><p>Convenience property that returns or sets the
+X component of the marker position.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1111,14 +1147,16 @@ def tracks(self) -&gt; List[MarkerTrack]:
 <pre><code class="python">@property
 def X(self) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    Convenience property that returns or sets the X component of the marker position.
+    Convenience property that returns or sets the
+    X component of the marker position.
     &#34;&#34;&#34;
     return self.data[:, 0]</code></pre>
 </details>
 </dd>
 <dt id="basictdf.tdfData3D.MarkerTrack.Y"><code class="name">var <span class="ident">Y</span> : numpy.ndarray</code></dt>
 <dd>
-<div class="desc"><p>Convenience property that returns or sets the Y component of the marker position.</p></div>
+<div class="desc"><p>Convenience property that returns or sets the
+Y component of the marker position.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1126,14 +1164,16 @@ def X(self) -&gt; np.ndarray:
 <pre><code class="python">@property
 def Y(self) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    Convenience property that returns or sets the Y component of the marker position.
+    Convenience property that returns or sets the
+    Y component of the marker position.
     &#34;&#34;&#34;
     return self.data[:, 1]</code></pre>
 </details>
 </dd>
 <dt id="basictdf.tdfData3D.MarkerTrack.Z"><code class="name">var <span class="ident">Z</span> : numpy.ndarray</code></dt>
 <dd>
-<div class="desc"><p>Convenience property that returns or sets the Z component of the marker position.</p></div>
+<div class="desc"><p>Convenience property that returns or sets the
+Z component of the marker position.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1141,7 +1181,8 @@ def Y(self) -&gt; np.ndarray:
 <pre><code class="python">@property
 def Z(self) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    Convenience property that returns or sets the Z component of the marker position.
+    Convenience property that returns or sets the
+    Z component of the marker position.
     &#34;&#34;&#34;
     return self.data[:, 2]</code></pre>
 </details>

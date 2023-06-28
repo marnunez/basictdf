@@ -31,11 +31,12 @@
 
 from enum import Enum
 from typing import Iterator, Union
-from basictdf.tdfBlock import Block
-from basictdf.tdfTypes import BTSString, u32, i32, f32
-from basictdf.tdfUtils import is_iterable
-from basictdf.tdfBlock import BlockType
+
 import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import BTSString, f32, i32, u32
+from basictdf.tdfUtils import is_iterable
 
 
 class TemporalEventsDataFormat(Enum):
@@ -106,7 +107,6 @@ class TemporalEventsData(Block):
 
     @staticmethod
     def _build(stream, format) -&gt; &#34;TemporalEventsData&#34;:
-
         format = TemporalEventsDataFormat(format)
         nEvents = i32.bread(stream)
         start_time = f32.bread(stream)
@@ -150,7 +150,10 @@ class TemporalEventsData(Block):
         raise TypeError(f&#34;Invalid key type: {type(value)}&#34;)
 
     def __repr__(self) -&gt; str:
-        return f&#34;TemporalEventsData(format={self.format}, nEvents={len(self.events)}, start_time={self.start_time}, events={self.events}) size={self.nBytes}&#34;</code></pre>
+        return (
+            f&#34;TemporalEventsData(format={self.format}, nEvents={len(self.events)}, &#34;
+            f&#34;start_time={self.start_time}, events={self.events}) size={self.nBytes}&#34;
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -285,7 +288,6 @@ def nBytes(self) -&gt; int:
 
     @staticmethod
     def _build(stream, format) -&gt; &#34;TemporalEventsData&#34;:
-
         format = TemporalEventsDataFormat(format)
         nEvents = i32.bread(stream)
         start_time = f32.bread(stream)
@@ -329,7 +331,10 @@ def nBytes(self) -&gt; int:
         raise TypeError(f&#34;Invalid key type: {type(value)}&#34;)
 
     def __repr__(self) -&gt; str:
-        return f&#34;TemporalEventsData(format={self.format}, nEvents={len(self.events)}, start_time={self.start_time}, events={self.events}) size={self.nBytes}&#34;</code></pre>
+        return (
+            f&#34;TemporalEventsData(format={self.format}, nEvents={len(self.events)}, &#34;
+            f&#34;start_time={self.start_time}, events={self.events}) size={self.nBytes}&#34;
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

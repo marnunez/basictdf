@@ -29,21 +29,23 @@
 </summary>
 <pre><code class="python">__doc__ = &#34;Force, torque and acceleration data module.&#34;
 
+from enum import Enum
 from io import BytesIO
 from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Type, Union
-from basictdf.tdfBlock import Block, BlockType
-from enum import Enum
-from basictdf.tdfTypes import (
-    i32,
-    f32,
-    BTSString,
-    u32,
-    VEC3F,
-    MAT3X3F,
-    Volume,
-    TdfType,
-)
+
 import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import (
+    MAT3X3F,
+    VEC3F,
+    BTSString,
+    TdfType,
+    Volume,
+    f32,
+    i32,
+    u32,
+)
 
 SegmentData = TdfType(np.dtype([(&#34;startFrame&#34;, &#34;&lt;i4&#34;), (&#34;nFrames&#34;, &#34;&lt;i4&#34;)]))
 ForceType = ApplicationPointType = TorqueType = TdfType(np.dtype(&#34;&lt;3f4&#34;))
@@ -267,7 +269,10 @@ class ForceTorque3D(Block):
             raise TypeError(&#34;Track must be of type ForceTorqueTrack&#34;)
         if track.nFrames != self.nFrames:
             raise ValueError(
-                f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
+                (
+                    f&#34;Track with label {track.label} has {track.nFrames}&#34;
+                    f&#34; frames, expected {self.nFrames} frames&#34;
+                )
             )
         self._tracks.append(track)
 
@@ -373,7 +378,10 @@ class ForceTorque3D(Block):
             track._write(file)
 
     def __repr__(self):
-        return f&#34;&lt;ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;</code></pre>
+        return (
+            f&#34;&lt;ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, &#34;
+            f&#34;{self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -482,7 +490,10 @@ inheritance.</p></div>
             raise TypeError(&#34;Track must be of type ForceTorqueTrack&#34;)
         if track.nFrames != self.nFrames:
             raise ValueError(
-                f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
+                (
+                    f&#34;Track with label {track.label} has {track.nFrames}&#34;
+                    f&#34; frames, expected {self.nFrames} frames&#34;
+                )
             )
         self._tracks.append(track)
 
@@ -588,7 +599,10 @@ inheritance.</p></div>
             track._write(file)
 
     def __repr__(self):
-        return f&#34;&lt;ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;</code></pre>
+        return (
+            f&#34;&lt;ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, &#34;
+            f&#34;{self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -700,7 +714,10 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
         raise TypeError(&#34;Track must be of type ForceTorqueTrack&#34;)
     if track.nFrames != self.nFrames:
         raise ValueError(
-            f&#34;Track with label {track.label} has {track.nFrames} frames, expected {self.nFrames} frames&#34;
+            (
+                f&#34;Track with label {track.label} has {track.nFrames}&#34;
+                f&#34; frames, expected {self.nFrames} frames&#34;
+            )
         )
     self._tracks.append(track)</code></pre>
 </details>
