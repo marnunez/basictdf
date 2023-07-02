@@ -363,5 +363,5 @@ class CalibrationDataBlock(Block):
             + MAT3X3F.btype.itemsize  # rotation matrix
             + VEC3F.btype.itemsize  # translation_vector
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
-            + sum([cam.nBytes for cam in self.cam_data])  # calibration data
+            + sum(cam.nBytes for cam in self.cam_data)  # calibration data
         )

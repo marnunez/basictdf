@@ -320,7 +320,7 @@ class ForceTorque3D(Block):
             base += track.nBytes
         return base
 
-    def _write(self, file):
+    def _write(self, file) -> None:
         if self.format != ForceTorque3DBlockFormat.byTrack:
             raise NotImplementedError(
                 f"Force3D format {self.format} not implemented yet"
@@ -348,7 +348,7 @@ class ForceTorque3D(Block):
         for track in self._tracks:
             track._write(file)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"<ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, "
             f"{self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"

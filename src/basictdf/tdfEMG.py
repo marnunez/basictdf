@@ -19,7 +19,7 @@ class EMGBlockFormat(Enum):
 
 
 class EMGTrack:
-    def __init__(self, label: str, trackData: np.ndarray):
+    def __init__(self, label: str, trackData: np.ndarray) -> None:
         self.label = label
         self.data = trackData
 
@@ -37,7 +37,7 @@ class EMGTrack:
         return np.ma.clump_unmasked(maskedTrackData.T)
 
     @staticmethod
-    def build(stream, nSamples):
+    def build(stream, nSamples) -> "EMGTrack":
         label = BTSString.bread(stream, 256)
         nSegments = i32.bread(stream)
         i32.skip(stream)  # padding
@@ -48,7 +48,7 @@ class EMGTrack:
             trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
-    def write(self, file):
+    def write(self, file) -> None:
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -80,7 +80,7 @@ class EMGTrack:
     def __eq__(self, other):
         return self.label == other.label and np.all(self.data == other.data)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"EMGTrack(label={self.label}, nSamples={self.nSamples},"
             f"segments={len(self._segments)})"
@@ -92,7 +92,7 @@ class EMG(Block):
 
     type = BlockType.electromyographicData
 
-    def __init__(self, frequency, nSamples, startTime=0.0):
+    def __init__(self, frequency, nSamples, startTime=0.0) -> None:
         super().__init__()
         self.frequency = frequency
         self.startTime = startTime
@@ -101,7 +101,7 @@ class EMG(Block):
         self._emgMap = []
 
     @staticmethod
-    def _build(stream, format):
+    def _build(stream, format) -> "EMG":
         format = EMGBlockFormat(format)
         nSignals = i32.bread(stream)
         frequency = i32.bread(stream)
@@ -111,7 +111,6 @@ class EMG(Block):
 
         d = EMG(frequency, nSamples, startTime)
         if format == EMGBlockFormat.byTrack:
-            # d._signals = [EMGTrack.build(stream, nSamples) for _ in range(nSignals)]
             for n in range(nSignals):
                 emgSignal = EMGTrack.build(stream, nSamples)
                 d.addSignal(emgSignal, channel=emgMap[n])
@@ -119,7 +118,7 @@ class EMG(Block):
             raise NotImplementedError(f"EMG format {format} not implemented yet")
         return d
 
-    def _write(self, file):
+    def _write(self, file) -> None:
         if self.format != EMGBlockFormat.byTrack:
             raise NotImplementedError(f"EMG format {self.format} not implemented yet")
 
@@ -172,7 +171,7 @@ class EMG(Block):
         other.write(buff2)
         return buff1.getvalue() == buff2.getvalue()
 
-    def addSignal(self, signal: EMGTrack, channel=None):
+    def addSignal(self, signal: EMGTrack, channel=None) -> None:
         """
         adds a signal to the EMG block. If the channel is not specified,
         it is set to the next one  available
@@ -199,7 +198,7 @@ class EMG(Block):
             self._emgMap.append(channel)
         self._signals.append(signal)
 
-    def removeSignal(self, label: str):
+    def removeSignal(self, label: str) -> None:
         try:
             pos = next(i for i, v in enumerate(self._signals) if v == label)
         except StopIteration:
@@ -219,7 +218,7 @@ class EMG(Block):
     def nSignals(self) -> int:
         return len(self._signals)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, "
             f"nSignals={self.nSignals}, startTime={self.startTime},)"

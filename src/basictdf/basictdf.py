@@ -94,7 +94,7 @@ class TdfEntry:
         self.comment = comment
         self.nBytes = 8 * 4 + 256
 
-    def _write(self, file):
+    def _write(self, file) -> None:
         u32.bwrite(file, self.type.value)
         u32.bwrite(file, self.format)
         i32.bwrite(file, self.offset)
@@ -148,7 +148,7 @@ class Tdf:
         self._mode = "rb"
         self._inside_context = False
 
-    def allow_write(self):
+    def allow_write(self) -> "Tdf":
         """Allow writing to the file."""
         self._mode = "r+b"
         return self
