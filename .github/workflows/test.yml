@@ -68,7 +68,7 @@ jobs:
     steps:
       - name: Run coverage
         run: |
-          pip install coverage
+          pip install pytest pytest-cov coverage
           coverage run -m pytest tests/
           coverage report -m
 
