@@ -61,10 +61,15 @@ jobs:
         run: |
           pytest tests/
 
+  coverage:
+    name: Code coverage
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
       - name: Run coverage
         run: |
           pip install coverage
-          coverage run --source=src -m pytest tests/
+          coverage run -m pytest tests/
           coverage report -m
 
       - name: Upload coverage reports to Codecov
