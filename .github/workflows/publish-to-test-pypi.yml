@@ -9,7 +9,6 @@ on:
 jobs:
   build-n-publish:
     name: Build and publish Python to PyPI
-    if: startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,7 +30,11 @@ jobs:
           --wheel
           --outdir dist/
           .
+      - name: Echo the github ref to the console
+        run: echo ${{ github.ref }}
+
       - name: Publish distribution 📦 to PyPI
+        if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
