@@ -273,6 +273,12 @@ class CalibrationDataBlockFormat(IntEnum):
 
 
 class CalibrationDataBlock(Block):
+    &#34;&#34;&#34;
+    A class representing the Calibration Data block. This block holds
+    the calibration data for the cameras, as well as the calibration
+    volume data.
+    &#34;&#34;&#34;
+
     type = BlockType.calibrationData
 
     def __init__(
@@ -392,7 +398,7 @@ class CalibrationDataBlock(Block):
             + MAT3X3F.btype.itemsize  # rotation matrix
             + VEC3F.btype.itemsize  # translation_vector
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
-            + sum([cam.nBytes for cam in self.cam_data])  # calibration data
+            + sum(cam.nBytes for cam in self.cam_data)  # calibration data
         )</code></pre>
 </details>
 </section>
@@ -592,13 +598,20 @@ class CalibrationDataBlock(Block):
 <span>(</span><span>distorsion_model: <a title="basictdf.tdfCalibrationData.DistorsionModel" href="#basictdf.tdfCalibrationData.DistorsionModel">DistorsionModel</a>, calibration_volume_size: numpy.ndarray, calibration_volume_rotation_matrix: numpy.ndarray, calibration_volume_translation_vector: numpy.ndarray, cameras_calibration_map: numpy.ndarray, cam_data: Union[List[<a title="basictdf.tdfCalibrationData.BTSCameraData" href="#basictdf.tdfCalibrationData.BTSCameraData">BTSCameraData</a>], List[<a title="basictdf.tdfCalibrationData.SeelabCameraData" href="#basictdf.tdfCalibrationData.SeelabCameraData">SeelabCameraData</a>]])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p></div>
+<div class="desc"><p>A class representing the Calibration Data block. This block holds
+the calibration data for the cameras, as well as the calibration
+volume data.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CalibrationDataBlock(Block):
+    &#34;&#34;&#34;
+    A class representing the Calibration Data block. This block holds
+    the calibration data for the cameras, as well as the calibration
+    volume data.
+    &#34;&#34;&#34;
+
     type = BlockType.calibrationData
 
     def __init__(
@@ -718,7 +731,7 @@ inheritance.</p></div>
             + MAT3X3F.btype.itemsize  # rotation matrix
             + VEC3F.btype.itemsize  # translation_vector
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
-            + sum([cam.nBytes for cam in self.cam_data])  # calibration data
+            + sum(cam.nBytes for cam in self.cam_data)  # calibration data
         )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -771,7 +784,7 @@ inheritance.</p></div>
         + MAT3X3F.btype.itemsize  # rotation matrix
         + VEC3F.btype.itemsize  # translation_vector
         + i16.btype.itemsize * len(self.cam_data)  # calibration map
-        + sum([cam.nBytes for cam in self.cam_data])  # calibration data
+        + sum(cam.nBytes for cam in self.cam_data)  # calibration data
     )</code></pre>
 </details>
 </dd>

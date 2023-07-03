@@ -244,6 +244,12 @@ class CalibrationDataBlockFormat(IntEnum):
 
 
 class CalibrationDataBlock(Block):
+    """
+    A class representing the Calibration Data block. This block holds
+    the calibration data for the cameras, as well as the calibration
+    volume data.
+    """
+
     type = BlockType.calibrationData
 
     def __init__(

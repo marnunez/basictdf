@@ -215,7 +215,8 @@ __all__ = [
 
 __pdoc__ = {}
 __pdoc__[&#34;basictdf.tdfUtils&#34;] = False
-__pdoc__[&#34;basictdf.tdfTypes&#34;] = False</code></pre>
+__pdoc__[&#34;basictdf.tdfTypes&#34;] = False
+__pdoc__[&#34;collections.ABC&#34;] = False</code></pre>
 </details>
 </section>
 <section>
@@ -249,6 +250,10 @@ __pdoc__[&#34;basictdf.tdfTypes&#34;] = False</code></pre>
 <dd>
 <div class="desc"><p>Force, torque and acceleration data module.</p></div>
 </dd>
+<dt><code class="name"><a title="basictdf.tdfForcePlatformsCalibration" href="tdfForcePlatformsCalibration.html">basictdf.tdfForcePlatformsCalibration</a></code></dt>
+<dd>
+<div class="desc"><p>Force platform calibration data module.</p></div>
+</dd>
 <dt><code class="name"><a title="basictdf.tdfOpticalSystem" href="tdfOpticalSystem.html">basictdf.tdfOpticalSystem</a></code></dt>
 <dd>
 <div class="desc"><p>Optical System Configuration Data module.</p></div>
@@ -267,8 +272,7 @@ __pdoc__[&#34;basictdf.tdfTypes&#34;] = False</code></pre>
 <span>(</span><span>frequency: float, nFrames: int, volume: numpy.ndarray, rotationMatrix: numpy.ndarray, translationVector: numpy.ndarray, startTime: float = 0.0, flag: <a title="basictdf.tdfData3D.Flags" href="tdfData3D.html#basictdf.tdfData3D.Flags">Flags</a> = Flags.rawData, format: <a title="basictdf.tdfData3D.Data3dBlockFormat" href="tdfData3D.html#basictdf.tdfData3D.Data3dBlockFormat">Data3dBlockFormat</a> = Data3dBlockFormat.byTrack)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+<div class="desc"><p>A class to represent a TDF block.</p>
 <p>A data block that contains marker tracks.</p>
 <h2 id="args">Args</h2>
 <dl>
@@ -735,7 +739,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
 
     type = BlockType.electromyographicData
 
-    def __init__(self, frequency, nSamples, startTime=0.0):
+    def __init__(self, frequency, nSamples, startTime=0.0) -&gt; None:
         super().__init__()
         self.frequency = frequency
         self.startTime = startTime
@@ -744,7 +748,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
         self._emgMap = []
 
     @staticmethod
-    def _build(stream, format):
+    def _build(stream, format) -&gt; &#34;EMG&#34;:
         format = EMGBlockFormat(format)
         nSignals = i32.bread(stream)
         frequency = i32.bread(stream)
@@ -754,7 +758,6 @@ def tracks(self) -&gt; List[MarkerTrack]:
 
         d = EMG(frequency, nSamples, startTime)
         if format == EMGBlockFormat.byTrack:
-            # d._signals = [EMGTrack.build(stream, nSamples) for _ in range(nSignals)]
             for n in range(nSignals):
                 emgSignal = EMGTrack.build(stream, nSamples)
                 d.addSignal(emgSignal, channel=emgMap[n])
@@ -762,7 +765,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
             raise NotImplementedError(f&#34;EMG format {format} not implemented yet&#34;)
         return d
 
-    def _write(self, file):
+    def _write(self, file) -&gt; None:
         if self.format != EMGBlockFormat.byTrack:
             raise NotImplementedError(f&#34;EMG format {self.format} not implemented yet&#34;)
 
@@ -815,7 +818,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
         other.write(buff2)
         return buff1.getvalue() == buff2.getvalue()
 
-    def addSignal(self, signal: EMGTrack, channel=None):
+    def addSignal(self, signal: EMGTrack, channel=None) -&gt; None:
         &#34;&#34;&#34;
         adds a signal to the EMG block. If the channel is not specified,
         it is set to the next one  available
@@ -842,7 +845,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
             self._emgMap.append(channel)
         self._signals.append(signal)
 
-    def removeSignal(self, label: str):
+    def removeSignal(self, label: str) -&gt; None:
         try:
             pos = next(i for i, v in enumerate(self._signals) if v == label)
         except StopIteration:
@@ -862,7 +865,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
     def nSignals(self) -&gt; int:
         return len(self._signals)
 
-    def __repr__(self):
+    def __repr__(self) -&gt; str:
         return (
             f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, &#34;
             f&#34;nSignals={self.nSignals}, startTime={self.startTime},)&#34;
@@ -913,7 +916,7 @@ def nSignals(self) -&gt; int:
 <h3>Methods</h3>
 <dl>
 <dt id="basictdf.EMG.addSignal"><code class="name flex">
-<span>def <span class="ident">addSignal</span></span>(<span>self, signal: <a title="basictdf.tdfEMG.EMGTrack" href="tdfEMG.html#basictdf.tdfEMG.EMGTrack">EMGTrack</a>, channel=None)</span>
+<span>def <span class="ident">addSignal</span></span>(<span>self, signal: <a title="basictdf.tdfEMG.EMGTrack" href="tdfEMG.html#basictdf.tdfEMG.EMGTrack">EMGTrack</a>, channel=None) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>adds a signal to the EMG block. If the channel is not specified,
@@ -923,7 +926,7 @@ available</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def addSignal(self, signal: EMGTrack, channel=None):
+<pre><code class="python">def addSignal(self, signal: EMGTrack, channel=None) -&gt; None:
     &#34;&#34;&#34;
     adds a signal to the EMG block. If the channel is not specified,
     it is set to the next one  available
@@ -952,7 +955,7 @@ available</p></div>
 </details>
 </dd>
 <dt id="basictdf.EMG.removeSignal"><code class="name flex">
-<span>def <span class="ident">removeSignal</span></span>(<span>self, label: str)</span>
+<span>def <span class="ident">removeSignal</span></span>(<span>self, label: str) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -960,7 +963,7 @@ available</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def removeSignal(self, label: str):
+<pre><code class="python">def removeSignal(self, label: str) -&gt; None:
     try:
         pos = next(i for i, v in enumerate(self._signals) if v == label)
     except StopIteration:
@@ -983,7 +986,7 @@ available</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class EMGTrack:
-    def __init__(self, label: str, trackData: np.ndarray):
+    def __init__(self, label: str, trackData: np.ndarray) -&gt; None:
         self.label = label
         self.data = trackData
 
@@ -1001,7 +1004,7 @@ available</p></div>
         return np.ma.clump_unmasked(maskedTrackData.T)
 
     @staticmethod
-    def build(stream, nSamples):
+    def build(stream, nSamples) -&gt; &#34;EMGTrack&#34;:
         label = BTSString.bread(stream, 256)
         nSegments = i32.bread(stream)
         i32.skip(stream)  # padding
@@ -1012,7 +1015,7 @@ available</p></div>
             trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
-    def write(self, file):
+    def write(self, file) -&gt; None:
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -1044,7 +1047,7 @@ available</p></div>
     def __eq__(self, other):
         return self.label == other.label and np.all(self.data == other.data)
 
-    def __repr__(self):
+    def __repr__(self) -&gt; str:
         return (
             f&#34;EMGTrack(label={self.label}, nSamples={self.nSamples},&#34;
             f&#34;segments={len(self._segments)})&#34;
@@ -1053,7 +1056,7 @@ available</p></div>
 <h3>Static methods</h3>
 <dl>
 <dt id="basictdf.EMGTrack.build"><code class="name flex">
-<span>def <span class="ident">build</span></span>(<span>stream, nSamples)</span>
+<span>def <span class="ident">build</span></span>(<span>stream, nSamples) ‑> <a title="basictdf.tdfEMG.EMGTrack" href="tdfEMG.html#basictdf.tdfEMG.EMGTrack">EMGTrack</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1062,7 +1065,7 @@ available</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def build(stream, nSamples):
+def build(stream, nSamples) -&gt; &#34;EMGTrack&#34;:
     label = BTSString.bread(stream, 256)
     nSegments = i32.bread(stream)
     i32.skip(stream)  # padding
@@ -1116,7 +1119,7 @@ def nSamples(self) -&gt; int:
 <h3>Methods</h3>
 <dl>
 <dt id="basictdf.EMGTrack.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>self, file)</span>
+<span>def <span class="ident">write</span></span>(<span>self, file) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1124,7 +1127,7 @@ def nSamples(self) -&gt; int:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write(self, file):
+<pre><code class="python">def write(self, file) -&gt; None:
     # label
     BTSString.bwrite(file, 256, self.label)
 
@@ -1498,7 +1501,7 @@ def nFrames(self) -&gt; int:
         self._mode = &#34;rb&#34;
         self._inside_context = False
 
-    def allow_write(self):
+    def allow_write(self) -&gt; &#34;Tdf&#34;:
         &#34;&#34;&#34;Allow writing to the file.&#34;&#34;&#34;
         self._mode = &#34;r+b&#34;
         return self
@@ -2217,7 +2220,7 @@ def add_block(
 </details>
 </dd>
 <dt id="basictdf.Tdf.allow_write"><code class="name flex">
-<span>def <span class="ident">allow_write</span></span>(<span>self)</span>
+<span>def <span class="ident">allow_write</span></span>(<span>self) ‑> <a title="basictdf.basictdf.Tdf" href="basictdf.html#basictdf.basictdf.Tdf">Tdf</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Allow writing to the file.</p></div>
@@ -2225,7 +2228,7 @@ def add_block(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def allow_write(self):
+<pre><code class="python">def allow_write(self) -&gt; &#34;Tdf&#34;:
     &#34;&#34;&#34;Allow writing to the file.&#34;&#34;&#34;
     self._mode = &#34;r+b&#34;
     return self</code></pre>
@@ -2497,6 +2500,7 @@ def nBytes(self) -&gt; int:
 <li><code><a title="basictdf.tdfEMG" href="tdfEMG.html">basictdf.tdfEMG</a></code></li>
 <li><code><a title="basictdf.tdfEvents" href="tdfEvents.html">basictdf.tdfEvents</a></code></li>
 <li><code><a title="basictdf.tdfForce3D" href="tdfForce3D.html">basictdf.tdfForce3D</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration" href="tdfForcePlatformsCalibration.html">basictdf.tdfForcePlatformsCalibration</a></code></li>
 <li><code><a title="basictdf.tdfOpticalSystem" href="tdfOpticalSystem.html">basictdf.tdfOpticalSystem</a></code></li>
 </ul>
 </li>

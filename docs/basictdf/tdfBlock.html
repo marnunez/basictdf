@@ -57,6 +57,10 @@ class BlockType(Enum):
 
 
 class Block(ABC):
+    &#34;&#34;&#34;
+    A class to represent a TDF block.
+    &#34;&#34;&#34;
+
     type = BlockType.notDefined
 
     def __init__(
@@ -99,7 +103,7 @@ class NotImplementedBlock(Block):
     @classmethod
     def _build(cls, *args, **kwargs):
         raise NotImplementedError(
-            f&#34;Buidling blocks of type {cls.type} is yet implemented&#34;
+            f&#34;Buidling blocks of type {cls.type} is not implemented yet&#34;
         )
 
     def _write(self, *args, **kwargs):
@@ -166,13 +170,16 @@ class NotDefinedBlock(NotImplementedBlock):
 <span>(</span><span>creation_date: Optional[datetime.datetime] = None, last_modification_date: Optional[datetime.datetime] = None, last_access_date: Optional[datetime.datetime] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p></div>
+<div class="desc"><p>A class to represent a TDF block.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Block(ABC):
+    &#34;&#34;&#34;
+    A class to represent a TDF block.
+    &#34;&#34;&#34;
+
     type = BlockType.notDefined
 
     def __init__(
@@ -220,6 +227,7 @@ inheritance.</p></div>
 <li><a title="basictdf.tdfEMG.EMG" href="tdfEMG.html#basictdf.tdfEMG.EMG">EMG</a></li>
 <li><a title="basictdf.tdfEvents.TemporalEventsData" href="tdfEvents.html#basictdf.tdfEvents.TemporalEventsData">TemporalEventsData</a></li>
 <li><a title="basictdf.tdfForce3D.ForceTorque3D" href="tdfForce3D.html#basictdf.tdfForce3D.ForceTorque3D">ForceTorque3D</a></li>
+<li><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock" href="tdfForcePlatformsCalibration.html#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock">ForcePlatformsCalibrationDataBlock</a></li>
 <li><a title="basictdf.tdfOpticalSystem.OpticalSetupBlock" href="tdfOpticalSystem.html#basictdf.tdfOpticalSystem.OpticalSetupBlock">OpticalSetupBlock</a></li>
 </ul>
 <h3>Class variables</h3>

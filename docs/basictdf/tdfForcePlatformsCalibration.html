@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>basictdf.tdfForcePlatformsCalibration API documentation</title>
+<meta name="description" content="Force platform calibration data module." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>basictdf.tdfForcePlatformsCalibration</code></h1>
+</header>
+<section id="section-intro">
+<p>Force platform calibration data module.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">__doc__ = &#34;&#34;&#34;
+Force platform calibration data module.
+&#34;&#34;&#34;
+
+from enum import Enum
+from typing import Iterable, Iterator, List, Sequence, Tuple, Union
+
+import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfTypes import VEC2F, BTSString, TdfType, i16, i32
+
+# type that stores the 4 vertices of a force platform as a 4x3 float matrix
+ForcePlatformVertices = TdfType(np.dtype(&#34;(4,3)&lt;f4&#34;))
+
+
+class ForcePlatformCalibrationBlockFormat(Enum):
+    unknownFormat = 0
+    ISSFormat = 1  # TDF_CALPLAT_FORMAT_ISS
+    GRPFormat = 2  # TDF_CALPLAT_FORMAT_GRP? (not documented)
+
+
+class ForcePlatform:
+    &#34;&#34;&#34;
+    Class that stores the calibration data of a force platform.
+    &#34;&#34;&#34;
+
+    def __init__(self, label, size, position) -&gt; None:
+        self.label = label
+        &#34;Force platform label&#34;
+        self.size = size
+        &#34;Size in meters (width, length)&#34;
+        self.position = position
+        &#34;Position of the 4 vertices in x,y,z coordinates&#34;
+
+    @staticmethod
+    def _build(stream) -&gt; &#34;ForcePlatform&#34;:
+        label = BTSString.bread(stream, 256)  # Docs say 32, but it&#39;s actually 256
+        size = VEC2F.bread(stream)
+        position = ForcePlatformVertices.bread(stream)
+        BTSString.bread(stream, 256)  # Undocumented padding
+
+        return ForcePlatform(label, size, position)
+
+    def _write(self, stream) -&gt; None:
+        BTSString.bwrite(stream, 256, self.label)
+        VEC2F.bwrite(stream, self.size)
+        ForcePlatformVertices.bwrite(stream, self.position)
+        BTSString.bwrite(stream, 256, &#34;&#34;)  # Undocumented padding
+
+    nBytes = 256 + (4 * 2) + (4 * 3 * 4) + 256
+
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, ForcePlatform):
+            return False
+        return (
+            self.label == o.label
+            and np.allclose(self.size, o.size)
+            and np.allclose(self.position, o.position)
+        )
+
+    def __repr__(self) -&gt; str:
+        return (
+            f&#34;ForcePlatform(label={self.label}, size={self.size},&#34;
+            &#34; position={self.position})&#34;
+        )
+
+
+class ForcePlatformsCalibrationDataBlock(Block):
+    &#34;&#34;&#34;
+    Block that stores the calibration data of a list of force platforms.
+    Each platform is stored as a ForcePlatform object, along with a channel
+    number. The channel number links the logical channel of the platform to the
+    physical channel of the data acquisition system.
+    &#34;&#34;&#34;
+
+    type = BlockType.forcePlatformsCalibrationData
+
+    def __init__(self, platforms=None) -&gt; None:
+        self._platforms: List[ForcePlatform] = platforms or []
+        self._platformMap = []
+
+    @property
+    def nPlatforms(self) -&gt; int:
+        return len(self._platforms)
+
+    @staticmethod
+    def _build(stream, format) -&gt; &#34;ForcePlatformsCalibrationDataBlock&#34;:
+        format = ForcePlatformCalibrationBlockFormat(format)
+        if format != ForcePlatformCalibrationBlockFormat.GRPFormat:
+            raise NotImplementedError(
+                f&#34;Platform calibration format {format} not implemented yet&#34;
+            )
+        nPlats = i32.bread(stream)
+        i32.skip(stream)  # padding
+        platMap = i16.bread(stream, n=nPlats)
+        block = ForcePlatformsCalibrationDataBlock()
+        for nPlat in range(nPlats):
+            platform = ForcePlatform._build(stream)
+            block.addPlatform(platform, channel=platMap[nPlat])
+
+        return block
+
+    def _write(
+        self, file, format=ForcePlatformCalibrationBlockFormat.GRPFormat
+    ) -&gt; None:
+        if format != ForcePlatformCalibrationBlockFormat.GRPFormat:
+            raise NotImplementedError(
+                f&#34;Platform calibration format {format} not implemented yet&#34;
+            )
+
+        # nPlats
+        i32.bwrite(file, self.nPlatforms)
+
+        # padding
+        i32.bpad(file, 1)
+
+        # platMap
+        i16.bwrite(file, self._platformMap)
+
+        # platforms
+        for platform in self._platforms:
+            platform._write(file)
+
+    def addPlatform(self, platform: ForcePlatform, channel: int = None):
+        &#34;&#34;&#34;
+        Adds a platform to the list of platforms. Optionally, a channel can be
+        specified. If no channel is specified, the next available channel is
+        used.
+        &#34;&#34;&#34;
+        if not isinstance(platform, ForcePlatform):
+            raise TypeError(&#34;platform must be of type ForcePlatform&#34;)
+
+        if channel is None:
+            if len(self._platformMap) == 0:
+                next_channel = 0
+            else:
+                next_channel = max(self._platformMap) + 1
+            self._platformMap.append(next_channel)
+        else:
+            if channel in self._platformMap:
+                raise ValueError(f&#34;channel {channel} already in use&#34;)
+            self._platformMap.append(channel)
+        self._platforms.append(platform)
+
+    def removePlatform(self, plat):
+        &#34;&#34;&#34;
+        Removes a platform from the list of platforms. The platform can be
+        specified either by index or by ForcePlatform object.
+        &#34;&#34;&#34;
+        if isinstance(plat, ForcePlatform):
+            if plat in self._platforms:
+                index = self._platforms.index(plat)
+            else:
+                raise ValueError(f&#34;platform {plat} not in list&#34;)
+        elif isinstance(plat, int):
+            if plat &gt;= len(self._platforms):
+                raise ValueError(f&#34;index {plat} out of range&#34;)
+            else:
+                index = plat
+
+        del self._platforms[index]
+        del self._platformMap[index]
+
+    def removePlatforms(self, plats):
+        &#34;&#34;&#34;
+        Removes a list of platforms from the list of platforms. The platforms
+        can be specified either by index or by ForcePlatform object.
+        &#34;&#34;&#34;
+        for plat in plats:
+            self.removePlatform(plat)
+
+    def addPlatforms(self, plats, channels=None):
+        &#34;&#34;&#34;
+        Adds a list of platforms to the list of platforms. If a list of
+        channels is provided, the platforms will be added to the corresponding
+        channels. If no list of channels is provided, the platforms will be
+        added to the next available channels.
+
+        &#34;&#34;&#34;
+        if channels:
+            for plat, channel in zip(plats, channels):
+                self.addPlatform(plat, channel)
+        else:
+            for plat in plats:
+                self.addPlatform(plat)
+
+    @property
+    def platforms(self) -&gt; List[Tuple[int, ForcePlatform]]:
+        &#34;&#34;&#34;
+        Returns:
+            List[Tuple(int, ForcePlatform)]: a list of tuples containing the
+            channel and the platform
+        &#34;&#34;&#34;
+
+        return list(zip(self._platformMap, self._platforms))
+
+    @platforms.setter
+    def platforms(self, channel_plats: Iterable[Sequence[Union[int, ForcePlatform]]]):
+        &#34;&#34;&#34;
+        Replaces the current list of platforms with the one provided. The
+        input is a list of tuples containing the channel and the platform.
+        &#34;&#34;&#34;
+        self._platformMap = []
+        self._platforms = []
+        for channel, plat in channel_plats:
+            self.addPlatform(plat, channel)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return (
+            4  # nPlats
+            + 4  # padding
+            + 2 * len(self._platformMap)
+            + sum(platform.nBytes for platform in self._platforms)
+        )
+
+    def __getitem__(self, key):
+        return self._platforms[key]
+
+    def __iter__(self) -&gt; Iterator[ForcePlatform]:
+        return iter(self.platforms)
+
+    def __contains__(self, item: ForcePlatform) -&gt; bool:
+        return item in self._platforms
+
+    def __len__(self) -&gt; int:
+        return len(self._platforms)
+
+    def __repr__(self) -&gt; str:
+        return f&#34;ForcePlatformsCalibrationDataBlock(platforms={self.platforms})&#34;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatform"><code class="flex name class">
+<span>class <span class="ident">ForcePlatform</span></span>
+<span>(</span><span>label, size, position)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that stores the calibration data of a force platform.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ForcePlatform:
+    &#34;&#34;&#34;
+    Class that stores the calibration data of a force platform.
+    &#34;&#34;&#34;
+
+    def __init__(self, label, size, position) -&gt; None:
+        self.label = label
+        &#34;Force platform label&#34;
+        self.size = size
+        &#34;Size in meters (width, length)&#34;
+        self.position = position
+        &#34;Position of the 4 vertices in x,y,z coordinates&#34;
+
+    @staticmethod
+    def _build(stream) -&gt; &#34;ForcePlatform&#34;:
+        label = BTSString.bread(stream, 256)  # Docs say 32, but it&#39;s actually 256
+        size = VEC2F.bread(stream)
+        position = ForcePlatformVertices.bread(stream)
+        BTSString.bread(stream, 256)  # Undocumented padding
+
+        return ForcePlatform(label, size, position)
+
+    def _write(self, stream) -&gt; None:
+        BTSString.bwrite(stream, 256, self.label)
+        VEC2F.bwrite(stream, self.size)
+        ForcePlatformVertices.bwrite(stream, self.position)
+        BTSString.bwrite(stream, 256, &#34;&#34;)  # Undocumented padding
+
+    nBytes = 256 + (4 * 2) + (4 * 3 * 4) + 256
+
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, ForcePlatform):
+            return False
+        return (
+            self.label == o.label
+            and np.allclose(self.size, o.size)
+            and np.allclose(self.position, o.position)
+        )
+
+    def __repr__(self) -&gt; str:
+        return (
+            f&#34;ForcePlatform(label={self.label}, size={self.size},&#34;
+            &#34; position={self.position})&#34;
+        )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatform.nBytes"><code class="name">var <span class="ident">nBytes</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatform.label"><code class="name">var <span class="ident">label</span></code></dt>
+<dd>
+<div class="desc"><p>Force platform label</p></div>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatform.position"><code class="name">var <span class="ident">position</span></code></dt>
+<dd>
+<div class="desc"><p>Position of the 4 vertices in x,y,z coordinates</p></div>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatform.size"><code class="name">var <span class="ident">size</span></code></dt>
+<dd>
+<div class="desc"><p>Size in meters (width, length)</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat"><code class="flex name class">
+<span>class <span class="ident">ForcePlatformCalibrationBlockFormat</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ForcePlatformCalibrationBlockFormat(Enum):
+    unknownFormat = 0
+    ISSFormat = 1  # TDF_CALPLAT_FORMAT_ISS
+    GRPFormat = 2  # TDF_CALPLAT_FORMAT_GRP? (not documented)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.GRPFormat"><code class="name">var <span class="ident">GRPFormat</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.ISSFormat"><code class="name">var <span class="ident">ISSFormat</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.unknownFormat"><code class="name">var <span class="ident">unknownFormat</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock"><code class="flex name class">
+<span>class <span class="ident">ForcePlatformsCalibrationDataBlock</span></span>
+<span>(</span><span>platforms=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Block that stores the calibration data of a list of force platforms.
+Each platform is stored as a ForcePlatform object, along with a channel
+number. The channel number links the logical channel of the platform to the
+physical channel of the data acquisition system.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ForcePlatformsCalibrationDataBlock(Block):
+    &#34;&#34;&#34;
+    Block that stores the calibration data of a list of force platforms.
+    Each platform is stored as a ForcePlatform object, along with a channel
+    number. The channel number links the logical channel of the platform to the
+    physical channel of the data acquisition system.
+    &#34;&#34;&#34;
+
+    type = BlockType.forcePlatformsCalibrationData
+
+    def __init__(self, platforms=None) -&gt; None:
+        self._platforms: List[ForcePlatform] = platforms or []
+        self._platformMap = []
+
+    @property
+    def nPlatforms(self) -&gt; int:
+        return len(self._platforms)
+
+    @staticmethod
+    def _build(stream, format) -&gt; &#34;ForcePlatformsCalibrationDataBlock&#34;:
+        format = ForcePlatformCalibrationBlockFormat(format)
+        if format != ForcePlatformCalibrationBlockFormat.GRPFormat:
+            raise NotImplementedError(
+                f&#34;Platform calibration format {format} not implemented yet&#34;
+            )
+        nPlats = i32.bread(stream)
+        i32.skip(stream)  # padding
+        platMap = i16.bread(stream, n=nPlats)
+        block = ForcePlatformsCalibrationDataBlock()
+        for nPlat in range(nPlats):
+            platform = ForcePlatform._build(stream)
+            block.addPlatform(platform, channel=platMap[nPlat])
+
+        return block
+
+    def _write(
+        self, file, format=ForcePlatformCalibrationBlockFormat.GRPFormat
+    ) -&gt; None:
+        if format != ForcePlatformCalibrationBlockFormat.GRPFormat:
+            raise NotImplementedError(
+                f&#34;Platform calibration format {format} not implemented yet&#34;
+            )
+
+        # nPlats
+        i32.bwrite(file, self.nPlatforms)
+
+        # padding
+        i32.bpad(file, 1)
+
+        # platMap
+        i16.bwrite(file, self._platformMap)
+
+        # platforms
+        for platform in self._platforms:
+            platform._write(file)
+
+    def addPlatform(self, platform: ForcePlatform, channel: int = None):
+        &#34;&#34;&#34;
+        Adds a platform to the list of platforms. Optionally, a channel can be
+        specified. If no channel is specified, the next available channel is
+        used.
+        &#34;&#34;&#34;
+        if not isinstance(platform, ForcePlatform):
+            raise TypeError(&#34;platform must be of type ForcePlatform&#34;)
+
+        if channel is None:
+            if len(self._platformMap) == 0:
+                next_channel = 0
+            else:
+                next_channel = max(self._platformMap) + 1
+            self._platformMap.append(next_channel)
+        else:
+            if channel in self._platformMap:
+                raise ValueError(f&#34;channel {channel} already in use&#34;)
+            self._platformMap.append(channel)
+        self._platforms.append(platform)
+
+    def removePlatform(self, plat):
+        &#34;&#34;&#34;
+        Removes a platform from the list of platforms. The platform can be
+        specified either by index or by ForcePlatform object.
+        &#34;&#34;&#34;
+        if isinstance(plat, ForcePlatform):
+            if plat in self._platforms:
+                index = self._platforms.index(plat)
+            else:
+                raise ValueError(f&#34;platform {plat} not in list&#34;)
+        elif isinstance(plat, int):
+            if plat &gt;= len(self._platforms):
+                raise ValueError(f&#34;index {plat} out of range&#34;)
+            else:
+                index = plat
+
+        del self._platforms[index]
+        del self._platformMap[index]
+
+    def removePlatforms(self, plats):
+        &#34;&#34;&#34;
+        Removes a list of platforms from the list of platforms. The platforms
+        can be specified either by index or by ForcePlatform object.
+        &#34;&#34;&#34;
+        for plat in plats:
+            self.removePlatform(plat)
+
+    def addPlatforms(self, plats, channels=None):
+        &#34;&#34;&#34;
+        Adds a list of platforms to the list of platforms. If a list of
+        channels is provided, the platforms will be added to the corresponding
+        channels. If no list of channels is provided, the platforms will be
+        added to the next available channels.
+
+        &#34;&#34;&#34;
+        if channels:
+            for plat, channel in zip(plats, channels):
+                self.addPlatform(plat, channel)
+        else:
+            for plat in plats:
+                self.addPlatform(plat)
+
+    @property
+    def platforms(self) -&gt; List[Tuple[int, ForcePlatform]]:
+        &#34;&#34;&#34;
+        Returns:
+            List[Tuple(int, ForcePlatform)]: a list of tuples containing the
+            channel and the platform
+        &#34;&#34;&#34;
+
+        return list(zip(self._platformMap, self._platforms))
+
+    @platforms.setter
+    def platforms(self, channel_plats: Iterable[Sequence[Union[int, ForcePlatform]]]):
+        &#34;&#34;&#34;
+        Replaces the current list of platforms with the one provided. The
+        input is a list of tuples containing the channel and the platform.
+        &#34;&#34;&#34;
+        self._platformMap = []
+        self._platforms = []
+        for channel, plat in channel_plats:
+            self.addPlatform(plat, channel)
+
+    @property
+    def nBytes(self) -&gt; int:
+        return (
+            4  # nPlats
+            + 4  # padding
+            + 2 * len(self._platformMap)
+            + sum(platform.nBytes for platform in self._platforms)
+        )
+
+    def __getitem__(self, key):
+        return self._platforms[key]
+
+    def __iter__(self) -&gt; Iterator[ForcePlatform]:
+        return iter(self.platforms)
+
+    def __contains__(self, item: ForcePlatform) -&gt; bool:
+        return item in self._platforms
+
+    def __len__(self) -&gt; int:
+        return len(self._platforms)
+
+    def __repr__(self) -&gt; str:
+        return f&#34;ForcePlatformsCalibrationDataBlock(platforms={self.platforms})&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    return (
+        4  # nPlats
+        + 4  # padding
+        + 2 * len(self._platformMap)
+        + sum(platform.nBytes for platform in self._platforms)
+    )</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.nPlatforms"><code class="name">var <span class="ident">nPlatforms</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nPlatforms(self) -&gt; int:
+    return len(self._platforms)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.platforms"><code class="name">var <span class="ident">platforms</span> : List[Tuple[int, <a title="basictdf.tdfForcePlatformsCalibration.ForcePlatform" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatform">ForcePlatform</a>]]</code></dt>
+<dd>
+<div class="desc"><h2 id="returns">Returns</h2>
+<p>List[Tuple(int, ForcePlatform)]: a list of tuples containing the
+channel and the platform</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def platforms(self) -&gt; List[Tuple[int, ForcePlatform]]:
+    &#34;&#34;&#34;
+    Returns:
+        List[Tuple(int, ForcePlatform)]: a list of tuples containing the
+        channel and the platform
+    &#34;&#34;&#34;
+
+    return list(zip(self._platformMap, self._platforms))</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.addPlatform"><code class="name flex">
+<span>def <span class="ident">addPlatform</span></span>(<span>self, platform: <a title="basictdf.tdfForcePlatformsCalibration.ForcePlatform" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatform">ForcePlatform</a>, channel: int = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a platform to the list of platforms. Optionally, a channel can be
+specified. If no channel is specified, the next available channel is
+used.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addPlatform(self, platform: ForcePlatform, channel: int = None):
+    &#34;&#34;&#34;
+    Adds a platform to the list of platforms. Optionally, a channel can be
+    specified. If no channel is specified, the next available channel is
+    used.
+    &#34;&#34;&#34;
+    if not isinstance(platform, ForcePlatform):
+        raise TypeError(&#34;platform must be of type ForcePlatform&#34;)
+
+    if channel is None:
+        if len(self._platformMap) == 0:
+            next_channel = 0
+        else:
+            next_channel = max(self._platformMap) + 1
+        self._platformMap.append(next_channel)
+    else:
+        if channel in self._platformMap:
+            raise ValueError(f&#34;channel {channel} already in use&#34;)
+        self._platformMap.append(channel)
+    self._platforms.append(platform)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.addPlatforms"><code class="name flex">
+<span>def <span class="ident">addPlatforms</span></span>(<span>self, plats, channels=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds a list of platforms to the list of platforms. If a list of
+channels is provided, the platforms will be added to the corresponding
+channels. If no list of channels is provided, the platforms will be
+added to the next available channels.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def addPlatforms(self, plats, channels=None):
+    &#34;&#34;&#34;
+    Adds a list of platforms to the list of platforms. If a list of
+    channels is provided, the platforms will be added to the corresponding
+    channels. If no list of channels is provided, the platforms will be
+    added to the next available channels.
+
+    &#34;&#34;&#34;
+    if channels:
+        for plat, channel in zip(plats, channels):
+            self.addPlatform(plat, channel)
+    else:
+        for plat in plats:
+            self.addPlatform(plat)</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.removePlatform"><code class="name flex">
+<span>def <span class="ident">removePlatform</span></span>(<span>self, plat)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Removes a platform from the list of platforms. The platform can be
+specified either by index or by ForcePlatform object.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removePlatform(self, plat):
+    &#34;&#34;&#34;
+    Removes a platform from the list of platforms. The platform can be
+    specified either by index or by ForcePlatform object.
+    &#34;&#34;&#34;
+    if isinstance(plat, ForcePlatform):
+        if plat in self._platforms:
+            index = self._platforms.index(plat)
+        else:
+            raise ValueError(f&#34;platform {plat} not in list&#34;)
+    elif isinstance(plat, int):
+        if plat &gt;= len(self._platforms):
+            raise ValueError(f&#34;index {plat} out of range&#34;)
+        else:
+            index = plat
+
+    del self._platforms[index]
+    del self._platformMap[index]</code></pre>
+</details>
+</dd>
+<dt id="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.removePlatforms"><code class="name flex">
+<span>def <span class="ident">removePlatforms</span></span>(<span>self, plats)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Removes a list of platforms from the list of platforms. The platforms
+can be specified either by index or by ForcePlatform object.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def removePlatforms(self, plats):
+    &#34;&#34;&#34;
+    Removes a list of platforms from the list of platforms. The platforms
+    can be specified either by index or by ForcePlatform object.
+    &#34;&#34;&#34;
+    for plat in plats:
+        self.removePlatform(plat)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="basictdf" href="index.html">basictdf</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatform" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatform">ForcePlatform</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatform.label" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatform.label">label</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatform.nBytes" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatform.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatform.position" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatform.position">position</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatform.size" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatform.size">size</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat">ForcePlatformCalibrationBlockFormat</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.GRPFormat" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.GRPFormat">GRPFormat</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.ISSFormat" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.ISSFormat">ISSFormat</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.unknownFormat" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformCalibrationBlockFormat.unknownFormat">unknownFormat</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock">ForcePlatformsCalibrationDataBlock</a></code></h4>
+<ul class="two-column">
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.addPlatform" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.addPlatform">addPlatform</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.addPlatforms" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.addPlatforms">addPlatforms</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.nBytes" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.nPlatforms" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.nPlatforms">nPlatforms</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.platforms" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.platforms">platforms</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.removePlatform" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.removePlatform">removePlatform</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.removePlatforms" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.removePlatforms">removePlatforms</a></code></li>
+<li><code><a title="basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.type" href="#basictdf.tdfForcePlatformsCalibration.ForcePlatformsCalibrationDataBlock.type">type</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

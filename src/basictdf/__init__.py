@@ -112,3 +112,4 @@ __all__ = [
 __pdoc__ = {}
 __pdoc__["basictdf.tdfUtils"] = False
 __pdoc__["basictdf.tdfTypes"] = False
+__pdoc__["collections.ABC"] = False

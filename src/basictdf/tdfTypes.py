@@ -55,7 +55,9 @@ class BTSString:
         dat = data.encode("windows-1252") + b"\x00"
         padding = b"\x00" * (size - len(dat))
         if len(dat) > size:
-            raise ValueError(f"data is too long for {size}")
+            raise ValueError(
+                f"The string is too long: max {size} chars, got {len(dat)}"
+            )
         return dat + padding
 
     @staticmethod
@@ -146,6 +148,7 @@ VEC3F = TdfType(np.dtype("3<f4"))
 VEC3D = TdfType(np.dtype("3<f8"))
 
 VEC2I = TdfType(np.dtype("2<i4"))
+VEC2F = TdfType(np.dtype("2<f4"))
 VEC2D = TdfType(np.dtype("2<f8"))
 
 MAT3X3F = TdfType(np.dtype("(3,3)<f4"))

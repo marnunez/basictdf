@@ -28,6 +28,10 @@ class BlockType(Enum):
 
 
 class Block(ABC):
+    """
+    A class to represent a TDF block.
+    """
+
     type = BlockType.notDefined
 
     def __init__(
@@ -70,7 +74,7 @@ class NotImplementedBlock(Block):
     @classmethod
     def _build(cls, *args, **kwargs):
         raise NotImplementedError(
-            f"Buidling blocks of type {cls.type} is yet implemented"
+            f"Buidling blocks of type {cls.type} is not implemented yet"
         )
 
     def _write(self, *args, **kwargs):

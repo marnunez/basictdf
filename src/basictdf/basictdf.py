@@ -9,7 +9,6 @@ from basictdf.tdfBlock import (
     BlockType,
     CalibrationData2D,
     Data2D,
-    ForcePlatformsCalibrationData,
     ForcePlatformsCalibrationData2D,
     ForcePlatformsData,
     GeneralCalibrationData,
@@ -29,6 +28,7 @@ from basictdf.tdfUtils import (
     raise_if_outside_context,
     raise_if_outside_write_context,
 )
+from basictdf.tdfForcePlatformsCalibration import ForcePlatformsCalibrationDataBlock
 
 
 def _get_block_class(block_type: BlockType) -> Type[Block]:
@@ -47,7 +47,7 @@ def _get_block_class(block_type: BlockType) -> Type[Block]:
     elif block_type == BlockType.opticalSystemConfiguration:
         return OpticalSetupBlock
     elif block_type == BlockType.forcePlatformsCalibrationData:
-        return ForcePlatformsCalibrationData
+        return ForcePlatformsCalibrationDataBlock
     elif block_type == BlockType.forcePlatformsCalibrationData2D:
         return ForcePlatformsCalibrationData2D
     elif block_type == BlockType.forcePlatformsData:
