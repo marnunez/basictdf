@@ -8,7 +8,6 @@ from basictdf.tdfBlock import (
     Block,
     BlockType,
     CalibrationData2D,
-    Data2D,
     ForcePlatformsCalibrationData2D,
     ForcePlatformsData,
     GeneralCalibrationData,
@@ -17,6 +16,7 @@ from basictdf.tdfBlock import (
     VolumetricData,
 )
 from basictdf.tdfCalibrationData import CalibrationDataBlock
+from basictdf.tdfData2D import Data2D
 from basictdf.tdfData3D import Data3D
 from basictdf.tdfEMG import EMG
 from basictdf.tdfEvents import TemporalEventsData

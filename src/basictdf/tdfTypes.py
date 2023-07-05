@@ -157,6 +157,7 @@ MAT3X3D = TdfType(np.dtype("(3,3)<f8"))
 i32 = TdfType(np.dtype("<i4"))
 i16 = TdfType(np.dtype("<i2"))
 u32 = TdfType(np.dtype("<u4"))
+u16 = TdfType(np.dtype("<u2"))
 f32 = TdfType(np.dtype("<f4"))
 f64 = TdfType(np.dtype("<f8"))
 
