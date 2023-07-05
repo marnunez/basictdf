@@ -100,34 +100,34 @@ class TestForcePlatformsCalibrationDataBlock(TestCase):
         self.assertEqual(len(a), 0)
         self.assertEqual(a.nBytes, 8)
 
-        a.addPlatform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))))
+        a.add_platform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))))
         self.assertEqual(len(a), 1)
         self.assertEqual(
             a.nBytes, ForcePlatform.nBytes + 8 + 2
         )  # 2 extra bytes from the platformMap
 
-    def test_addPlatform(self):
+    def test_add_platform(self):
         a = ForcePlatformsCalibrationDataBlock()
-        a.addPlatform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))))
+        a.add_platform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))))
         self.assertEqual(len(a), 1)
         self.assertEqual(a.nBytes, ForcePlatform.nBytes + 8 + 2)
 
         # Shouldn't let me add it to the same channel
         with self.assertRaises(ValueError):
-            a.addPlatform(
+            a.add_platform(
                 ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))), channel=0
             )
 
         # Should let me add a platform to an arbitrary channel
-        a.addPlatform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))), channel=36)
+        a.add_platform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))), channel=36)
         self.assertEqual(len(a), 2)
         self.assertEqual(a._platformMap, [0, 36])
 
     def test_write(self):
         a = ForcePlatformsCalibrationDataBlock()
         fp = ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3)))
-        a.addPlatform(fp)
-        a.addPlatform(fp, channel=36)
+        a.add_platform(fp)
+        a.add_platform(fp, channel=36)
 
         c = BytesIO()
         a._write(c)

@@ -93,7 +93,7 @@ class ForcePlatformsCalibrationDataBlock(Block):
         block = ForcePlatformsCalibrationDataBlock()
         for nPlat in range(nPlats):
             platform = ForcePlatform._build(stream)
-            block.addPlatform(platform, channel=platMap[nPlat])
+            block.add_platform(platform, channel=platMap[nPlat])
 
         return block
 
@@ -118,7 +118,7 @@ class ForcePlatformsCalibrationDataBlock(Block):
         for platform in self._platforms:
             platform._write(file)
 
-    def addPlatform(self, platform: ForcePlatform, channel: int = None):
+    def add_platform(self, platform: ForcePlatform, channel: int = None):
         """
         Adds a platform to the list of platforms. Optionally, a channel can be
         specified. If no channel is specified, the next available channel is
@@ -139,7 +139,7 @@ class ForcePlatformsCalibrationDataBlock(Block):
             self._platformMap.append(channel)
         self._platforms.append(platform)
 
-    def removePlatform(self, plat):
+    def remove_platform(self, plat):
         """
         Removes a platform from the list of platforms. The platform can be
         specified either by index or by ForcePlatform object.
@@ -158,15 +158,15 @@ class ForcePlatformsCalibrationDataBlock(Block):
         del self._platforms[index]
         del self._platformMap[index]
 
-    def removePlatforms(self, plats):
+    def remove_platforms(self, plats):
         """
         Removes a list of platforms from the list of platforms. The platforms
         can be specified either by index or by ForcePlatform object.
         """
         for plat in plats:
-            self.removePlatform(plat)
+            self.remove_platform(plat)
 
-    def addPlatforms(self, plats, channels=None):
+    def add_platforms(self, plats, channels=None):
         """
         Adds a list of platforms to the list of platforms. If a list of
         channels is provided, the platforms will be added to the corresponding
@@ -176,10 +176,10 @@ class ForcePlatformsCalibrationDataBlock(Block):
         """
         if channels:
             for plat, channel in zip(plats, channels):
-                self.addPlatform(plat, channel)
+                self.add_platform(plat, channel)
         else:
             for plat in plats:
-                self.addPlatform(plat)
+                self.add_platform(plat)
 
     @property
     def platforms(self) -> List[Tuple[int, ForcePlatform]]:
@@ -203,7 +203,7 @@ class ForcePlatformsCalibrationDataBlock(Block):
         self._platformMap = []
         self._platforms = []
         for channel, plat in channel_plats:
-            self.addPlatform(plat, channel)
+            self.add_platform(plat, channel)
 
     @property
     def nBytes(self) -> int:
