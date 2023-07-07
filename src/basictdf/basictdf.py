@@ -9,12 +9,12 @@ from basictdf.tdfBlock import (
     BlockType,
     CalibrationData2D,
     ForcePlatformsCalibrationData2D,
-    ForcePlatformsData,
     GeneralCalibrationData,
     NotDefinedBlock,
     UnusedBlock,
     VolumetricData,
 )
+from basictdf.tdfForcePlatformsData import ForcePlatformsDataBlock
 from basictdf.tdfCalibrationData import CalibrationDataBlock
 from basictdf.tdfData2D import Data2D
 from basictdf.tdfData3D import Data3D
@@ -51,7 +51,7 @@ def _get_block_class(block_type: BlockType) -> Type[Block]:
     elif block_type == BlockType.forcePlatformsCalibrationData2D:
         return ForcePlatformsCalibrationData2D
     elif block_type == BlockType.forcePlatformsData:
-        return ForcePlatformsData
+        return ForcePlatformsDataBlock
     elif block_type == BlockType.anthropometricData:
         return AnthropometricData
     elif block_type == BlockType.electromyographicData:
@@ -129,10 +129,10 @@ class TdfEntry:
 
     def __repr__(self) -> str:
         return (
-            f"TdfEntry({self.type}, {self.format}, {self.offset},"
-            f" {self.size}, {self.creation_date},"
-            f" {self.last_modification_date},"
-            f" {self.last_access_date}, {self.comment})"
+            f"TdfEntry(type={self.type}, format={self.format}, offset={self.offset}, "
+            f"size={self.size}, creation_date={self.creation_date}, "
+            f"last_modification_date={self.last_modification_date}, "
+            f"last_access_date={self.last_access_date}, comment={self.comment})"
         )
 
 

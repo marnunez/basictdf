@@ -211,3 +211,6 @@ class CameraViewPort:
         if not isinstance(other, CameraViewPort):
             raise TypeError("Can only compare CameraViewPort with CameraViewPort")
         return np.all(self.origin == other.origin) and np.all(self.size == other.size)
+
+
+SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
