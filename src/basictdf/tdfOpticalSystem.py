@@ -190,4 +190,4 @@ class OpticalSetupBlock(Block):
         return base
 
     def __repr__(self) -> str:
-        return f"<OpticalSetupBlock: {len(self.channels)} channels>"
+        return f"<OpticalSetupBlock format={self.format.name} nChannels={len(self)}>"

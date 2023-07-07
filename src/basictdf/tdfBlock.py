@@ -65,7 +65,7 @@ class Block(ABC):
         pass
 
     def __repr__(self):
-        return self.__class__.__name__ + "(" + str(self.__class__.type) + ")"
+        return f"<{self.__class__.__name__} type={self.type}>"
 
 
 class NotImplementedBlock(Block):
@@ -119,8 +119,19 @@ class GeneralCalibrationData(NotImplementedBlock):
     type = BlockType.generalCalibrationData
 
 
-class UnusedBlock(NotImplementedBlock):
+class UnusedBlock(Block):
     type = BlockType.unusedSlot
+    nBytes = 0
+
+    @staticmethod
+    def _build(*args, **kwargs) -> "UnusedBlock":
+        return UnusedBlock()
+
+    def _write(self, *args, **kwargs) -> None:
+        pass
+
+    def __repr__(self) -> str:
+        return "<UnusedBlock>"
 
 
 class NotDefinedBlock(NotImplementedBlock):

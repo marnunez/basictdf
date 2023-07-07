@@ -260,6 +260,7 @@ class CalibrationDataBlock(Block):
         calibration_volume_translation_vector: np.ndarray,
         cameras_calibration_map: np.ndarray,
         cam_data: Union[List[BTSCameraData], List[SeelabCameraData]],
+        format: CalibrationDataBlockFormat = CalibrationDataBlockFormat.Seelab1,
     ) -> None:
         super().__init__()
 
@@ -309,11 +310,14 @@ class CalibrationDataBlock(Block):
         self.cameras_calibration_map = cameras_calibration_map
 
         self.cam_data = cam_data
+        self.format = format
 
     @staticmethod
     def _build(stream, format) -> "CalibrationDataBlock":
+        format = CalibrationDataBlockFormat(format)
+
         nCams = i32.bread(stream)
-        distosion_model = DistorsionModel(i32.bread(stream))
+        distorsion_model = DistorsionModel(i32.bread(stream))
         calibration_volume = VEC3F.bread(stream)
         rotation_matrix = MAT3X3F.bread(stream)
         translation_vector = VEC3F.bread(stream)
@@ -329,12 +333,13 @@ class CalibrationDataBlock(Block):
             raise ValueError(f'"Unknown calibration format "{format}"')
 
         return CalibrationDataBlock(
-            distorsion_model=distosion_model,
+            distorsion_model=distorsion_model,
             calibration_volume_size=calibration_volume,
             calibration_volume_rotation_matrix=rotation_matrix,
             calibration_volume_translation_vector=translation_vector,
             cameras_calibration_map=calibration_map,
             cam_data=calibration_data,
+            format=format,
         )
 
     def _write(self, file) -> None:
@@ -370,4 +375,13 @@ class CalibrationDataBlock(Block):
             + VEC3F.btype.itemsize  # translation_vector
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
             + sum(cam.nBytes for cam in self.cam_data)  # calibration data
+        )
+
+    def __repr__(self) -> str:
+        return (
+            "<CalibrationDataBlock "
+            f"format={self.format.name} "
+            f"nCams={len(self.cam_data)} "
+            f"distorsion_model={self.distorsion_model.name} "
+            f"calibration_volume_size={self.calibration_volume_size} >"
         )

@@ -17,6 +17,7 @@ from basictdf.tdfTypes import (
     f32,
     i32,
     u32,
+    SegmentData,
 )
 
 
@@ -42,7 +43,6 @@ class Flags(Enum):
 
 
 LinkType = TdfType(np.dtype([("Track1", "<u4"), ("Track2", "<u4")]))
-SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 
 TrackType = TdfType(np.dtype("<3f4"))
 
@@ -427,6 +427,11 @@ class Data3D(Block):
 
     def __repr__(self) -> str:
         return (
-            f"<Data3D: {self.nFrames} frames, {self.frequency} Hz,"
-            f" {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"
+            f"<Data3D "
+            f"format={self.format.name}, "
+            f"nFrames={self.nFrames}, "
+            f"frequency={self.frequency}, "
+            f"startTime={self.startTime}, "
+            f"nTracks={self.nTracks}, "
+            f"tracks={[i.label for i in self._tracks]}>"
         )

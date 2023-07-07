@@ -5,7 +5,7 @@ import numpy as np
 
 from basictdf.tdfForcePlatformsCalibration import (
     ForcePlatformsCalibrationDataBlock,
-    ForcePlatform,
+    ForcePlatformInfo,
     ForcePlatformVertices,
     ForcePlatformCalibrationBlockFormat,
 )
@@ -25,7 +25,7 @@ class TestForcePlatform(TestCase):
         )
         size = (1.0, 2.0)
 
-        f = ForcePlatform("test", size, vertices)
+        f = ForcePlatformInfo("test", size, vertices)
         assert f.label == "test"
         np.testing.assert_equal(f.size, size)
         np.testing.assert_equal(f.position, vertices)
@@ -53,7 +53,7 @@ class TestForcePlatform(TestCase):
         b += b"\x00" * 256
 
         c = BytesIO(b)
-        f = ForcePlatform._build(c)
+        f = ForcePlatformInfo._build(c)
         self.assertEqual(f.label, "test")
         np.testing.assert_equal(f.size, size)
         np.testing.assert_equal(f.position, vertices)
@@ -70,7 +70,7 @@ class TestForcePlatform(TestCase):
             dtype=np.float32,
         )
         size = np.array([1.0, 2.0], dtype=np.float32)
-        a = ForcePlatform("test", size, vertices)
+        a = ForcePlatformInfo("test", size, vertices)
 
         b = b""
         # label
@@ -87,7 +87,7 @@ class TestForcePlatform(TestCase):
         self.assertEqual(c.getvalue(), b)
         self.assertEqual(a.nBytes, len(b))
 
-        d = ForcePlatform._build(BytesIO(b))
+        d = ForcePlatformInfo._build(BytesIO(b))
         self.assertEqual(d.label, a.label)
         np.testing.assert_equal(d.size, a.size)
         np.testing.assert_equal(d.position, a.position)
@@ -100,32 +100,34 @@ class TestForcePlatformsCalibrationDataBlock(TestCase):
         self.assertEqual(len(a), 0)
         self.assertEqual(a.nBytes, 8)
 
-        a.add_platform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))))
+        a.add_platform(ForcePlatformInfo("test", (1.0, 2.0), np.zeros((4, 3))))
         self.assertEqual(len(a), 1)
         self.assertEqual(
-            a.nBytes, ForcePlatform.nBytes + 8 + 2
+            a.nBytes, ForcePlatformInfo.nBytes + 8 + 2
         )  # 2 extra bytes from the platformMap
 
     def test_add_platform(self):
         a = ForcePlatformsCalibrationDataBlock()
-        a.add_platform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))))
+        a.add_platform(ForcePlatformInfo("test", (1.0, 2.0), np.zeros((4, 3))))
         self.assertEqual(len(a), 1)
-        self.assertEqual(a.nBytes, ForcePlatform.nBytes + 8 + 2)
+        self.assertEqual(a.nBytes, ForcePlatformInfo.nBytes + 8 + 2)
 
         # Shouldn't let me add it to the same channel
         with self.assertRaises(ValueError):
             a.add_platform(
-                ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))), channel=0
+                ForcePlatformInfo("test", (1.0, 2.0), np.zeros((4, 3))), channel=0
             )
 
         # Should let me add a platform to an arbitrary channel
-        a.add_platform(ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3))), channel=36)
+        a.add_platform(
+            ForcePlatformInfo("test", (1.0, 2.0), np.zeros((4, 3))), channel=36
+        )
         self.assertEqual(len(a), 2)
         self.assertEqual(a._platformMap, [0, 36])
 
     def test_write(self):
         a = ForcePlatformsCalibrationDataBlock()
-        fp = ForcePlatform("test", (1.0, 2.0), np.zeros((4, 3)))
+        fp = ForcePlatformInfo("test", (1.0, 2.0), np.zeros((4, 3)))
         a.add_platform(fp)
         a.add_platform(fp, channel=36)
 
@@ -141,7 +143,7 @@ class TestForcePlatformsCalibrationDataBlock(TestCase):
         self.assertEqual(a._platformMap, [0, 36])
         self.assertEqual(
             a.nBytes,
-            2 * ForcePlatform.nBytes
+            2 * ForcePlatformInfo.nBytes
             + 8  # base
             + (2 * 2),  # platformMap for two platforms
         )

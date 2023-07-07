@@ -350,6 +350,10 @@ class ForceTorque3D(Block):
 
     def __repr__(self) -> str:
         return (
-            f"<ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, "
-            f"{self.nTracks} tracks, tracks={[i.label for i in self._tracks]}>"
+            f"<ForceTorque3D format={self.format.name} "
+            f"nFrames={self.nFrames} "
+            f"frequency={self.frequency} Hz "
+            f"startTime={self.startTime} "
+            f"nTracks={self.nTracks} "
+            f"tracks={[i.label for i in self._tracks]}>"
         )

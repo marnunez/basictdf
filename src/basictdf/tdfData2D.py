@@ -135,3 +135,10 @@ class Data2D(Block):
             + i16.btype.itemsize * self.nCams
             + self.data.nbytes
         )
+
+    def __repr__(self) -> str:
+        return (
+            f"<Data2D format={self.format.name} nCams={self.nCams}"
+            f"nFrames={self.nFrames} frequency={self.frequency} "
+            f"startTime={self.startTime} flags={self.flags.name} >"
+        )

@@ -20,7 +20,7 @@ class ForcePlatformCalibrationBlockFormat(Enum):
     GRPFormat = 2  # TDF_CALPLAT_FORMAT_GRP? (not documented)
 
 
-class ForcePlatform:
+class ForcePlatformInfo:
     """
     Class that stores the calibration data of a force platform.
     """
@@ -34,13 +34,13 @@ class ForcePlatform:
         "Position of the 4 vertices in x,y,z coordinates"
 
     @staticmethod
-    def _build(stream) -> "ForcePlatform":
+    def _build(stream) -> "ForcePlatformInfo":
         label = BTSString.bread(stream, 256)  # Docs say 32, but it's actually 256
         size = VEC2F.bread(stream)
         position = ForcePlatformVertices.bread(stream)
         BTSString.bread(stream, 256)  # Undocumented padding
 
-        return ForcePlatform(label, size, position)
+        return ForcePlatformInfo(label, size, position)
 
     def _write(self, stream) -> None:
         BTSString.bwrite(stream, 256, self.label)
@@ -51,7 +51,7 @@ class ForcePlatform:
     nBytes = 256 + (4 * 2) + (4 * 3 * 4) + 256
 
     def __eq__(self, o: object) -> bool:
-        if not isinstance(o, ForcePlatform):
+        if not isinstance(o, ForcePlatformInfo):
             return False
         return (
             self.label == o.label
@@ -60,9 +60,13 @@ class ForcePlatform:
         )
 
     def __repr__(self) -> str:
+        # return (
+        #     f"ForcePlatform(label={self.label}, size={self.size},"
+        #     " position={self.position})"
+        # )
         return (
-            f"ForcePlatform(label={self.label}, size={self.size},"
-            " position={self.position})"
+            "<ForcePlatformInfo "
+            f"label={self.label}, size={self.size}, position={self.position}>"
         )
 
 
@@ -76,9 +80,12 @@ class ForcePlatformsCalibrationDataBlock(Block):
 
     type = BlockType.forcePlatformsCalibrationData
 
-    def __init__(self, platforms=None) -> None:
-        self._platforms: List[ForcePlatform] = platforms or []
+    def __init__(
+        self, platforms=None, format=ForcePlatformCalibrationBlockFormat.GRPFormat
+    ) -> None:
+        self._platforms: List[ForcePlatformInfo] = platforms or []
         self._platformMap = []
+        self.format = format
 
     @staticmethod
     def _build(stream, format) -> "ForcePlatformsCalibrationDataBlock":
@@ -90,9 +97,9 @@ class ForcePlatformsCalibrationDataBlock(Block):
         nPlats = i32.bread(stream)
         i32.skip(stream)  # padding
         platMap = i16.bread(stream, n=nPlats)
-        block = ForcePlatformsCalibrationDataBlock()
+        block = ForcePlatformsCalibrationDataBlock(format=format)
         for nPlat in range(nPlats):
-            platform = ForcePlatform._build(stream)
+            platform = ForcePlatformInfo._build(stream)
             block.add_platform(platform, channel=platMap[nPlat])
 
         return block
@@ -118,13 +125,13 @@ class ForcePlatformsCalibrationDataBlock(Block):
         for platform in self._platforms:
             platform._write(file)
 
-    def add_platform(self, platform: ForcePlatform, channel: int = None):
+    def add_platform(self, platform: ForcePlatformInfo, channel: int = None):
         """
         Adds a platform to the list of platforms. Optionally, a channel can be
         specified. If no channel is specified, the next available channel is
         used.
         """
-        if not isinstance(platform, ForcePlatform):
+        if not isinstance(platform, ForcePlatformInfo):
             raise TypeError("platform must be of type ForcePlatform")
 
         if channel is None:
@@ -144,7 +151,7 @@ class ForcePlatformsCalibrationDataBlock(Block):
         Removes a platform from the list of platforms. The platform can be
         specified either by index or by ForcePlatform object.
         """
-        if isinstance(plat, ForcePlatform):
+        if isinstance(plat, ForcePlatformInfo):
             if plat in self._platforms:
                 index = self._platforms.index(plat)
             else:
@@ -182,7 +189,7 @@ class ForcePlatformsCalibrationDataBlock(Block):
                 self.add_platform(plat)
 
     @property
-    def platforms(self) -> List[Tuple[int, ForcePlatform]]:
+    def platforms(self) -> List[Tuple[int, ForcePlatformInfo]]:
         """
         Returns:
             List[Tuple(int, ForcePlatform)]: a list of tuples containing the
@@ -195,7 +202,9 @@ class ForcePlatformsCalibrationDataBlock(Block):
         return list(zip(self._platformMap, self._platforms))
 
     @platforms.setter
-    def platforms(self, channel_plats: Iterable[Sequence[Union[int, ForcePlatform]]]):
+    def platforms(
+        self, channel_plats: Iterable[Sequence[Union[int, ForcePlatformInfo]]]
+    ):
         """
         Replaces the current list of platforms with the one provided. The
         input is a list of tuples containing the channel and the platform.
@@ -217,14 +226,17 @@ class ForcePlatformsCalibrationDataBlock(Block):
     def __getitem__(self, key):
         return self._platforms[key]
 
-    def __iter__(self) -> Iterator[ForcePlatform]:
+    def __iter__(self) -> Iterator[ForcePlatformInfo]:
         return iter(self.platforms)
 
-    def __contains__(self, item: ForcePlatform) -> bool:
+    def __contains__(self, item: ForcePlatformInfo) -> bool:
         return item in self._platforms
 
     def __len__(self) -> int:
         return len(self._platforms)
 
     def __repr__(self) -> str:
-        return f"ForcePlatformsCalibrationDataBlock(platforms={self.platforms})"
+        return (
+            f"<ForcePlatformsCalibrationDataBlock "
+            f"format={self.format.name}, nPlats={len(self)}>"
+        )

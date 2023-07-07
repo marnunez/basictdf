@@ -60,7 +60,13 @@ class Event:
         return 256 + 4 + 4 + len(self.values) * 4
 
     def __repr__(self) -> str:
-        return f"Event(label={self.label}, type={self.type}, items={self.values})"
+        return (
+            "<Event "
+            f"label={self.label} "
+            f"type={self.type} "
+            f"nItems={len(self.values)} "
+            f"values={self.values}>"
+        )
 
 
 class TemporalEventsData(Block):
@@ -122,6 +128,10 @@ class TemporalEventsData(Block):
 
     def __repr__(self) -> str:
         return (
-            f"TemporalEventsData(format={self.format}, nEvents={len(self.events)}, "
-            f"start_time={self.start_time}, events={self.events}) size={self.nBytes}"
+            "<TemporalEventsData "
+            f"format={self.format.name} "
+            f"nEvents={len(self.events)} "
+            f"start_time={self.start_time} "
+            f"events={self.events} "
+            f"size={self.nBytes}>"
         )
