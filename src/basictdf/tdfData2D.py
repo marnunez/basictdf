@@ -86,8 +86,9 @@ class Data2D(Block):
         self.flags: Data2DFlags = flags
         self.data = data
         """a numpy array of shape (nFrames, nCams).
-        Each element is a numpy array of shape (nPoints, 2) containing the 2D coordinates of the points
-        captured by the camera at the corresponding frame.
+        Each element is a numpy array of shape (nPoints, 2) containing
+        the 2D coordinates of the points captured by the camera at
+        the corresponding frame.
         """
         self.format = format
 

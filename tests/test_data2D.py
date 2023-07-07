@@ -1,12 +1,10 @@
 from io import BytesIO
-from pathlib import Path
 from unittest import TestCase
 from datetime import datetime
 
 import numpy as np
 
-from basictdf import Tdf
-from basictdf.tdfData2D import Data2D, Data2DBlockFormat, Data2DFlags, Data2DPCK
+from basictdf.tdfData2D import Data2D, Data2DBlockFormat, Data2DFlags
 
 
 class TestData2D(TestCase):
