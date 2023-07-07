@@ -24,7 +24,10 @@ class TestData2D(TestCase):
         self.assertEqual(d.frequency, 100)
         self.assertEqual(d.startTime, startTime)
         self.assertEqual(d.flags, flags)
-        np.testing.assert_equal(d.data, data)
+        self.assertEqual(d.data.shape, (2, 2))
+        for i in range(2):
+            for j in range(2):
+                np.testing.assert_equal(d.data[i, j], data[i, j])
         self.assertEqual(d.format, Data2DBlockFormat.PCKFormat)
         self.assertEqual(d.nBytes, 4 + 4 + 4 + 4 + 4 + 2 * 2 + data.nbytes)
 
