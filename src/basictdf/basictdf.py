@@ -389,7 +389,7 @@ class Tdf:
 
         """
         if "+" not in self._mode:
-            raise ValueError(
+            raise PermissionError(
                 "Can't remove blocks, this file was opened in read-only mode"
             )
 
