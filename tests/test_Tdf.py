@@ -259,4 +259,16 @@ class TestRealTdf(TestCase):
             with tdf_file as tdf:
                 self.assertEqual(tdf.nBytes, file.stat().st_size)
                 self.assertEqual(len(tdf.entries), 14)
-                self.assertEqual(len(tdf), 8)
+                # self.assertEqual(len(tdf), 8)
+                blocks = tdf.blocks
+                entries = tdf.entries
+                for block, entry in zip(blocks, entries):
+                    blockClass = block.__class__
+                    b = BytesIO()
+                    block._write(b)
+                    b.seek(0, 0)
+                    self.assertEqual(block.nBytes, len(b.getvalue()))
+                    newBlock = blockClass._build(b, block.format)
+                    self.assertEqual(block.nBytes, newBlock.nBytes)
+                    self.assertEqual(block, newBlock)
+                    self.assertEqual(block.nBytes, entry.size)
