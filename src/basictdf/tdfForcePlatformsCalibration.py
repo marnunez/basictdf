@@ -235,6 +235,15 @@ class ForcePlatformsCalibrationDataBlock(Block):
     def __len__(self) -> int:
         return len(self._platforms)
 
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, ForcePlatformsCalibrationDataBlock):
+            return False
+        return (
+            self.format == o.format
+            and self._platformMap == o._platformMap
+            and self._platforms == o._platforms
+        )
+
     def __repr__(self) -> str:
         return (
             f"<ForcePlatformsCalibrationDataBlock "
