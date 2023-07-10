@@ -200,9 +200,7 @@ class CameraViewPort:
         VEC2I.bwrite(stream, self.origin)
         VEC2I.bwrite(stream, self.size)
 
-    @property
-    def nBytes(self) -> int:
-        return 8 + 8
+    nBytes = 8 + 8
 
     def __repr__(self) -> str:
         return f"CameraViewPort(origin={self.origin}, size={self.size})"
