@@ -1,6 +1,5 @@
 from io import BytesIO
 from unittest import TestCase
-from datetime import datetime
 
 import numpy as np
 
