@@ -5,7 +5,7 @@ from basictdf.tdfTypes import BTSDate, i32, u16, SegmentData, TdfType
 import numpy as np
 
 PlatDataType = TdfType(
-    np.dtype([("application_point", "2<f4"), ("force", "3<f4"), ("torque", "1<f4")])
+    np.dtype([("application_point", "2<f4"), ("force", "3<f4"), ("torque", "<f4")])
 )
 
 
@@ -67,11 +67,10 @@ class ForcePlatformData:
 
     def _get_segment_data(self, segment):
         start, stop = segment.start, segment.stop
-        return PlatDataType.btype.pack(
-            self.application_point[start:stop],
-            self.force[start:stop],
-            self.torque[start:stop],
-        )
+        app_point = self.application_point[start:stop]
+        force = self.force[start:stop]
+        torque = self.torque[start:stop]
+        return np.rec.fromarrays([app_point, force, torque], dtype=PlatDataType.btype)
 
     def _write(self, stream, format) -> None:
         if format != ForcePlatformBlockFormat.byTrackISSFormat:
@@ -80,7 +79,7 @@ class ForcePlatformData:
             )
         segments = self._segments
         i32.bwrite(stream, len(segments))
-        i32.bwrite(stream, 0)  # padding
+        i32.bpad(stream)
         for segment in segments:
             # startFrame
             i32.bwrite(stream, np.array(segment.start))
@@ -90,12 +89,31 @@ class ForcePlatformData:
         for segment in segments:
             PlatDataType.bwrite(stream, self._get_segment_data(segment))
 
+    @property
+    def nBytes(self) -> int:
+        nSegments = len(self._segments)
+
+        base = 4 + 4 + (4 + 4) * nSegments
+
+        for segment in self._segments:
+            base += PlatDataType.btype.itemsize * (segment.stop - segment.start)
+
+        return base
+
     def __repr__(self):
         return (
             "<ForcePlatformData "
             f"application_point={self.application_point}, "
             f"force={self.force}, "
             f"torque={self.torque}>"
+        )
+
+    def __eq__(self, __value: object) -> bool:
+        return (
+            isinstance(__value, ForcePlatformData)
+            and np.allclose(self.application_point, __value.application_point)
+            and np.allclose(self.force, __value.force)
+            and np.allclose(self.torque, __value.torque)
         )
 
 
@@ -152,10 +170,31 @@ class ForcePlatformsDataBlock(Block):
         i32.bwrite(stream, self.frequency)
         BTSDate.bwrite(stream, self.start_time)
         i32.bwrite(stream, self.n_frames)
+        u16.bwrite(stream, self._plat_map)
+        for plat in self._platforms:
+            plat._write(stream, self.format)
 
     @property
     def nBytes(self) -> int:
-        return 4 + 4 + 8 + 4 + (len(self._platforms) * 2)
+        return (
+            4  # nPlatforms
+            + 4  # frequency
+            + 4  # startTime
+            + 4  # nFrames
+            + len(self._platforms) * 2  # platMap
+            + sum(plat.nBytes for plat in self._platforms)
+        )
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, ForcePlatformsDataBlock):
+            return False
+        return (
+            self.start_time == o.start_time
+            and self.frequency == o.frequency
+            and self.n_frames == o.n_frames
+            and np.array_equal(self._plat_map, o._plat_map)
+            and all(plat == oplat for plat, oplat in zip(self._platforms, o._platforms))
+        )
 
     def __repr__(self) -> str:
         return (
