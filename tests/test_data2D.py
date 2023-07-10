@@ -15,15 +15,14 @@ class TestData2D(TestCase):
         data[1, 0] = np.array([[9, 10], [11, 12]], dtype=np.float32)
         data[1, 1] = np.array([[13, 14], [15, 16]], dtype=np.float32)
         flags = Data2DFlags(0)
-        # Today without milliseconds
-        startTime = datetime.now().replace(microsecond=0)
+        startTime = 10.71131231312312
         d = Data2D(2, 2, 100, startTime, flags)
         d.data = data
         d._camMap = [0, 1]
         self.assertEqual(d.nCams, 2)
         self.assertEqual(d.nFrames, 2)
         self.assertEqual(d.frequency, 100)
-        self.assertEqual(d.startTime, startTime)
+        np.testing.assert_almost_equal(d.startTime, startTime)
         self.assertEqual(d.flags, flags)
         self.assertEqual(d.data.shape, (2, 2))
         for i in range(2):
@@ -58,7 +57,7 @@ class TestData2D(TestCase):
         self.assertEqual(d.nCams, new.nCams)
         self.assertEqual(d.nFrames, new.nFrames)
         self.assertEqual(d.frequency, new.frequency)
-        self.assertEqual(d.startTime, new.startTime)
+        np.testing.assert_almost_equal(d.startTime, new.startTime)
         self.assertEqual(d.flags, new.flags)
         for i in range(d.nCams):
             for j in range(d.nFrames):

@@ -4,17 +4,9 @@ Data2D module
 from enum import Enum
 
 import numpy as np
-from datetime import datetime
 
 from basictdf.tdfBlock import Block, BlockType
-from basictdf.tdfTypes import (
-    VEC2F,
-    BTSDate,
-    i32,
-    i16,
-    u32,
-    u16,
-)
+from basictdf.tdfTypes import VEC2F, i32, i16, u32, u16, f32
 
 
 class Data2DFlags(Enum):
@@ -88,7 +80,7 @@ class Data2D(Block):
         nCams: int,
         nFrames: int,
         frequency: int,
-        startTime: datetime,
+        startTime: float,
         flags: Data2DFlags,
         format: Data2DBlockFormat = Data2DBlockFormat.PCKFormat,
     ) -> None:
@@ -128,7 +120,7 @@ class Data2D(Block):
         nCams = i32.bread(stream)
         nFrames = i32.bread(stream)
         frequency = i32.bread(stream)
-        startTime = BTSDate.bread(stream)
+        startTime = f32.bread(stream)
         flags = Data2DFlags(u32.bread(stream))
         camMap = u16.bread(stream, nCams)
         data = Data2DPCK._build(stream, nFrames, nCams)
@@ -147,7 +139,7 @@ class Data2D(Block):
         i32.bwrite(stream, self.nCams)
         i32.bwrite(stream, self.nFrames)
         i32.bwrite(stream, self.frequency)
-        BTSDate.bwrite(stream, self.startTime)
+        f32.bwrite(stream, self.startTime)
         u32.bwrite(stream, self.flags.value)
         i16.bwrite(stream, self._camMap)
         self._data._write(stream)
