@@ -112,6 +112,7 @@ class SeelabCameraData:
         VEC2D.bwrite(file, self.thin_prism)
         self.view_port.bwrite(file)
 
+    @property
     def nBytes(self) -> int:
         return (
             MAT3X3D.btype.itemsize  # rotation_matrix
@@ -122,6 +123,20 @@ class SeelabCameraData:
             + VEC2D.btype.itemsize  # decentering
             + VEC2D.btype.itemsize  # thin_prism
             + CameraViewPort.nBytes  # view_port
+        )
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, SeelabCameraData):
+            return False
+        return (
+            np.array_equal(self.rotation_matrix, o.rotation_matrix)
+            and np.array_equal(self.translation_vector, o.translation_vector)
+            and np.array_equal(self.focus, o.focus)
+            and np.array_equal(self.optical_center, o.optical_center)
+            and np.array_equal(self.radial_distortion, o.radial_distortion)
+            and np.array_equal(self.decentering, o.decentering)
+            and np.array_equal(self.thin_prism, o.thin_prism)
+            and self.view_port == o.view_port
         )
 
 
@@ -219,6 +234,7 @@ class BTSCameraData:
         f64.bwrite(file, self.y_distortion_coefficients)  # y_distortion_coefficients
         self.view_port.bwrite(file)  # view_port
 
+    @property
     def nBytes(self) -> int:
         return (
             MAT3X3D.btype.itemsize  # rotation_matrix
@@ -366,6 +382,7 @@ class CalibrationDataBlock(Block):
         for cam in self.cam_data:
             cam._write(file)
 
+    @property
     def nBytes(self) -> int:
         return (
             i32.btype.itemsize  # nCams
@@ -375,6 +392,26 @@ class CalibrationDataBlock(Block):
             + VEC3F.btype.itemsize  # translation_vector
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
             + sum(cam.nBytes for cam in self.cam_data)  # calibration data
+        )
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, CalibrationDataBlock):
+            return False
+
+        return (
+            self.distorsion_model == o.distorsion_model
+            and np.array_equal(self.calibration_volume_size, o.calibration_volume_size)
+            and np.array_equal(
+                self.calibration_volume_rotation_matrix,
+                o.calibration_volume_rotation_matrix,
+            )
+            and np.array_equal(
+                self.calibration_volume_translation_vector,
+                o.calibration_volume_translation_vector,
+            )
+            and np.array_equal(self.cameras_calibration_map, o.cameras_calibration_map)
+            and all(i == j for i, j in zip(self.cam_data, o.cam_data))
+            and self.format == o.format
         )
 
     def __repr__(self) -> str:
