@@ -92,13 +92,16 @@ class EMG(Block):
 
     type = BlockType.electromyographicData
 
-    def __init__(self, frequency, nSamples, startTime=0.0) -> None:
+    def __init__(
+        self, frequency, nSamples, startTime=0.0, format=EMGBlockFormat.byTrack
+    ) -> None:
         super().__init__()
         self.frequency = frequency
         self.startTime = startTime
         self.nSamples = nSamples
         self._signals = []
         self._emgMap = []
+        self.format = format
 
     @staticmethod
     def _build(stream, format) -> "EMG":
@@ -109,7 +112,7 @@ class EMG(Block):
         nSamples = i32.bread(stream) + 49  # Why 49??? Whyyyy????
         emgMap = i16.bread(stream, n=nSignals)
 
-        d = EMG(frequency, nSamples, startTime)
+        d = EMG(frequency, nSamples, startTime, format)
         if format == EMGBlockFormat.byTrack:
             for n in range(nSignals):
                 emgSignal = EMGTrack.build(stream, nSamples)
@@ -131,11 +134,11 @@ class EMG(Block):
         # startTime
         f32.bwrite(file, self.startTime)
 
-        # emgMap
-        i16.bwrite(file, self._emgMap)
-
         # nSamples
         i32.bwrite(file, self.nSamples - 49)  # That 49 again
+
+        # emgMap
+        i16.bwrite(file, self._emgMap)
 
         # signals
         for signal in self._signals:
@@ -165,11 +168,12 @@ class EMG(Block):
         return len(self._signals)
 
     def __eq__(self, other) -> bool:
-        buff1 = BytesIO()
-        buff2 = BytesIO()
-        self.write(buff1)
-        other.write(buff2)
-        return buff1.getvalue() == buff2.getvalue()
+        return (
+            self.frequency == other.frequency
+            and self.startTime == other.startTime
+            and self.nSamples == other.nSamples
+            and all(s1 == s2 for s1, s2 in zip(self._signals, other._signals))
+        )
 
     def addSignal(self, signal: EMGTrack, channel=None) -> None:
         """
@@ -220,6 +224,11 @@ class EMG(Block):
 
     def __repr__(self) -> str:
         return (
-            f"EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, "
-            f"nSignals={self.nSignals}, startTime={self.startTime},)"
+            "<EMGBlock"
+            f" format={self.format.name}"
+            f" frequency={self.frequency}"
+            f" nSamples={self.nSamples}"
+            f" nSignals={self.nSignals}"
+            f" startTime={self.startTime}"
+            ">"
         )
