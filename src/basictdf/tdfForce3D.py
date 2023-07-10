@@ -16,9 +16,9 @@ from basictdf.tdfTypes import (
     f32,
     i32,
     u32,
+    SegmentData,
 )
 
-SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
 ForceType = ApplicationPointType = TorqueType = TdfType(np.dtype("<3f4"))
 
 
@@ -226,6 +226,34 @@ class ForceTorque3D(Block):
         f._tracks = [ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)]
         return f
 
+    def _write(self, file) -> None:
+        if self.format != ForceTorque3DBlockFormat.byTrack:
+            raise NotImplementedError(
+                f"Force3D format {self.format} not implemented yet"
+            )
+
+        # nTracks
+        u32.bwrite(file, len(self._tracks))
+        # frequency
+        i32.bwrite(file, self.frequency)
+        # startTime
+        f32.bwrite(file, self.startTime)
+        # nFrames
+        i32.bwrite(file, self.nFrames)
+
+        # volume
+        Volume.bwrite(file, self.volume)
+        # rotationMatrix
+        MAT3X3F.bwrite(file, self.rotationMatrix)
+        # translationVector
+        VEC3F.bwrite(file, self.translationVector)
+
+        # padding
+        i32.bpad(file)
+
+        for track in self._tracks:
+            track._write(file)
+
     def add_track(self, track: ForceTorqueTrack) -> None:
         """Adds a track to the data block
 
@@ -319,34 +347,6 @@ class ForceTorque3D(Block):
         for track in self._tracks:
             base += track.nBytes
         return base
-
-    def _write(self, file) -> None:
-        if self.format != ForceTorque3DBlockFormat.byTrack:
-            raise NotImplementedError(
-                f"Force3D format {self.format} not implemented yet"
-            )
-        # nFrames
-        i32.bwrite(file, self.nFrames)
-
-        # frequency
-        i32.bwrite(file, self.frequency)
-        # startTime
-        f32.bwrite(file, self.startTime)
-        # nTracks
-        u32.bwrite(file, len(self._tracks))
-
-        # volume
-        Volume.bwrite(file, self.volume)
-        # rotationMatrix
-        MAT3X3F.bwrite(file, self.rotationMatrix)
-        # translationVector
-        VEC3F.bwrite(file, self.translationVector)
-
-        # padding
-        i32.bpad(file)
-
-        for track in self._tracks:
-            track._write(file)
 
     def __repr__(self) -> str:
         return (
