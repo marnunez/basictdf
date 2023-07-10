@@ -55,6 +55,15 @@ class Event:
     def __len__(self) -> int:
         return len(self.values)
 
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, Event):
+            return False
+        return (
+            self.label == o.label
+            and self.type == o.type
+            and np.array_equal(self.values, o.values)
+        )
+
     @property
     def nBytes(self) -> int:
         return 256 + 4 + 4 + len(self.values) * 4
@@ -125,6 +134,17 @@ class TemporalEventsData(Block):
         elif isinstance(value, str):
             return any(value == event.label for event in self.events)
         raise TypeError(f"Invalid key type: {type(value)}")
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, TemporalEventsData):
+            raise TypeError(
+                "Can only compare TemporalEventsData with TemporalEventsData"
+            )
+        return (
+            self.format == other.format
+            and self.start_time == other.start_time
+            and all(e1 == e2 for e1, e2 in zip(self.events, other.events))
+        )
 
     def __repr__(self) -> str:
         return (
