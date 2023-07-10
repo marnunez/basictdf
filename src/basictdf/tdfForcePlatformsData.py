@@ -1,6 +1,6 @@
 from enum import Enum
 from basictdf.tdfBlock import Block, BlockType
-from basictdf.tdfTypes import BTSDate, i32, u16, SegmentData, TdfType
+from basictdf.tdfTypes import i32, u16, SegmentData, TdfType, f32
 
 import numpy as np
 
@@ -153,7 +153,7 @@ class ForcePlatformsDataBlock(Block):
             )
         n_plats = i32.bread(stream)
         frequency = i32.bread(stream)
-        start_time = BTSDate.bread(stream)
+        start_time = f32.bread(stream)
         n_frames = i32.bread(stream)
         plat_map = u16.bread(stream, n_plats)
         platforms = [
@@ -168,7 +168,7 @@ class ForcePlatformsDataBlock(Block):
     def _write(self, stream) -> None:
         i32.bwrite(stream, len(self._platforms))
         i32.bwrite(stream, self.frequency)
-        BTSDate.bwrite(stream, self.start_time)
+        f32.bwrite(stream, self.start_time)
         i32.bwrite(stream, self.n_frames)
         u16.bwrite(stream, self._plat_map)
         for plat in self._platforms:
