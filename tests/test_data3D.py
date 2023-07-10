@@ -1,18 +1,14 @@
 from io import BytesIO
-from pathlib import Path
-from tempfile import TemporaryDirectory
 from unittest import TestCase
 
 import numpy as np
 
-from basictdf import Tdf
 from basictdf.tdfData3D import (
     Data3D,
     Data3dBlockFormat,
     MarkerTrack,
     TrackType,
 )
-from tests import test_file_feeder
 
 
 class TestMarkerTrack(TestCase):

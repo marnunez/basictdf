@@ -1,7 +1,6 @@
 __doc__ = "Electromyography data module."
 
 from enum import Enum
-from io import BytesIO
 from typing import Iterator, Union
 
 import numpy as np
