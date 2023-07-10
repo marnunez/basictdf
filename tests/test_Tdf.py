@@ -151,7 +151,7 @@ class TestTdf(TestCase):
             oldSize = tdf.nBytes
 
         # Can't remove a block in read-only mode
-        with self.assertRaises(ValueError):
+        with self.assertRaises(PermissionError):
             with tdf_file as tdf:
                 tdf.remove_block(BlockType.temporalEventsData)
 
