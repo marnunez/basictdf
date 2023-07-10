@@ -122,6 +122,7 @@ class GeneralCalibrationData(NotImplementedBlock):
 class UnusedBlock(Block):
     type = BlockType.unusedSlot
     nBytes = 0
+    format = None
 
     @staticmethod
     def _build(*args, **kwargs) -> "UnusedBlock":
@@ -132,6 +133,9 @@ class UnusedBlock(Block):
 
     def __repr__(self) -> str:
         return "<UnusedBlock>"
+
+    def __eq__(self, other: "UnusedBlock") -> bool:
+        return isinstance(other, UnusedBlock)
 
 
 class NotDefinedBlock(NotImplementedBlock):
