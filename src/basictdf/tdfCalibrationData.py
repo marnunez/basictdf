@@ -45,23 +45,51 @@ class SeelabCameraData(Sized, BuildWriteable):
         thin_prism,
         view_port: Union[CameraViewPort, np.ndarray],
     ) -> None:
+        if not isinstance(rotation_matrix, np.ndarray) or rotation_matrix.shape != (
+            3,
+            3,
+        ):
+            raise TypeError("rotation_matrix must be a (3,3) shape numpy array")
+
         self.rotation_matrix = rotation_matrix
         "Rotation matrix of the camera"
+
+        if not isinstance(
+            translation_vector, np.ndarray
+        ) or translation_vector.shape != (3,):
+            raise TypeError("translation_vector must be a (3,) shape numpy array")
 
         self.translation_vector = translation_vector
         "Translation vector of the camera"
 
+        if not isinstance(focus, np.ndarray) or focus.shape != (2,):
+            raise TypeError("focus must be a (2,) shape numpy array")
+
         self.focus = focus
         "Focal length of the camera"
+
+        if not isinstance(optical_center, np.ndarray) or optical_center.shape != (2,):
+            raise TypeError("optical_center must be a (2,) shape numpy array")
 
         self.optical_center = optical_center
         "Optical center of the camera"
 
+        if not isinstance(radial_distortion, np.ndarray) or radial_distortion.shape != (
+            2,
+        ):
+            raise TypeError("radial_distortion must be a (2,) shape numpy array")
+
         self.radial_distortion = radial_distortion
         "Radial distortion of the camera"
 
+        if not isinstance(decentering, np.ndarray) or decentering.shape != (2,):
+            raise TypeError("decentering must be a (2,) shape numpy array")
+
         self.decentering = decentering
         "Decentering of the camera"
+
+        if not isinstance(thin_prism, np.ndarray) or thin_prism.shape != (2,):
+            raise TypeError("thin_prism must be a (2,) shape numpy array")
 
         self.thin_prism = thin_prism
         "Thin prism of the camera"
