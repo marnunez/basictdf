@@ -1,11 +1,44 @@
-__doc__ = "Electromyography data module."
+__doc__ = """
+
+EMG data module.
+
+This module contains the classes to represent EMG data in a TDF file.
+
+Example:
+
+```python
+from basictdf import Tdf, EMG, EMGTrack
+import numpy as np
+
+# Create an empty EMG block
+emg = EMG(frequency=1000, nSamples=1000)
+
+# Create a bogus EMG track with random data
+emgTrack = EMGTrack("emg", np.random.rand(1000))
+
+# Add it to the EMG block
+emg.addSignal(emgTrack)
+
+# Write it to a new TDF file
+with Tdf.new("my_file.tdf").allow_write() as tdf:
+    tdf.emg = emg
+
+# This works too
+tdf = Tdf.new("my_file.tdf")
+with tdf.allow_write() as tdf:
+    tdf.emg = emg
+
+```
+
+"""
+
 
 from enum import Enum
 from typing import Iterator, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, Sized, BuildWriteable
 from basictdf.tdfTypes import BTSString, TdfType, f32, i16, i32
 
 SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
@@ -17,7 +50,7 @@ class EMGBlockFormat(Enum):
     byFrame = 2
 
 
-class EMGTrack:
+class EMGTrack(Sized, BuildWriteable):
     def __init__(self, label: str, trackData: np.ndarray) -> None:
         self.label = label
         self.data = trackData
@@ -36,7 +69,7 @@ class EMGTrack:
         return np.ma.clump_unmasked(maskedTrackData.T)
 
     @staticmethod
-    def build(stream, nSamples) -> "EMGTrack":
+    def _build(stream, nSamples) -> "EMGTrack":
         label = BTSString.bread(stream, 256)
         nSegments = i32.bread(stream)
         i32.skip(stream)  # padding
@@ -47,7 +80,7 @@ class EMGTrack:
             trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
-    def write(self, file) -> None:
+    def _write(self, file) -> None:
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -114,7 +147,7 @@ class EMG(Block):
         d = EMG(frequency, nSamples, startTime, format)
         if format == EMGBlockFormat.byTrack:
             for n in range(nSignals):
-                emgSignal = EMGTrack.build(stream, nSamples)
+                emgSignal = EMGTrack._build(stream, nSamples)
                 d.addSignal(emgSignal, channel=emgMap[n])
         else:
             raise NotImplementedError(f"EMG format {format} not implemented yet")
@@ -141,7 +174,7 @@ class EMG(Block):
 
         # signals
         for signal in self._signals:
-            signal.write(file)
+            signal._write(file)
 
     def __getitem__(self, key) -> EMGTrack:
         if isinstance(key, int):
@@ -176,7 +209,7 @@ class EMG(Block):
 
     def addSignal(self, signal: EMGTrack, channel=None) -> None:
         """
-        adds a signal to the EMG block. If the channel is not specified,
+        Adds a signal to the EMG block. If the channel is not specified,
         it is set to the next one  available
         """
         if not isinstance(signal, EMGTrack):
@@ -202,6 +235,9 @@ class EMG(Block):
         self._signals.append(signal)
 
     def removeSignal(self, label: str) -> None:
+        """
+        Removes a signal specified by its label from the EMG block
+        """
         try:
             pos = next(i for i, v in enumerate(self._signals) if v == label)
         except StopIteration:

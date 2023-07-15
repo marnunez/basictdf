@@ -5,7 +5,7 @@ from typing import Iterator, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
 from basictdf.tdfTypes import BTSString, f32, i32, u32
 from basictdf.tdfUtils import is_iterable
 
@@ -20,7 +20,7 @@ class EventsDataType(Enum):
     eventSequence = 1
 
 
-class Event:
+class Event(Sized, BuildWriteable):
     """
     A class representing a single event or a sequence of events.
     """
@@ -80,7 +80,7 @@ class Event:
 
 class TemporalEventsData(Block):
     """
-    A class to represent a TDF temporal events data block.
+    The Events data block. Stores the temporal events data.
     """
 
     type = BlockType.temporalEventsData

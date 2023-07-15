@@ -33,14 +33,14 @@ class TestEMGTrack(TestCase):
         # data
         b += f32.write(data)
         c = BytesIO(b)
-        a = EMGTrack.build(c, 11)
+        a = EMGTrack._build(c, 11)
         self.assertEqual(a.label, "Right Rectus Femoris")
         self.assertEqual(a.nSamples, 11)
         self.assertEqual(a.nBytes, 256 + 4 + 4 + 4 + 4 + 11 * 4)
         self.assertEqual(a._segments, [slice(0, 11)])
         self.assertEqual(a.data.shape, (11,))
         d = BytesIO()
-        a.write(d)
+        a._write(d)
         self.assertEqual(d.getvalue(), b)
 
     def test_write(self) -> None:
@@ -64,7 +64,7 @@ class TestEMGTrack(TestCase):
         b += f32.write(data)
         i = BytesIO(b)
         other = BytesIO()
-        a.write(other)
+        a._write(other)
         self.assertEqual(i.getvalue(), other.getvalue())
         self.assertEqual(a.nBytes, len(b))
 

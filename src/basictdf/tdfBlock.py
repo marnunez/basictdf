@@ -8,6 +8,7 @@ __doc__ = "Block and block type classes."
 
 
 class BlockType(Enum):
+    "All posible block types"
     unusedSlot = 0  # TDF_DATABLOCK_NOBLOCK
     notDefined = 1  # TDF_DATABLOCK_NOTYPE
     calibrationData = 2  # TDF_DATABLOCK_CALIB
@@ -27,7 +28,26 @@ class BlockType(Enum):
     temporalEventsData = 16  # TDF_DATABLOCK_EVENTS
 
 
-class Block(ABC):
+class Sized(ABC):
+    @property
+    @abstractmethod
+    def nBytes(self) -> int:
+        "Size in bytes"
+        pass
+
+
+class BuildWriteable(ABC):
+    @classmethod
+    @abstractmethod
+    def _build(cls, file: IO[bytes], format: int):
+        pass
+
+    @abstractmethod
+    def _write(self, file: IO[bytes]):
+        pass
+
+
+class Block(Sized, BuildWriteable, ABC):
     """
     A class to represent a TDF block.
     """
@@ -53,15 +73,7 @@ class Block(ABC):
         )
 
     @abstractmethod
-    def nBytes(self) -> int:
-        pass
-
-    @abstractmethod
-    def _build(self, file: IO[bytes], format: int):
-        pass
-
-    @abstractmethod
-    def _write(self, file: IO[bytes]):
+    def __iter__(self):
         pass
 
     def __repr__(self):
@@ -133,6 +145,9 @@ class UnusedBlock(Block):
 
     def __repr__(self) -> str:
         return "<UnusedBlock>"
+
+    def __iter__(self):
+        return iter([])
 
     def __eq__(self, other: "UnusedBlock") -> bool:
         return isinstance(other, UnusedBlock)

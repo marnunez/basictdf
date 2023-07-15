@@ -7,7 +7,7 @@ from typing import BinaryIO, Iterable, Iterator, List, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
 from basictdf.tdfTypes import (
     MAT3X3F,
     VEC3F,
@@ -47,7 +47,7 @@ LinkType = TdfType(np.dtype([("Track1", "<u4"), ("Track2", "<u4")]))
 TrackType = TdfType(np.dtype("<3f4"))
 
 
-class MarkerTrack:
+class MarkerTrack(Sized, BuildWriteable):
     """
     A track that collects all the data of a physical marker, such as name and position.
     """

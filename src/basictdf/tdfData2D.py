@@ -5,7 +5,7 @@ from enum import Enum
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, Sized, BuildWriteable
 from basictdf.tdfTypes import VEC2F, i32, i16, u32, u16, f32
 
 
@@ -14,12 +14,12 @@ class Data2DFlags(Enum):
     without_distortion = 1
 
 
-class Data2DPCK:
+class Data2DPCK(Sized, BuildWriteable):
     def __init__(self, data) -> None:
         self.data = data
 
     @staticmethod
-    def _build(stream, nFrames, nCameras):
+    def _build(stream, nFrames, nCameras) -> "Data2DPCK":
         nPointsCaptured = u16.bread(stream, nCameras * nFrames).reshape(
             [nCameras, nFrames]
         )
@@ -104,12 +104,15 @@ class Data2D(Block):
         self._camMap = []
         self._data = None
 
+    def __iter__(self):
+        return iter(self._data.data)
+
     @property
     def data(self):
         return self._data.data
 
     @data.setter
-    def data(self, value):
+    def data(self, value) -> None:
         self._data = Data2DPCK(value)
 
     @staticmethod

@@ -3,7 +3,7 @@ from typing import List, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
 from basictdf.tdfTypes import (
     MAT3X3D,
     MAT3X3F,
@@ -33,7 +33,7 @@ class DistorsionModel(IntEnum):
     "Radial distorsion up to 2nd order"
 
 
-class SeelabCameraData:
+class SeelabCameraData(Sized, BuildWriteable):
     def __init__(
         self,
         rotation_matrix,
@@ -393,6 +393,13 @@ class CalibrationDataBlock(Block):
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
             + sum(cam.nBytes for cam in self.cam_data)  # calibration data
         )
+
+    def __iter__(self):
+        """
+        Iterates over the cameras in the block.
+        Returns a tuple of (channel, camera)
+        """
+        return iter(zip(self.cameras_calibration_map, self.cam_data))
 
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, CalibrationDataBlock):

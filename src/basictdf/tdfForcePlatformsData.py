@@ -1,5 +1,9 @@
+__doc__ = """
+Force platform data module.
+"""
+
 from enum import Enum
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, Sized, BuildWriteable
 from basictdf.tdfTypes import i32, u16, SegmentData, TdfType, f32
 
 import numpy as np
@@ -27,13 +31,19 @@ class ForcePlatformBlockFormat(Enum):
     byFrameDoubleWithVelocityFormat = 14  # TDF_DATAPLAT_FORMAT_BYFRAME_DBL_VEL
 
 
-class ForcePlatformData:
+class ForcePlatformData(Sized, BuildWriteable):
     """
     Class that stores the data of a force platform,
     such as force, torque and application point.
     """
 
-    def __init__(self, label, application_point, force, torque) -> None:
+    def __init__(
+        self,
+        label: str,
+        application_point: np.array,
+        force: np.array,
+        torque: np.array,
+    ) -> None:
         self.label = label
         "Force platform label"
         self.application_point = application_point
@@ -91,6 +101,7 @@ class ForcePlatformData:
 
     @property
     def nBytes(self) -> int:
+        "Size in bytes of the platform data"
         nSegments = len(self._segments)
 
         base = 4 + 4 + (4 + 4) * nSegments
@@ -173,6 +184,26 @@ class ForcePlatformsDataBlock(Block):
         u16.bwrite(stream, self._plat_map)
         for plat in self._platforms:
             plat._write(stream, self.format)
+
+    def __iter__(self):
+        """
+        Iterates over the platforms in the block.
+        Returns a tuple of (channel, platform)
+        """
+        return iter(zip(self._plat_map, self._platforms))
+
+    def add_platform(self, platform: ForcePlatformData, channel: int = None) -> None:
+        """
+        Adds a platform to the block. If channel is specified and it's not already
+        in use, the platform is added to that channel. Otherwise, the platform is
+        added to the next available channel.
+        """
+        if channel is None:
+            channel = len(self._platforms)
+        if channel in self._plat_map:
+            raise ValueError(f"Channel {channel} already in use")
+        self._plat_map.append(channel)
+        self._platforms.append(platform)
 
     @property
     def nBytes(self) -> int:

@@ -106,6 +106,8 @@ __all__ = [
     "EventsDataType",
     "EMG",
     "EMGTrack",
+    "ForcePlatformsDataBlock",
+    "ForcePlatformData",
 ]
 
 
