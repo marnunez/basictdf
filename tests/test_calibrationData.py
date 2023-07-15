@@ -4,9 +4,6 @@ from unittest import TestCase
 import numpy as np
 
 from basictdf.tdfCalibrationData import (
-    CalibrationDataBlock,
-    CalibrationDataBlockFormat,
-    DistorsionModel,
     SeelabCameraData,
     CameraViewPort,
 )
@@ -89,41 +86,3 @@ class TestCalibrationData(TestCase):
         b.seek(0, 0)
 
         self.assertEqual(c.read(), b.read())
-
-    def test_creation(self):
-        return
-        n_cams = 2
-        distortion_model = DistorsionModel.AmassDistorsion
-        calibration_volume = np.array(
-            [
-                [1, 2, 3],
-            ],
-            dtype=np.float32,
-        )
-        rotation_matrix = np.array(
-            [
-                [1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9],
-            ],
-            dtype=np.float32,
-        )
-        translation_vector = np.array(
-            [1, 2, 3],
-            dtype=np.float32,
-        )
-        calibration_map = np.array(
-            [
-                [1, 2, 3],
-                [4, 5, 6],
-            ],
-            dtype=np.float32,
-        )
-        block = CalibrationDataBlock(
-            distorsion_model=distortion_model,
-            calibration_volume=calibration_volume,
-            calibration_volume_rotation_matrix=rotation_matrix,
-            calibration_volume_translation_vector=translation_vector,
-            cameras_calibration_map=calibration_map,
-            cam_data=1,
-        )
