@@ -1,4 +1,6 @@
-# basictdf
+<p align="center">
+  <img width="460" height="300" src="logo.svg">
+</p>
 
 [![example workflow](https://github.com/marnunez/basictdf/actions/workflows/test.yml/badge.svg)](https://github.com/marnunez/basictdf/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/marnunez/basictdf/branch/master/graph/badge.svg?token=7BP5TOHNBF)](https://codecov.io/gh/marnunez/basictdf)
