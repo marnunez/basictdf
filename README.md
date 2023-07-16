@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="460" height="300" src="logo.svg">
+  <img width="460" height="300" src="https://github.com/marnunez/basictdf/raw/master/logo.svg">
 </p>
 
 [![example workflow](https://github.com/marnunez/basictdf/actions/workflows/test.yml/badge.svg)](https://github.com/marnunez/basictdf/actions/workflows/test.yml)
