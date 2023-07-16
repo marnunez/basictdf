@@ -305,8 +305,9 @@ class CalibrationDataBlock(Block):
         cameras_calibration_map: np.ndarray,
         cam_data: Union[List[BTSCameraData], List[SeelabCameraData]],
         format: CalibrationDataBlockFormat = CalibrationDataBlockFormat.Seelab1,
+        **kwargs,
     ) -> None:
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.distorsion_model = distorsion_model
         "Distorsion model of the calibration"

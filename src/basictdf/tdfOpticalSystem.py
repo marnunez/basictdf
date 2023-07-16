@@ -124,12 +124,13 @@ class OpticalSetupBlock(Block):
         self,
         format: OpticalSetupBlockFormat = OpticalSetupBlockFormat.basicFormat,
         channels: List[OpticalChannelData] = [],
+        **kwargs,
     ) -> None:
         """A data block containing information about the physical setup of
         motion capture.
         """
 
-        super().__init__()
+        super().__init__(**kwargs)
         self.format = format
         self.channels = channels
 

@@ -131,10 +131,17 @@ class GeneralCalibrationData(NotImplementedBlock):
     type = BlockType.generalCalibrationData
 
 
+class UnusedFormat(Enum):
+    unusedFormat = 0
+
+
 class UnusedBlock(Block):
     type = BlockType.unusedSlot
     nBytes = 0
-    format = None
+    format = UnusedFormat.unusedFormat
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
 
     @staticmethod
     def _build(*args, **kwargs) -> "UnusedBlock":

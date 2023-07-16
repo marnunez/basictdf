@@ -127,6 +127,20 @@ class TdfEntry:
             comment,
         )
 
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, TdfEntry):
+            return False
+        return (
+            self.type == o.type
+            and self.format == o.format
+            and self.offset == o.offset
+            and self.size == o.size
+            and self.creation_date == o.creation_date
+            and self.last_modification_date == o.last_modification_date
+            and self.last_access_date == o.last_access_date
+            and self.comment == o.comment
+        )
+
     def __repr__(self) -> str:
         return (
             f"TdfEntry(type={self.type}, format={self.format}, offset={self.offset}, "
@@ -140,10 +154,10 @@ class Tdf:
     SIGNATURE = b"\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08"
 
     def __init__(self, filename: Union[Path, str]) -> None:
-        self.filePath = Path(filename)
+        self.file_path = Path(filename)
 
-        if not self.filePath.exists():
-            raise FileNotFoundError(f"File {self.filePath} not found")
+        if not self.file_path.exists():
+            raise FileNotFoundError(f"File {self.file_path} not found")
 
         self._mode = "rb"
         self._inside_context = False
@@ -155,7 +169,7 @@ class Tdf:
 
     def __enter__(self) -> "Tdf":
         self._inside_context = True
-        self.handler: IO[bytes] = self.filePath.open(self._mode)
+        self.handler: IO[bytes] = self.file_path.open(self._mode)
 
         self.signature = self.handler.read(len(self.SIGNATURE))
 
@@ -509,7 +523,7 @@ class Tdf:
     @property
     def nBytes(self) -> int:
         """Return the size of the TDF file in bytes"""
-        return self.filePath.stat().st_size
+        return self.file_path.stat().st_size
 
     def __len__(self) -> int:
         """Return the number of blocks in the TDF file
@@ -517,6 +531,15 @@ class Tdf:
         """
         return sum(1 for i in self.entries if i.type != BlockType.unusedSlot)
 
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, Tdf):
+            return False
+        return (
+            self.version == o.version
+            and self.nEntries == o.nEntries
+            and self.blocks == o.blocks
+        )
+
     @provide_context_if_needed
     def __repr__(self) -> str:
-        return f"Tdf({self.filePath}, nEntries={self.nEntries}, nBytes={self.nBytes}"
+        return f"Tdf({self.file_path}, nEntries={self.nEntries}, nBytes={self.nBytes}"

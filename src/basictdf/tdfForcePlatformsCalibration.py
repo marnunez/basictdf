@@ -81,8 +81,12 @@ class ForcePlatformsCalibrationDataBlock(Block):
     type = BlockType.forcePlatformsCalibrationData
 
     def __init__(
-        self, platforms=None, format=ForcePlatformCalibrationBlockFormat.GRPFormat
+        self,
+        platforms=None,
+        format=ForcePlatformCalibrationBlockFormat.GRPFormat,
+        **kwargs,
     ) -> None:
+        super().__init__(**kwargs)
         self._platforms: List[ForcePlatformInfo] = platforms or []
         self._platformMap = []
         self.format = format

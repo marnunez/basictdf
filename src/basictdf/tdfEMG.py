@@ -200,6 +200,8 @@ class EMG(Block):
         return len(self._signals)
 
     def __eq__(self, other) -> bool:
+        if not isinstance(other, EMG):
+            return False
         return (
             self.frequency == other.frequency
             and self.startTime == other.startTime
