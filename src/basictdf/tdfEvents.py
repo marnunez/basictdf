@@ -137,9 +137,7 @@ class TemporalEventsData(Block):
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, TemporalEventsData):
-            raise TypeError(
-                "Can only compare TemporalEventsData with TemporalEventsData"
-            )
+            return False
         return (
             self.format == other.format
             and self.start_time == other.start_time
