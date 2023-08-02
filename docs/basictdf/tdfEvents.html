@@ -34,7 +34,7 @@ from typing import Iterator, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
 from basictdf.tdfTypes import BTSString, f32, i32, u32
 from basictdf.tdfUtils import is_iterable
 
@@ -49,7 +49,7 @@ class EventsDataType(Enum):
     eventSequence = 1
 
 
-class Event:
+class Event(Sized, BuildWriteable):
     &#34;&#34;&#34;
     A class representing a single event or a sequence of events.
     &#34;&#34;&#34;
@@ -84,17 +84,32 @@ class Event:
     def __len__(self) -&gt; int:
         return len(self.values)
 
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, Event):
+            return False
+        return (
+            self.label == o.label
+            and self.type == o.type
+            and np.array_equal(self.values, o.values)
+        )
+
     @property
     def nBytes(self) -&gt; int:
         return 256 + 4 + 4 + len(self.values) * 4
 
     def __repr__(self) -&gt; str:
-        return f&#34;Event(label={self.label}, type={self.type}, items={self.values})&#34;
+        return (
+            &#34;&lt;Event &#34;
+            f&#34;label={self.label} &#34;
+            f&#34;type={self.type} &#34;
+            f&#34;nItems={len(self.values)} &#34;
+            f&#34;values={self.values}&gt;&#34;
+        )
 
 
 class TemporalEventsData(Block):
     &#34;&#34;&#34;
-    A class to represent a TDF temporal events data block.
+    The Events data block. Stores the temporal events data.
     &#34;&#34;&#34;
 
     type = BlockType.temporalEventsData
@@ -130,6 +145,16 @@ class TemporalEventsData(Block):
         return len(self.events)
 
     def __getitem__(self, item: Union[int, str]) -&gt; Event:
+        &#34;&#34;&#34;
+        Returns the event with the given index or label.
+
+        Args:
+            item (Union[int, str]): index or label of the event
+
+        Raises:
+            KeyError: if the event with the given label is not found
+            TypeError: if the key type is not int or str
+        &#34;&#34;&#34;
         if isinstance(item, int):
             return self.events[item]
         elif isinstance(item, str):
@@ -149,10 +174,23 @@ class TemporalEventsData(Block):
             return any(value == event.label for event in self.events)
         raise TypeError(f&#34;Invalid key type: {type(value)}&#34;)
 
+    def __eq__(self, other) -&gt; bool:
+        if not isinstance(other, TemporalEventsData):
+            return False
+        return (
+            self.format == other.format
+            and self.start_time == other.start_time
+            and all(e1 == e2 for e1, e2 in zip(self.events, other.events))
+        )
+
     def __repr__(self) -&gt; str:
         return (
-            f&#34;TemporalEventsData(format={self.format}, nEvents={len(self.events)}, &#34;
-            f&#34;start_time={self.start_time}, events={self.events}) size={self.nBytes}&#34;
+            &#34;&lt;TemporalEventsData &#34;
+            f&#34;format={self.format.name} &#34;
+            f&#34;nEvents={len(self.events)} &#34;
+            f&#34;start_time={self.start_time} &#34;
+            f&#34;events={self.events} &#34;
+            f&#34;size={self.nBytes}&gt;&#34;
         )</code></pre>
 </details>
 </section>
@@ -175,7 +213,7 @@ class TemporalEventsData(Block):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Event:
+<pre><code class="python">class Event(Sized, BuildWriteable):
     &#34;&#34;&#34;
     A class representing a single event or a sequence of events.
     &#34;&#34;&#34;
@@ -210,18 +248,39 @@ class TemporalEventsData(Block):
     def __len__(self) -&gt; int:
         return len(self.values)
 
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, Event):
+            return False
+        return (
+            self.label == o.label
+            and self.type == o.type
+            and np.array_equal(self.values, o.values)
+        )
+
     @property
     def nBytes(self) -&gt; int:
         return 256 + 4 + 4 + len(self.values) * 4
 
     def __repr__(self) -&gt; str:
-        return f&#34;Event(label={self.label}, type={self.type}, items={self.values})&#34;</code></pre>
+        return (
+            &#34;&lt;Event &#34;
+            f&#34;label={self.label} &#34;
+            f&#34;type={self.type} &#34;
+            f&#34;nItems={len(self.values)} &#34;
+            f&#34;values={self.values}&gt;&#34;
+        )</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
+<li>abc.ABC</li>
+</ul>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfEvents.Event.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -268,14 +327,14 @@ def nBytes(self) -&gt; int:
 <span>(</span><span>format=TemporalEventsDataFormat.standard, start_time=0.0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A class to represent a TDF temporal events data block.</p></div>
+<div class="desc"><p>The Events data block. Stores the temporal events data.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class TemporalEventsData(Block):
     &#34;&#34;&#34;
-    A class to represent a TDF temporal events data block.
+    The Events data block. Stores the temporal events data.
     &#34;&#34;&#34;
 
     type = BlockType.temporalEventsData
@@ -311,6 +370,16 @@ def nBytes(self) -&gt; int:
         return len(self.events)
 
     def __getitem__(self, item: Union[int, str]) -&gt; Event:
+        &#34;&#34;&#34;
+        Returns the event with the given index or label.
+
+        Args:
+            item (Union[int, str]): index or label of the event
+
+        Raises:
+            KeyError: if the event with the given label is not found
+            TypeError: if the key type is not int or str
+        &#34;&#34;&#34;
         if isinstance(item, int):
             return self.events[item]
         elif isinstance(item, str):
@@ -330,15 +399,30 @@ def nBytes(self) -&gt; int:
             return any(value == event.label for event in self.events)
         raise TypeError(f&#34;Invalid key type: {type(value)}&#34;)
 
+    def __eq__(self, other) -&gt; bool:
+        if not isinstance(other, TemporalEventsData):
+            return False
+        return (
+            self.format == other.format
+            and self.start_time == other.start_time
+            and all(e1 == e2 for e1, e2 in zip(self.events, other.events))
+        )
+
     def __repr__(self) -&gt; str:
         return (
-            f&#34;TemporalEventsData(format={self.format}, nEvents={len(self.events)}, &#34;
-            f&#34;start_time={self.start_time}, events={self.events}) size={self.nBytes}&#34;
+            &#34;&lt;TemporalEventsData &#34;
+            f&#34;format={self.format.name} &#34;
+            f&#34;nEvents={len(self.events)} &#34;
+            f&#34;start_time={self.start_time} &#34;
+            f&#34;events={self.events} &#34;
+            f&#34;size={self.nBytes}&gt;&#34;
         )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
 <li>abc.ABC</li>
 </ul>
 <h3>Class variables</h3>
@@ -352,7 +436,7 @@ def nBytes(self) -&gt; int:
 <dl>
 <dt id="basictdf.tdfEvents.TemporalEventsData.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>

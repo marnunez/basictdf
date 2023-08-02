@@ -153,12 +153,13 @@ class OpticalSetupBlock(Block):
         self,
         format: OpticalSetupBlockFormat = OpticalSetupBlockFormat.basicFormat,
         channels: List[OpticalChannelData] = [],
+        **kwargs,
     ) -&gt; None:
         &#34;&#34;&#34;A data block containing information about the physical setup of
         motion capture.
         &#34;&#34;&#34;
 
-        super().__init__()
+        super().__init__(**kwargs)
         self.format = format
         self.channels = channels
 
@@ -219,7 +220,7 @@ class OpticalSetupBlock(Block):
         return base
 
     def __repr__(self) -&gt; str:
-        return f&#34;&lt;OpticalSetupBlock: {len(self.channels)} channels&gt;&#34;</code></pre>
+        return f&#34;&lt;OpticalSetupBlock format={self.format.name} nChannels={len(self)}&gt;&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -388,7 +389,7 @@ def nBytes(self) -&gt; int:
 </dd>
 <dt id="basictdf.tdfOpticalSystem.OpticalSetupBlock"><code class="flex name class">
 <span>class <span class="ident">OpticalSetupBlock</span></span>
-<span>(</span><span>format: <a title="basictdf.tdfOpticalSystem.OpticalSetupBlockFormat" href="#basictdf.tdfOpticalSystem.OpticalSetupBlockFormat">OpticalSetupBlockFormat</a> = OpticalSetupBlockFormat.basicFormat, channels: List[<a title="basictdf.tdfOpticalSystem.OpticalChannelData" href="#basictdf.tdfOpticalSystem.OpticalChannelData">OpticalChannelData</a>] = [])</span>
+<span>(</span><span>format: <a title="basictdf.tdfOpticalSystem.OpticalSetupBlockFormat" href="#basictdf.tdfOpticalSystem.OpticalSetupBlockFormat">OpticalSetupBlockFormat</a> = OpticalSetupBlockFormat.basicFormat, channels: List[<a title="basictdf.tdfOpticalSystem.OpticalChannelData" href="#basictdf.tdfOpticalSystem.OpticalChannelData">OpticalChannelData</a>] = [], **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A class to represent a TDF block.</p>
@@ -405,12 +406,13 @@ motion capture.</p></div>
         self,
         format: OpticalSetupBlockFormat = OpticalSetupBlockFormat.basicFormat,
         channels: List[OpticalChannelData] = [],
+        **kwargs,
     ) -&gt; None:
         &#34;&#34;&#34;A data block containing information about the physical setup of
         motion capture.
         &#34;&#34;&#34;
 
-        super().__init__()
+        super().__init__(**kwargs)
         self.format = format
         self.channels = channels
 
@@ -471,11 +473,13 @@ motion capture.</p></div>
         return base
 
     def __repr__(self) -&gt; str:
-        return f&#34;&lt;OpticalSetupBlock: {len(self.channels)} channels&gt;&#34;</code></pre>
+        return f&#34;&lt;OpticalSetupBlock format={self.format.name} nChannels={len(self)}&gt;&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
 <li>abc.ABC</li>
 </ul>
 <h3>Class variables</h3>
@@ -489,7 +493,7 @@ motion capture.</p></div>
 <dl>
 <dt id="basictdf.tdfOpticalSystem.OpticalSetupBlock.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>

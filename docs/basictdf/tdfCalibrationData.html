@@ -32,7 +32,7 @@ from typing import List, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
 from basictdf.tdfTypes import (
     MAT3X3D,
     MAT3X3F,
@@ -62,7 +62,7 @@ class DistorsionModel(IntEnum):
     &#34;Radial distorsion up to 2nd order&#34;
 
 
-class SeelabCameraData:
+class SeelabCameraData(Sized, BuildWriteable):
     def __init__(
         self,
         rotation_matrix,
@@ -74,23 +74,51 @@ class SeelabCameraData:
         thin_prism,
         view_port: Union[CameraViewPort, np.ndarray],
     ) -&gt; None:
+        if not isinstance(rotation_matrix, np.ndarray) or rotation_matrix.shape != (
+            3,
+            3,
+        ):
+            raise TypeError(&#34;rotation_matrix must be a (3,3) shape numpy array&#34;)
+
         self.rotation_matrix = rotation_matrix
         &#34;Rotation matrix of the camera&#34;
+
+        if not isinstance(
+            translation_vector, np.ndarray
+        ) or translation_vector.shape != (3,):
+            raise TypeError(&#34;translation_vector must be a (3,) shape numpy array&#34;)
 
         self.translation_vector = translation_vector
         &#34;Translation vector of the camera&#34;
 
+        if not isinstance(focus, np.ndarray) or focus.shape != (2,):
+            raise TypeError(&#34;focus must be a (2,) shape numpy array&#34;)
+
         self.focus = focus
         &#34;Focal length of the camera&#34;
+
+        if not isinstance(optical_center, np.ndarray) or optical_center.shape != (2,):
+            raise TypeError(&#34;optical_center must be a (2,) shape numpy array&#34;)
 
         self.optical_center = optical_center
         &#34;Optical center of the camera&#34;
 
+        if not isinstance(radial_distortion, np.ndarray) or radial_distortion.shape != (
+            2,
+        ):
+            raise TypeError(&#34;radial_distortion must be a (2,) shape numpy array&#34;)
+
         self.radial_distortion = radial_distortion
         &#34;Radial distortion of the camera&#34;
 
+        if not isinstance(decentering, np.ndarray) or decentering.shape != (2,):
+            raise TypeError(&#34;decentering must be a (2,) shape numpy array&#34;)
+
         self.decentering = decentering
         &#34;Decentering of the camera&#34;
+
+        if not isinstance(thin_prism, np.ndarray) or thin_prism.shape != (2,):
+            raise TypeError(&#34;thin_prism must be a (2,) shape numpy array&#34;)
 
         self.thin_prism = thin_prism
         &#34;Thin prism of the camera&#34;
@@ -141,6 +169,7 @@ class SeelabCameraData:
         VEC2D.bwrite(file, self.thin_prism)
         self.view_port.bwrite(file)
 
+    @property
     def nBytes(self) -&gt; int:
         return (
             MAT3X3D.btype.itemsize  # rotation_matrix
@@ -151,6 +180,20 @@ class SeelabCameraData:
             + VEC2D.btype.itemsize  # decentering
             + VEC2D.btype.itemsize  # thin_prism
             + CameraViewPort.nBytes  # view_port
+        )
+
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, SeelabCameraData):
+            return False
+        return (
+            np.array_equal(self.rotation_matrix, o.rotation_matrix)
+            and np.array_equal(self.translation_vector, o.translation_vector)
+            and np.array_equal(self.focus, o.focus)
+            and np.array_equal(self.optical_center, o.optical_center)
+            and np.array_equal(self.radial_distortion, o.radial_distortion)
+            and np.array_equal(self.decentering, o.decentering)
+            and np.array_equal(self.thin_prism, o.thin_prism)
+            and self.view_port == o.view_port
         )
 
 
@@ -248,6 +291,7 @@ class BTSCameraData:
         f64.bwrite(file, self.y_distortion_coefficients)  # y_distortion_coefficients
         self.view_port.bwrite(file)  # view_port
 
+    @property
     def nBytes(self) -&gt; int:
         return (
             MAT3X3D.btype.itemsize  # rotation_matrix
@@ -289,8 +333,10 @@ class CalibrationDataBlock(Block):
         calibration_volume_translation_vector: np.ndarray,
         cameras_calibration_map: np.ndarray,
         cam_data: Union[List[BTSCameraData], List[SeelabCameraData]],
+        format: CalibrationDataBlockFormat = CalibrationDataBlockFormat.Seelab1,
+        **kwargs,
     ) -&gt; None:
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.distorsion_model = distorsion_model
         &#34;Distorsion model of the calibration&#34;
@@ -338,11 +384,14 @@ class CalibrationDataBlock(Block):
         self.cameras_calibration_map = cameras_calibration_map
 
         self.cam_data = cam_data
+        self.format = format
 
     @staticmethod
     def _build(stream, format) -&gt; &#34;CalibrationDataBlock&#34;:
+        format = CalibrationDataBlockFormat(format)
+
         nCams = i32.bread(stream)
-        distosion_model = DistorsionModel(i32.bread(stream))
+        distorsion_model = DistorsionModel(i32.bread(stream))
         calibration_volume = VEC3F.bread(stream)
         rotation_matrix = MAT3X3F.bread(stream)
         translation_vector = VEC3F.bread(stream)
@@ -358,12 +407,13 @@ class CalibrationDataBlock(Block):
             raise ValueError(f&#39;&#34;Unknown calibration format &#34;{format}&#34;&#39;)
 
         return CalibrationDataBlock(
-            distorsion_model=distosion_model,
+            distorsion_model=distorsion_model,
             calibration_volume_size=calibration_volume,
             calibration_volume_rotation_matrix=rotation_matrix,
             calibration_volume_translation_vector=translation_vector,
             cameras_calibration_map=calibration_map,
             cam_data=calibration_data,
+            format=format,
         )
 
     def _write(self, file) -&gt; None:
@@ -390,6 +440,7 @@ class CalibrationDataBlock(Block):
         for cam in self.cam_data:
             cam._write(file)
 
+    @property
     def nBytes(self) -&gt; int:
         return (
             i32.btype.itemsize  # nCams
@@ -399,6 +450,42 @@ class CalibrationDataBlock(Block):
             + VEC3F.btype.itemsize  # translation_vector
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
             + sum(cam.nBytes for cam in self.cam_data)  # calibration data
+        )
+
+    def __iter__(self):
+        &#34;&#34;&#34;
+        Iterates over the cameras in the block.
+        Returns a tuple of (channel, camera)
+        &#34;&#34;&#34;
+        return iter(zip(self.cameras_calibration_map, self.cam_data))
+
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, CalibrationDataBlock):
+            return False
+
+        return (
+            self.distorsion_model == o.distorsion_model
+            and np.array_equal(self.calibration_volume_size, o.calibration_volume_size)
+            and np.array_equal(
+                self.calibration_volume_rotation_matrix,
+                o.calibration_volume_rotation_matrix,
+            )
+            and np.array_equal(
+                self.calibration_volume_translation_vector,
+                o.calibration_volume_translation_vector,
+            )
+            and np.array_equal(self.cameras_calibration_map, o.cameras_calibration_map)
+            and all(i == j for i, j in zip(self.cam_data, o.cam_data))
+            and self.format == o.format
+        )
+
+    def __repr__(self) -&gt; str:
+        return (
+            &#34;&lt;CalibrationDataBlock &#34;
+            f&#34;format={self.format.name} &#34;
+            f&#34;nCams={len(self.cam_data)} &#34;
+            f&#34;distorsion_model={self.distorsion_model.name} &#34;
+            f&#34;calibration_volume_size={self.calibration_volume_size} &gt;&#34;
         )</code></pre>
 </details>
 </section>
@@ -515,6 +602,7 @@ class CalibrationDataBlock(Block):
         f64.bwrite(file, self.y_distortion_coefficients)  # y_distortion_coefficients
         self.view_port.bwrite(file)  # view_port
 
+    @property
     def nBytes(self) -&gt; int:
         return (
             MAT3X3D.btype.itemsize  # rotation_matrix
@@ -541,6 +629,28 @@ class CalibrationDataBlock(Block):
 <dd>
 <div class="desc"><p>Focal length of the camera</p></div>
 </dd>
+<dt id="basictdf.tdfCalibrationData.BTSCameraData.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    return (
+        MAT3X3D.btype.itemsize  # rotation_matrix
+        + VEC3D.btype.itemsize  # translation_vector
+        + VEC2D.btype.itemsize  # focus
+        + VEC2D.btype.itemsize  # optical_center
+        + f64.btype.itemsize
+        * self.max_distorsion_coefficients  # x_distortion_coefficients
+        + f64.btype.itemsize
+        * self.max_distorsion_coefficients  # y_distortion_coefficients
+        + CameraViewPort.nBytes  # view_port
+    )</code></pre>
+</details>
+</dd>
 <dt id="basictdf.tdfCalibrationData.BTSCameraData.optical_center"><code class="name">var <span class="ident">optical_center</span></code></dt>
 <dd>
 <div class="desc"><p>Optical center of the camera</p></div>
@@ -566,36 +676,10 @@ class CalibrationDataBlock(Block):
 <div class="desc"><p>Y distortion coefficients of the camera</p></div>
 </dd>
 </dl>
-<h3>Methods</h3>
-<dl>
-<dt id="basictdf.tdfCalibrationData.BTSCameraData.nBytes"><code class="name flex">
-<span>def <span class="ident">nBytes</span></span>(<span>self) ‑> int</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def nBytes(self) -&gt; int:
-    return (
-        MAT3X3D.btype.itemsize  # rotation_matrix
-        + VEC3D.btype.itemsize  # translation_vector
-        + VEC2D.btype.itemsize  # focus
-        + VEC2D.btype.itemsize  # optical_center
-        + f64.btype.itemsize
-        * self.max_distorsion_coefficients  # x_distortion_coefficients
-        + f64.btype.itemsize
-        * self.max_distorsion_coefficients  # y_distortion_coefficients
-        + CameraViewPort.nBytes  # view_port
-    )</code></pre>
-</details>
-</dd>
-</dl>
 </dd>
 <dt id="basictdf.tdfCalibrationData.CalibrationDataBlock"><code class="flex name class">
 <span>class <span class="ident">CalibrationDataBlock</span></span>
-<span>(</span><span>distorsion_model: <a title="basictdf.tdfCalibrationData.DistorsionModel" href="#basictdf.tdfCalibrationData.DistorsionModel">DistorsionModel</a>, calibration_volume_size: numpy.ndarray, calibration_volume_rotation_matrix: numpy.ndarray, calibration_volume_translation_vector: numpy.ndarray, cameras_calibration_map: numpy.ndarray, cam_data: Union[List[<a title="basictdf.tdfCalibrationData.BTSCameraData" href="#basictdf.tdfCalibrationData.BTSCameraData">BTSCameraData</a>], List[<a title="basictdf.tdfCalibrationData.SeelabCameraData" href="#basictdf.tdfCalibrationData.SeelabCameraData">SeelabCameraData</a>]])</span>
+<span>(</span><span>distorsion_model: <a title="basictdf.tdfCalibrationData.DistorsionModel" href="#basictdf.tdfCalibrationData.DistorsionModel">DistorsionModel</a>, calibration_volume_size: numpy.ndarray, calibration_volume_rotation_matrix: numpy.ndarray, calibration_volume_translation_vector: numpy.ndarray, cameras_calibration_map: numpy.ndarray, cam_data: Union[List[<a title="basictdf.tdfCalibrationData.BTSCameraData" href="#basictdf.tdfCalibrationData.BTSCameraData">BTSCameraData</a>], List[<a title="basictdf.tdfCalibrationData.SeelabCameraData" href="#basictdf.tdfCalibrationData.SeelabCameraData">SeelabCameraData</a>]], format: <a title="basictdf.tdfCalibrationData.CalibrationDataBlockFormat" href="#basictdf.tdfCalibrationData.CalibrationDataBlockFormat">CalibrationDataBlockFormat</a> = CalibrationDataBlockFormat.Seelab1, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A class representing the Calibration Data block. This block holds
@@ -622,8 +706,10 @@ volume data.</p></div>
         calibration_volume_translation_vector: np.ndarray,
         cameras_calibration_map: np.ndarray,
         cam_data: Union[List[BTSCameraData], List[SeelabCameraData]],
+        format: CalibrationDataBlockFormat = CalibrationDataBlockFormat.Seelab1,
+        **kwargs,
     ) -&gt; None:
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.distorsion_model = distorsion_model
         &#34;Distorsion model of the calibration&#34;
@@ -671,11 +757,14 @@ volume data.</p></div>
         self.cameras_calibration_map = cameras_calibration_map
 
         self.cam_data = cam_data
+        self.format = format
 
     @staticmethod
     def _build(stream, format) -&gt; &#34;CalibrationDataBlock&#34;:
+        format = CalibrationDataBlockFormat(format)
+
         nCams = i32.bread(stream)
-        distosion_model = DistorsionModel(i32.bread(stream))
+        distorsion_model = DistorsionModel(i32.bread(stream))
         calibration_volume = VEC3F.bread(stream)
         rotation_matrix = MAT3X3F.bread(stream)
         translation_vector = VEC3F.bread(stream)
@@ -691,12 +780,13 @@ volume data.</p></div>
             raise ValueError(f&#39;&#34;Unknown calibration format &#34;{format}&#34;&#39;)
 
         return CalibrationDataBlock(
-            distorsion_model=distosion_model,
+            distorsion_model=distorsion_model,
             calibration_volume_size=calibration_volume,
             calibration_volume_rotation_matrix=rotation_matrix,
             calibration_volume_translation_vector=translation_vector,
             cameras_calibration_map=calibration_map,
             cam_data=calibration_data,
+            format=format,
         )
 
     def _write(self, file) -&gt; None:
@@ -723,6 +813,7 @@ volume data.</p></div>
         for cam in self.cam_data:
             cam._write(file)
 
+    @property
     def nBytes(self) -&gt; int:
         return (
             i32.btype.itemsize  # nCams
@@ -732,11 +823,49 @@ volume data.</p></div>
             + VEC3F.btype.itemsize  # translation_vector
             + i16.btype.itemsize * len(self.cam_data)  # calibration map
             + sum(cam.nBytes for cam in self.cam_data)  # calibration data
+        )
+
+    def __iter__(self):
+        &#34;&#34;&#34;
+        Iterates over the cameras in the block.
+        Returns a tuple of (channel, camera)
+        &#34;&#34;&#34;
+        return iter(zip(self.cameras_calibration_map, self.cam_data))
+
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, CalibrationDataBlock):
+            return False
+
+        return (
+            self.distorsion_model == o.distorsion_model
+            and np.array_equal(self.calibration_volume_size, o.calibration_volume_size)
+            and np.array_equal(
+                self.calibration_volume_rotation_matrix,
+                o.calibration_volume_rotation_matrix,
+            )
+            and np.array_equal(
+                self.calibration_volume_translation_vector,
+                o.calibration_volume_translation_vector,
+            )
+            and np.array_equal(self.cameras_calibration_map, o.cameras_calibration_map)
+            and all(i == j for i, j in zip(self.cam_data, o.cam_data))
+            and self.format == o.format
+        )
+
+    def __repr__(self) -&gt; str:
+        return (
+            &#34;&lt;CalibrationDataBlock &#34;
+            f&#34;format={self.format.name} &#34;
+            f&#34;nCams={len(self.cam_data)} &#34;
+            f&#34;distorsion_model={self.distorsion_model.name} &#34;
+            f&#34;calibration_volume_size={self.calibration_volume_size} &gt;&#34;
         )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
 <li>abc.ABC</li>
 </ul>
 <h3>Class variables</h3>
@@ -764,19 +893,15 @@ volume data.</p></div>
 <dd>
 <div class="desc"><p>Distorsion model of the calibration</p></div>
 </dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="basictdf.tdfCalibrationData.CalibrationDataBlock.nBytes"><code class="name flex">
-<span>def <span class="ident">nBytes</span></span>(<span>self) ‑> int</span>
-</code></dt>
+<dt id="basictdf.tdfCalibrationData.CalibrationDataBlock.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def nBytes(self) -&gt; int:
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
     return (
         i32.btype.itemsize  # nCams
         + i32.btype.itemsize  # DistorsionModel
@@ -882,12 +1007,13 @@ volume data.</p></div>
 <span>(</span><span>rotation_matrix, translation_vector, focus, optical_center, radial_distortion, decentering, thin_prism, view_port: Union[basictdf.tdfTypes.CameraViewPort, numpy.ndarray])</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SeelabCameraData:
+<pre><code class="python">class SeelabCameraData(Sized, BuildWriteable):
     def __init__(
         self,
         rotation_matrix,
@@ -899,23 +1025,51 @@ volume data.</p></div>
         thin_prism,
         view_port: Union[CameraViewPort, np.ndarray],
     ) -&gt; None:
+        if not isinstance(rotation_matrix, np.ndarray) or rotation_matrix.shape != (
+            3,
+            3,
+        ):
+            raise TypeError(&#34;rotation_matrix must be a (3,3) shape numpy array&#34;)
+
         self.rotation_matrix = rotation_matrix
         &#34;Rotation matrix of the camera&#34;
+
+        if not isinstance(
+            translation_vector, np.ndarray
+        ) or translation_vector.shape != (3,):
+            raise TypeError(&#34;translation_vector must be a (3,) shape numpy array&#34;)
 
         self.translation_vector = translation_vector
         &#34;Translation vector of the camera&#34;
 
+        if not isinstance(focus, np.ndarray) or focus.shape != (2,):
+            raise TypeError(&#34;focus must be a (2,) shape numpy array&#34;)
+
         self.focus = focus
         &#34;Focal length of the camera&#34;
+
+        if not isinstance(optical_center, np.ndarray) or optical_center.shape != (2,):
+            raise TypeError(&#34;optical_center must be a (2,) shape numpy array&#34;)
 
         self.optical_center = optical_center
         &#34;Optical center of the camera&#34;
 
+        if not isinstance(radial_distortion, np.ndarray) or radial_distortion.shape != (
+            2,
+        ):
+            raise TypeError(&#34;radial_distortion must be a (2,) shape numpy array&#34;)
+
         self.radial_distortion = radial_distortion
         &#34;Radial distortion of the camera&#34;
 
+        if not isinstance(decentering, np.ndarray) or decentering.shape != (2,):
+            raise TypeError(&#34;decentering must be a (2,) shape numpy array&#34;)
+
         self.decentering = decentering
         &#34;Decentering of the camera&#34;
+
+        if not isinstance(thin_prism, np.ndarray) or thin_prism.shape != (2,):
+            raise TypeError(&#34;thin_prism must be a (2,) shape numpy array&#34;)
 
         self.thin_prism = thin_prism
         &#34;Thin prism of the camera&#34;
@@ -966,6 +1120,7 @@ volume data.</p></div>
         VEC2D.bwrite(file, self.thin_prism)
         self.view_port.bwrite(file)
 
+    @property
     def nBytes(self) -&gt; int:
         return (
             MAT3X3D.btype.itemsize  # rotation_matrix
@@ -976,8 +1131,28 @@ volume data.</p></div>
             + VEC2D.btype.itemsize  # decentering
             + VEC2D.btype.itemsize  # thin_prism
             + CameraViewPort.nBytes  # view_port
+        )
+
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, SeelabCameraData):
+            return False
+        return (
+            np.array_equal(self.rotation_matrix, o.rotation_matrix)
+            and np.array_equal(self.translation_vector, o.translation_vector)
+            and np.array_equal(self.focus, o.focus)
+            and np.array_equal(self.optical_center, o.optical_center)
+            and np.array_equal(self.radial_distortion, o.radial_distortion)
+            and np.array_equal(self.decentering, o.decentering)
+            and np.array_equal(self.thin_prism, o.thin_prism)
+            and self.view_port == o.view_port
         )</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
+<li>abc.ABC</li>
+</ul>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfCalibrationData.SeelabCameraData.decentering"><code class="name">var <span class="ident">decentering</span></code></dt>
@@ -987,6 +1162,27 @@ volume data.</p></div>
 <dt id="basictdf.tdfCalibrationData.SeelabCameraData.focus"><code class="name">var <span class="ident">focus</span></code></dt>
 <dd>
 <div class="desc"><p>Focal length of the camera</p></div>
+</dd>
+<dt id="basictdf.tdfCalibrationData.SeelabCameraData.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dd>
+<div class="desc"><p>Size in bytes</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def nBytes(self) -&gt; int:
+    return (
+        MAT3X3D.btype.itemsize  # rotation_matrix
+        + VEC3D.btype.itemsize  # translation_vector
+        + VEC2D.btype.itemsize  # focus
+        + VEC2D.btype.itemsize  # optical_center
+        + VEC2D.btype.itemsize  # radial_distortion
+        + VEC2D.btype.itemsize  # decentering
+        + VEC2D.btype.itemsize  # thin_prism
+        + CameraViewPort.nBytes  # view_port
+    )</code></pre>
+</details>
 </dd>
 <dt id="basictdf.tdfCalibrationData.SeelabCameraData.optical_center"><code class="name">var <span class="ident">optical_center</span></code></dt>
 <dd>
@@ -1011,31 +1207,6 @@ volume data.</p></div>
 <dt id="basictdf.tdfCalibrationData.SeelabCameraData.view_port"><code class="name">var <span class="ident">view_port</span></code></dt>
 <dd>
 <div class="desc"><p>Camera viewport</p></div>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="basictdf.tdfCalibrationData.SeelabCameraData.nBytes"><code class="name flex">
-<span>def <span class="ident">nBytes</span></span>(<span>self) ‑> int</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def nBytes(self) -&gt; int:
-    return (
-        MAT3X3D.btype.itemsize  # rotation_matrix
-        + VEC3D.btype.itemsize  # translation_vector
-        + VEC2D.btype.itemsize  # focus
-        + VEC2D.btype.itemsize  # optical_center
-        + VEC2D.btype.itemsize  # radial_distortion
-        + VEC2D.btype.itemsize  # decentering
-        + VEC2D.btype.itemsize  # thin_prism
-        + CameraViewPort.nBytes  # view_port
-    )</code></pre>
-</details>
 </dd>
 </dl>
 </dd>

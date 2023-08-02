@@ -36,15 +36,17 @@ from basictdf.tdfBlock import (
     Block,
     BlockType,
     CalibrationData2D,
-    Data2D,
     ForcePlatformsCalibrationData2D,
-    ForcePlatformsData,
     GeneralCalibrationData,
     NotDefinedBlock,
     UnusedBlock,
     VolumetricData,
+    Sized,
+    BuildWriteable,
 )
+from basictdf.tdfForcePlatformsData import ForcePlatformsDataBlock
 from basictdf.tdfCalibrationData import CalibrationDataBlock
+from basictdf.tdfData2D import Data2D
 from basictdf.tdfData3D import Data3D
 from basictdf.tdfEMG import EMG
 from basictdf.tdfEvents import TemporalEventsData
@@ -79,7 +81,7 @@ def _get_block_class(block_type: BlockType) -&gt; Type[Block]:
     elif block_type == BlockType.forcePlatformsCalibrationData2D:
         return ForcePlatformsCalibrationData2D
     elif block_type == BlockType.forcePlatformsData:
-        return ForcePlatformsData
+        return ForcePlatformsDataBlock
     elif block_type == BlockType.anthropometricData:
         return AnthropometricData
     elif block_type == BlockType.electromyographicData:
@@ -98,8 +100,23 @@ def _get_block_class(block_type: BlockType) -&gt; Type[Block]:
         raise Exception(&#34;Unknown block type&#34;)
 
 
-class TdfEntry:
-    &#34;&#34;&#34;A jumptable type entry for a data block.&#34;&#34;&#34;
+class TdfEntry(Sized, BuildWriteable):
+    &#34;&#34;&#34;A jumptable type entry for a data block.
+    Stores the metadata for each block in the file.
+
+    Args:
+        type (BlockType): the type of the block
+        format (int): the format of the block
+        offset (int): the offset in bytes from the start of the file
+        size (int): the size of the block in bytes
+        creation_date (datetime): the creation date of the block
+        last_modification_date (datetime): the last modification date of the block
+        last_access_date (datetime): the last access date of the block
+        comment (str): a comment for the block
+
+    &#34;&#34;&#34;
+
+    nBytes = 8 * 4 + 256
 
     def __init__(
         self,
@@ -120,7 +137,6 @@ class TdfEntry:
         self.last_modification_date = last_modification_date
         self.last_access_date = last_access_date
         self.comment = comment
-        self.nBytes = 8 * 4 + 256
 
     def _write(self, file) -&gt; None:
         u32.bwrite(file, self.type.value)
@@ -155,12 +171,26 @@ class TdfEntry:
             comment,
         )
 
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, TdfEntry):
+            return False
+        return (
+            self.type == o.type
+            and self.format == o.format
+            and self.offset == o.offset
+            and self.size == o.size
+            and self.creation_date == o.creation_date
+            and self.last_modification_date == o.last_modification_date
+            and self.last_access_date == o.last_access_date
+            and self.comment == o.comment
+        )
+
     def __repr__(self) -&gt; str:
         return (
-            f&#34;TdfEntry({self.type}, {self.format}, {self.offset},&#34;
-            f&#34; {self.size}, {self.creation_date},&#34;
-            f&#34; {self.last_modification_date},&#34;
-            f&#34; {self.last_access_date}, {self.comment})&#34;
+            f&#34;TdfEntry(type={self.type}, format={self.format}, offset={self.offset}, &#34;
+            f&#34;size={self.size}, creation_date={self.creation_date}, &#34;
+            f&#34;last_modification_date={self.last_modification_date}, &#34;
+            f&#34;last_access_date={self.last_access_date}, comment={self.comment})&#34;
         )
 
 
@@ -168,10 +198,10 @@ class Tdf:
     SIGNATURE = b&#34;\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08&#34;
 
     def __init__(self, filename: Union[Path, str]) -&gt; None:
-        self.filePath = Path(filename)
+        self.file_path = Path(filename)
 
-        if not self.filePath.exists():
-            raise FileNotFoundError(f&#34;File {self.filePath} not found&#34;)
+        if not self.file_path.exists():
+            raise FileNotFoundError(f&#34;File {self.file_path} not found&#34;)
 
         self._mode = &#34;rb&#34;
         self._inside_context = False
@@ -183,7 +213,7 @@ class Tdf:
 
     def __enter__(self) -&gt; &#34;Tdf&#34;:
         self._inside_context = True
-        self.handler: IO[bytes] = self.filePath.open(self._mode)
+        self.handler: IO[bytes] = self.file_path.open(self._mode)
 
         self.signature = self.handler.read(len(self.SIGNATURE))
 
@@ -204,6 +234,7 @@ class Tdf:
         i32.skip(self.handler, 5)
 
         self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
+        &#34;List of entries in the file&#34;
 
         return self
 
@@ -417,7 +448,7 @@ class Tdf:
 
         &#34;&#34;&#34;
         if &#34;+&#34; not in self._mode:
-            raise ValueError(
+            raise PermissionError(
                 &#34;Can&#39;t remove blocks, this file was opened in read-only mode&#34;
             )
 
@@ -537,7 +568,7 @@ class Tdf:
     @property
     def nBytes(self) -&gt; int:
         &#34;&#34;&#34;Return the size of the TDF file in bytes&#34;&#34;&#34;
-        return self.filePath.stat().st_size
+        return self.file_path.stat().st_size
 
     def __len__(self) -&gt; int:
         &#34;&#34;&#34;Return the number of blocks in the TDF file
@@ -545,9 +576,18 @@ class Tdf:
         &#34;&#34;&#34;
         return sum(1 for i in self.entries if i.type != BlockType.unusedSlot)
 
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, Tdf):
+            return False
+        return (
+            self.version == o.version
+            and self.nEntries == o.nEntries
+            and self.blocks == o.blocks
+        )
+
     @provide_context_if_needed
     def __repr__(self) -&gt; str:
-        return f&#34;Tdf({self.filePath}, nEntries={self.nEntries}, nBytes={self.nBytes}&#34;</code></pre>
+        return f&#34;Tdf({self.file_path}, nEntries={self.nEntries}, nBytes={self.nBytes}&#34;</code></pre>
 </details>
 </section>
 <section>
@@ -573,10 +613,10 @@ class Tdf:
     SIGNATURE = b&#34;\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08&#34;
 
     def __init__(self, filename: Union[Path, str]) -&gt; None:
-        self.filePath = Path(filename)
+        self.file_path = Path(filename)
 
-        if not self.filePath.exists():
-            raise FileNotFoundError(f&#34;File {self.filePath} not found&#34;)
+        if not self.file_path.exists():
+            raise FileNotFoundError(f&#34;File {self.file_path} not found&#34;)
 
         self._mode = &#34;rb&#34;
         self._inside_context = False
@@ -588,7 +628,7 @@ class Tdf:
 
     def __enter__(self) -&gt; &#34;Tdf&#34;:
         self._inside_context = True
-        self.handler: IO[bytes] = self.filePath.open(self._mode)
+        self.handler: IO[bytes] = self.file_path.open(self._mode)
 
         self.signature = self.handler.read(len(self.SIGNATURE))
 
@@ -609,6 +649,7 @@ class Tdf:
         i32.skip(self.handler, 5)
 
         self.entries = [TdfEntry._build(self.handler) for _ in range(self.nEntries)]
+        &#34;List of entries in the file&#34;
 
         return self
 
@@ -822,7 +863,7 @@ class Tdf:
 
         &#34;&#34;&#34;
         if &#34;+&#34; not in self._mode:
-            raise ValueError(
+            raise PermissionError(
                 &#34;Can&#39;t remove blocks, this file was opened in read-only mode&#34;
             )
 
@@ -942,7 +983,7 @@ class Tdf:
     @property
     def nBytes(self) -&gt; int:
         &#34;&#34;&#34;Return the size of the TDF file in bytes&#34;&#34;&#34;
-        return self.filePath.stat().st_size
+        return self.file_path.stat().st_size
 
     def __len__(self) -&gt; int:
         &#34;&#34;&#34;Return the number of blocks in the TDF file
@@ -950,9 +991,18 @@ class Tdf:
         &#34;&#34;&#34;
         return sum(1 for i in self.entries if i.type != BlockType.unusedSlot)
 
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, Tdf):
+            return False
+        return (
+            self.version == o.version
+            and self.nEntries == o.nEntries
+            and self.blocks == o.blocks
+        )
+
     @provide_context_if_needed
     def __repr__(self) -&gt; str:
-        return f&#34;Tdf({self.filePath}, nEntries={self.nEntries}, nBytes={self.nBytes}&#34;</code></pre>
+        return f&#34;Tdf({self.file_path}, nEntries={self.nEntries}, nBytes={self.nBytes}&#34;</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -1185,7 +1235,7 @@ def has_force_and_torque(self) -&gt; bool:
 <pre><code class="python">@property
 def nBytes(self) -&gt; int:
     &#34;&#34;&#34;Return the size of the TDF file in bytes&#34;&#34;&#34;
-    return self.filePath.stat().st_size</code></pre>
+    return self.file_path.stat().st_size</code></pre>
 </details>
 </dd>
 </dl>
@@ -1380,7 +1430,7 @@ def remove_block(self, type: Block) -&gt; None:
 
     &#34;&#34;&#34;
     if &#34;+&#34; not in self._mode:
-        raise ValueError(
+        raise PermissionError(
             &#34;Can&#39;t remove blocks, this file was opened in read-only mode&#34;
         )
 
@@ -1461,13 +1511,48 @@ def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; No
 <span>(</span><span>type: <a title="basictdf.tdfBlock.BlockType" href="tdfBlock.html#basictdf.tdfBlock.BlockType">BlockType</a>, format: int, offset: int, size: int, creation_date: datetime.datetime, last_modification_date: datetime.datetime, last_access_date: datetime.datetime, comment: str)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A jumptable type entry for a data block.</p></div>
+<div class="desc"><p>A jumptable type entry for a data block.
+Stores the metadata for each block in the file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>type</code></strong> :&ensp;<code>BlockType</code></dt>
+<dd>the type of the block</dd>
+<dt><strong><code>format</code></strong> :&ensp;<code>int</code></dt>
+<dd>the format of the block</dd>
+<dt><strong><code>offset</code></strong> :&ensp;<code>int</code></dt>
+<dd>the offset in bytes from the start of the file</dd>
+<dt><strong><code>size</code></strong> :&ensp;<code>int</code></dt>
+<dd>the size of the block in bytes</dd>
+<dt><strong><code>creation_date</code></strong> :&ensp;<code>datetime</code></dt>
+<dd>the creation date of the block</dd>
+<dt><strong><code>last_modification_date</code></strong> :&ensp;<code>datetime</code></dt>
+<dd>the last modification date of the block</dd>
+<dt><strong><code>last_access_date</code></strong> :&ensp;<code>datetime</code></dt>
+<dd>the last access date of the block</dd>
+<dt><strong><code>comment</code></strong> :&ensp;<code>str</code></dt>
+<dd>a comment for the block</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TdfEntry:
-    &#34;&#34;&#34;A jumptable type entry for a data block.&#34;&#34;&#34;
+<pre><code class="python">class TdfEntry(Sized, BuildWriteable):
+    &#34;&#34;&#34;A jumptable type entry for a data block.
+    Stores the metadata for each block in the file.
+
+    Args:
+        type (BlockType): the type of the block
+        format (int): the format of the block
+        offset (int): the offset in bytes from the start of the file
+        size (int): the size of the block in bytes
+        creation_date (datetime): the creation date of the block
+        last_modification_date (datetime): the last modification date of the block
+        last_access_date (datetime): the last access date of the block
+        comment (str): a comment for the block
+
+    &#34;&#34;&#34;
+
+    nBytes = 8 * 4 + 256
 
     def __init__(
         self,
@@ -1488,7 +1573,6 @@ def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; No
         self.last_modification_date = last_modification_date
         self.last_access_date = last_access_date
         self.comment = comment
-        self.nBytes = 8 * 4 + 256
 
     def _write(self, file) -&gt; None:
         u32.bwrite(file, self.type.value)
@@ -1523,14 +1607,41 @@ def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; No
             comment,
         )
 
+    def __eq__(self, o: object) -&gt; bool:
+        if not isinstance(o, TdfEntry):
+            return False
+        return (
+            self.type == o.type
+            and self.format == o.format
+            and self.offset == o.offset
+            and self.size == o.size
+            and self.creation_date == o.creation_date
+            and self.last_modification_date == o.last_modification_date
+            and self.last_access_date == o.last_access_date
+            and self.comment == o.comment
+        )
+
     def __repr__(self) -&gt; str:
         return (
-            f&#34;TdfEntry({self.type}, {self.format}, {self.offset},&#34;
-            f&#34; {self.size}, {self.creation_date},&#34;
-            f&#34; {self.last_modification_date},&#34;
-            f&#34; {self.last_access_date}, {self.comment})&#34;
+            f&#34;TdfEntry(type={self.type}, format={self.format}, offset={self.offset}, &#34;
+            f&#34;size={self.size}, creation_date={self.creation_date}, &#34;
+            f&#34;last_modification_date={self.last_modification_date}, &#34;
+            f&#34;last_access_date={self.last_access_date}, comment={self.comment})&#34;
         )</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.basictdf.TdfEntry.nBytes"><code class="name">var <span class="ident">nBytes</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -1573,6 +1684,9 @@ def replace_block(self, newBlock: Block, comment: Optional[str] = None) -&gt; No
 </li>
 <li>
 <h4><code><a title="basictdf.basictdf.TdfEntry" href="#basictdf.basictdf.TdfEntry">TdfEntry</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.basictdf.TdfEntry.nBytes" href="#basictdf.basictdf.TdfEntry.nBytes">nBytes</a></code></li>
+</ul>
 </li>
 </ul>
 </li>

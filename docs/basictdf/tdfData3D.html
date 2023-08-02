@@ -36,7 +36,7 @@ from typing import BinaryIO, Iterable, Iterator, List, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
 from basictdf.tdfTypes import (
     MAT3X3F,
     VEC3F,
@@ -46,7 +46,10 @@ from basictdf.tdfTypes import (
     f32,
     i32,
     u32,
+    SegmentData,
 )
+
+from basictdf.tdfUtils import is_nparray_of_shape, is_integer
 
 
 class Data3dBlockFormat(Enum):
@@ -71,12 +74,11 @@ class Flags(Enum):
 
 
 LinkType = TdfType(np.dtype([(&#34;Track1&#34;, &#34;&lt;u4&#34;), (&#34;Track2&#34;, &#34;&lt;u4&#34;)]))
-SegmentData = TdfType(np.dtype([(&#34;startFrame&#34;, &#34;&lt;i4&#34;), (&#34;nFrames&#34;, &#34;&lt;i4&#34;)]))
 
 TrackType = TdfType(np.dtype(&#34;&lt;3f4&#34;))
 
 
-class MarkerTrack:
+class MarkerTrack(Sized, BuildWriteable):
     &#34;&#34;&#34;
     A track that collects all the data of a physical marker, such as name and position.
     &#34;&#34;&#34;
@@ -227,32 +229,33 @@ class Data3D(Block):
         self.frequency = frequency
         self.startTime = startTime
 
-        if not (
-            isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == MAT3X3F.btype.shape
-        ):
+        if not is_nparray_of_shape(rotationMatrix, MAT3X3F.btype.shape):
             raise ValueError(
                 f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
-        if not (
-            isinstance(translationVector, np.ndarray)
-            and translationVector.shape == VEC3F.btype.shape
-        ):
+        if not is_nparray_of_shape(translationVector, VEC3F.btype.shape):
             raise ValueError(
                 f&#34;translationVector must be a numpy array of shape {VEC3F.btype}&#34;
             )
         self.translationVector = translationVector
 
-        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+        if not is_nparray_of_shape(volume, Volume.btype.shape):
             raise ValueError(
                 f&#34;volume must be a numpy array of shape {Volume.btype.shape}&#34;
             )
 
         self.volume = volume
 
+        if not isinstance(flag, Flags):
+            raise TypeError(&#34;flag must be of type Flags&#34;)
+
         self.flag = flag
+
+        if not is_integer(nFrames):
+            raise TypeError(&#34;nFrames must be an integer&#34;)
+
         self.nFrames = nFrames
 
         self._tracks = []
@@ -456,8 +459,13 @@ class Data3D(Block):
 
     def __repr__(self) -&gt; str:
         return (
-            f&#34;&lt;Data3D: {self.nFrames} frames, {self.frequency} Hz,&#34;
-            f&#34; {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+            f&#34;&lt;Data3D &#34;
+            f&#34;format={self.format.name}, &#34;
+            f&#34;nFrames={self.nFrames}, &#34;
+            f&#34;frequency={self.frequency}, &#34;
+            f&#34;startTime={self.startTime}, &#34;
+            f&#34;nTracks={self.nTracks}, &#34;
+            f&#34;tracks={[i.label for i in self._tracks]}&gt;&#34;
         )</code></pre>
 </details>
 </section>
@@ -547,32 +555,33 @@ class Data3D(Block):
         self.frequency = frequency
         self.startTime = startTime
 
-        if not (
-            isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == MAT3X3F.btype.shape
-        ):
+        if not is_nparray_of_shape(rotationMatrix, MAT3X3F.btype.shape):
             raise ValueError(
                 f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
-        if not (
-            isinstance(translationVector, np.ndarray)
-            and translationVector.shape == VEC3F.btype.shape
-        ):
+        if not is_nparray_of_shape(translationVector, VEC3F.btype.shape):
             raise ValueError(
                 f&#34;translationVector must be a numpy array of shape {VEC3F.btype}&#34;
             )
         self.translationVector = translationVector
 
-        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+        if not is_nparray_of_shape(volume, Volume.btype.shape):
             raise ValueError(
                 f&#34;volume must be a numpy array of shape {Volume.btype.shape}&#34;
             )
 
         self.volume = volume
 
+        if not isinstance(flag, Flags):
+            raise TypeError(&#34;flag must be of type Flags&#34;)
+
         self.flag = flag
+
+        if not is_integer(nFrames):
+            raise TypeError(&#34;nFrames must be an integer&#34;)
+
         self.nFrames = nFrames
 
         self._tracks = []
@@ -776,13 +785,20 @@ class Data3D(Block):
 
     def __repr__(self) -&gt; str:
         return (
-            f&#34;&lt;Data3D: {self.nFrames} frames, {self.frequency} Hz,&#34;
-            f&#34; {self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+            f&#34;&lt;Data3D &#34;
+            f&#34;format={self.format.name}, &#34;
+            f&#34;nFrames={self.nFrames}, &#34;
+            f&#34;frequency={self.frequency}, &#34;
+            f&#34;startTime={self.startTime}, &#34;
+            f&#34;nTracks={self.nTracks}, &#34;
+            f&#34;tracks={[i.label for i in self._tracks]}&gt;&#34;
         )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
 <li>abc.ABC</li>
 </ul>
 <h3>Class variables</h3>
@@ -796,7 +812,7 @@ class Data3D(Block):
 <dl>
 <dt id="basictdf.tdfData3D.Data3D.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1020,7 +1036,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MarkerTrack:
+<pre><code class="python">class MarkerTrack(Sized, BuildWriteable):
     &#34;&#34;&#34;
     A track that collects all the data of a physical marker, such as name and position.
     &#34;&#34;&#34;
@@ -1133,6 +1149,12 @@ def tracks(self) -&gt; List[MarkerTrack]:
     def __eq__(self, other):
         return self.label == other.label and np.all(self.data == other.data)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
+<li>abc.ABC</li>
+</ul>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfData3D.MarkerTrack.X"><code class="name">var <span class="ident">X</span> : numpy.ndarray</code></dt>

@@ -35,30 +35,35 @@ from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Type, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
 from basictdf.tdfTypes import (
     MAT3X3F,
     VEC3F,
     BTSString,
+    SegmentData,
     TdfType,
     Volume,
     f32,
     i32,
     u32,
 )
+from basictdf.tdfUtils import is_integer, is_nparray_of_shape, is_numeric
 
-SegmentData = TdfType(np.dtype([(&#34;startFrame&#34;, &#34;&lt;i4&#34;), (&#34;nFrames&#34;, &#34;&lt;i4&#34;)]))
 ForceType = ApplicationPointType = TorqueType = TdfType(np.dtype(&#34;&lt;3f4&#34;))
 
 
-class ForceTorqueTrack:
+class ForceTorqueTrack(Sized, BuildWriteable):
+    &#34;&#34;&#34;
+    Class that represents a force, torque and acceleration track.
+    &#34;&#34;&#34;
+
     def __init__(
         self,
         label: str,
         application_point: np.ndarray,
         force: np.ndarray,
         torque: np.ndarray,
-    ):
+    ) -&gt; None:
         if (
             application_point.shape != force.shape
             or application_point.shape != torque.shape
@@ -77,7 +82,7 @@ class ForceTorqueTrack:
         return np.ma.clump_unmasked(maskedPressureData.T[0])
 
     @_segments.setter
-    def _segments(self, value) -&gt; NoReturn:
+    def _segments(self, _) -&gt; NoReturn:
         raise AttributeError(
             &#34;Can&#39;t set number of segments directly, it&#39;s inferred from the data&#34;
         )
@@ -88,6 +93,7 @@ class ForceTorqueTrack:
 
     @property
     def nBytes(self) -&gt; int:
+        &#34;Returns the number of bytes of the data block&#34;
         segments = self._segments
         base = 256 + 4 + 4 + SegmentData.btype.itemsize * len(segments)
         for segment in segments:
@@ -176,6 +182,10 @@ class ForceTorqueTrack:
 
 
 class ForceTorque3DBlockFormat(Enum):
+    &#34;&#34;&#34;
+    Enum that represents the different formats of the Force3D data block.
+    &#34;&#34;&#34;
+
     unknownFormat = 0
     byTrack = 1
     byFrame = 2
@@ -184,6 +194,10 @@ class ForceTorque3DBlockFormat(Enum):
 
 
 class ForceTorque3D(Block):
+    &#34;&#34;&#34;
+    Class that represents a Force3D data block.
+    &#34;&#34;&#34;
+
     type = BlockType.forceAndTorqueData
 
     def __init__(
@@ -194,32 +208,36 @@ class ForceTorque3D(Block):
         rotationMatrix: np.ndarray,
         translationVector: np.ndarray,
         startTime: float = 0.0,
-        format=ForceTorque3DBlockFormat.byTrack,
+        format: ForceTorque3DBlockFormat = ForceTorque3DBlockFormat.byTrack,
     ) -&gt; None:
         super().__init__()
+        if not isinstance(format, ForceTorque3DBlockFormat):
+            raise TypeError(&#34;format must be of type ForceTorque3DBlockFormat&#34;)
         self.format = format
+
+        if not is_integer(frequency):
+            raise TypeError(&#34;frequency must be an integer&#34;)
+
         self.frequency = frequency
+
+        if not is_numeric(startTime):
+            raise TypeError(&#34;startTime must be a number&#34;)
+
         self.startTime = startTime
 
-        if not (
-            isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == MAT3X3F.btype.shape
-        ):
+        if not is_nparray_of_shape(rotationMatrix, MAT3X3F.btype.shape):
             raise ValueError(
                 f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
-        if not (
-            isinstance(translationVector, np.ndarray)
-            and translationVector.shape == VEC3F.btype.shape
-        ):
+        if not is_nparray_of_shape(translationVector, VEC3F.btype.shape):
             raise ValueError(
                 f&#34;translationVector must be a numpy array of shape {VEC3F.btype}&#34;
             )
         self.translationVector = translationVector
 
-        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+        if not is_nparray_of_shape(volume, Volume.btype.shape):
             raise ValueError(
                 f&#34;volume must be a numpy array of shape {Volume.btype.shape}&#34;
             )
@@ -254,6 +272,34 @@ class ForceTorque3D(Block):
 
         f._tracks = [ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)]
         return f
+
+    def _write(self, file) -&gt; None:
+        if self.format != ForceTorque3DBlockFormat.byTrack:
+            raise NotImplementedError(
+                f&#34;Force3D format {self.format} not implemented yet&#34;
+            )
+
+        # nTracks
+        u32.bwrite(file, len(self._tracks))
+        # frequency
+        i32.bwrite(file, self.frequency)
+        # startTime
+        f32.bwrite(file, self.startTime)
+        # nFrames
+        i32.bwrite(file, self.nFrames)
+
+        # volume
+        Volume.bwrite(file, self.volume)
+        # rotationMatrix
+        MAT3X3F.bwrite(file, self.rotationMatrix)
+        # translationVector
+        VEC3F.bwrite(file, self.translationVector)
+
+        # padding
+        i32.bpad(file)
+
+        for track in self._tracks:
+            track._write(file)
 
     def add_track(self, track: ForceTorqueTrack) -&gt; None:
         &#34;&#34;&#34;Adds a track to the data block
@@ -331,6 +377,7 @@ class ForceTorque3D(Block):
 
     @property
     def nTracks(self) -&gt; int:
+        &#34;Returns the number of tracks in the data block&#34;
         return len(self._tracks)
 
     @property
@@ -349,38 +396,14 @@ class ForceTorque3D(Block):
             base += track.nBytes
         return base
 
-    def _write(self, file) -&gt; None:
-        if self.format != ForceTorque3DBlockFormat.byTrack:
-            raise NotImplementedError(
-                f&#34;Force3D format {self.format} not implemented yet&#34;
-            )
-        # nFrames
-        i32.bwrite(file, self.nFrames)
-
-        # frequency
-        i32.bwrite(file, self.frequency)
-        # startTime
-        f32.bwrite(file, self.startTime)
-        # nTracks
-        u32.bwrite(file, len(self._tracks))
-
-        # volume
-        Volume.bwrite(file, self.volume)
-        # rotationMatrix
-        MAT3X3F.bwrite(file, self.rotationMatrix)
-        # translationVector
-        VEC3F.bwrite(file, self.translationVector)
-
-        # padding
-        i32.bpad(file)
-
-        for track in self._tracks:
-            track._write(file)
-
     def __repr__(self) -&gt; str:
         return (
-            f&#34;&lt;ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, &#34;
-            f&#34;{self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+            f&#34;&lt;ForceTorque3D format={self.format.name} &#34;
+            f&#34;nFrames={self.nFrames} &#34;
+            f&#34;frequency={self.frequency} Hz &#34;
+            f&#34;startTime={self.startTime} &#34;
+            f&#34;nTracks={self.nTracks} &#34;
+            f&#34;tracks={[i.label for i in self._tracks]}&gt;&#34;
         )</code></pre>
 </details>
 </section>
@@ -395,15 +418,19 @@ class ForceTorque3D(Block):
 <dl>
 <dt id="basictdf.tdfForce3D.ForceTorque3D"><code class="flex name class">
 <span>class <span class="ident">ForceTorque3D</span></span>
-<span>(</span><span>frequency: Union[int, float], nFrames: int, volume: numpy.ndarray, rotationMatrix: numpy.ndarray, translationVector: numpy.ndarray, startTime: float = 0.0, format=ForceTorque3DBlockFormat.byTrack)</span>
+<span>(</span><span>frequency: Union[int, float], nFrames: int, volume: numpy.ndarray, rotationMatrix: numpy.ndarray, translationVector: numpy.ndarray, startTime: float = 0.0, format: <a title="basictdf.tdfForce3D.ForceTorque3DBlockFormat" href="#basictdf.tdfForce3D.ForceTorque3DBlockFormat">ForceTorque3DBlockFormat</a> = ForceTorque3DBlockFormat.byTrack)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A class to represent a TDF block.</p></div>
+<div class="desc"><p>Class that represents a Force3D data block.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ForceTorque3D(Block):
+    &#34;&#34;&#34;
+    Class that represents a Force3D data block.
+    &#34;&#34;&#34;
+
     type = BlockType.forceAndTorqueData
 
     def __init__(
@@ -414,32 +441,36 @@ class ForceTorque3D(Block):
         rotationMatrix: np.ndarray,
         translationVector: np.ndarray,
         startTime: float = 0.0,
-        format=ForceTorque3DBlockFormat.byTrack,
+        format: ForceTorque3DBlockFormat = ForceTorque3DBlockFormat.byTrack,
     ) -&gt; None:
         super().__init__()
+        if not isinstance(format, ForceTorque3DBlockFormat):
+            raise TypeError(&#34;format must be of type ForceTorque3DBlockFormat&#34;)
         self.format = format
+
+        if not is_integer(frequency):
+            raise TypeError(&#34;frequency must be an integer&#34;)
+
         self.frequency = frequency
+
+        if not is_numeric(startTime):
+            raise TypeError(&#34;startTime must be a number&#34;)
+
         self.startTime = startTime
 
-        if not (
-            isinstance(rotationMatrix, np.ndarray)
-            and rotationMatrix.shape == MAT3X3F.btype.shape
-        ):
+        if not is_nparray_of_shape(rotationMatrix, MAT3X3F.btype.shape):
             raise ValueError(
                 f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
-        if not (
-            isinstance(translationVector, np.ndarray)
-            and translationVector.shape == VEC3F.btype.shape
-        ):
+        if not is_nparray_of_shape(translationVector, VEC3F.btype.shape):
             raise ValueError(
                 f&#34;translationVector must be a numpy array of shape {VEC3F.btype}&#34;
             )
         self.translationVector = translationVector
 
-        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
+        if not is_nparray_of_shape(volume, Volume.btype.shape):
             raise ValueError(
                 f&#34;volume must be a numpy array of shape {Volume.btype.shape}&#34;
             )
@@ -474,6 +505,34 @@ class ForceTorque3D(Block):
 
         f._tracks = [ForceTorqueTrack._build(stream, nFrames) for _ in range(nTracks)]
         return f
+
+    def _write(self, file) -&gt; None:
+        if self.format != ForceTorque3DBlockFormat.byTrack:
+            raise NotImplementedError(
+                f&#34;Force3D format {self.format} not implemented yet&#34;
+            )
+
+        # nTracks
+        u32.bwrite(file, len(self._tracks))
+        # frequency
+        i32.bwrite(file, self.frequency)
+        # startTime
+        f32.bwrite(file, self.startTime)
+        # nFrames
+        i32.bwrite(file, self.nFrames)
+
+        # volume
+        Volume.bwrite(file, self.volume)
+        # rotationMatrix
+        MAT3X3F.bwrite(file, self.rotationMatrix)
+        # translationVector
+        VEC3F.bwrite(file, self.translationVector)
+
+        # padding
+        i32.bpad(file)
+
+        for track in self._tracks:
+            track._write(file)
 
     def add_track(self, track: ForceTorqueTrack) -&gt; None:
         &#34;&#34;&#34;Adds a track to the data block
@@ -551,6 +610,7 @@ class ForceTorque3D(Block):
 
     @property
     def nTracks(self) -&gt; int:
+        &#34;Returns the number of tracks in the data block&#34;
         return len(self._tracks)
 
     @property
@@ -569,43 +629,21 @@ class ForceTorque3D(Block):
             base += track.nBytes
         return base
 
-    def _write(self, file) -&gt; None:
-        if self.format != ForceTorque3DBlockFormat.byTrack:
-            raise NotImplementedError(
-                f&#34;Force3D format {self.format} not implemented yet&#34;
-            )
-        # nFrames
-        i32.bwrite(file, self.nFrames)
-
-        # frequency
-        i32.bwrite(file, self.frequency)
-        # startTime
-        f32.bwrite(file, self.startTime)
-        # nTracks
-        u32.bwrite(file, len(self._tracks))
-
-        # volume
-        Volume.bwrite(file, self.volume)
-        # rotationMatrix
-        MAT3X3F.bwrite(file, self.rotationMatrix)
-        # translationVector
-        VEC3F.bwrite(file, self.translationVector)
-
-        # padding
-        i32.bpad(file)
-
-        for track in self._tracks:
-            track._write(file)
-
     def __repr__(self) -&gt; str:
         return (
-            f&#34;&lt;ForceTorque3D: {self.nFrames} frames, {self.frequency} Hz, &#34;
-            f&#34;{self.nTracks} tracks, tracks={[i.label for i in self._tracks]}&gt;&#34;
+            f&#34;&lt;ForceTorque3D format={self.format.name} &#34;
+            f&#34;nFrames={self.nFrames} &#34;
+            f&#34;frequency={self.frequency} Hz &#34;
+            f&#34;startTime={self.startTime} &#34;
+            f&#34;nTracks={self.nTracks} &#34;
+            f&#34;tracks={[i.label for i in self._tracks]}&gt;&#34;
         )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
 <li>abc.ABC</li>
 </ul>
 <h3>Class variables</h3>
@@ -619,7 +657,7 @@ class ForceTorque3D(Block):
 <dl>
 <dt id="basictdf.tdfForce3D.ForceTorque3D.nBytes"><code class="name">var <span class="ident">nBytes</span></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -643,13 +681,14 @@ def nBytes(self):
 </dd>
 <dt id="basictdf.tdfForce3D.ForceTorque3D.nTracks"><code class="name">var <span class="ident">nTracks</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns the number of tracks in the data block</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def nTracks(self) -&gt; int:
+    &#34;Returns the number of tracks in the data block&#34;
     return len(self._tracks)</code></pre>
 </details>
 </dd>
@@ -728,12 +767,16 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
 <span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>An enumeration.</p></div>
+<div class="desc"><p>Enum that represents the different formats of the Force3D data block.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ForceTorque3DBlockFormat(Enum):
+    &#34;&#34;&#34;
+    Enum that represents the different formats of the Force3D data block.
+    &#34;&#34;&#34;
+
     unknownFormat = 0
     byTrack = 1
     byFrame = 2
@@ -773,19 +816,23 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
 <span>(</span><span>label: str, application_point: numpy.ndarray, force: numpy.ndarray, torque: numpy.ndarray)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Class that represents a force, torque and acceleration track.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ForceTorqueTrack:
+<pre><code class="python">class ForceTorqueTrack(Sized, BuildWriteable):
+    &#34;&#34;&#34;
+    Class that represents a force, torque and acceleration track.
+    &#34;&#34;&#34;
+
     def __init__(
         self,
         label: str,
         application_point: np.ndarray,
         force: np.ndarray,
         torque: np.ndarray,
-    ):
+    ) -&gt; None:
         if (
             application_point.shape != force.shape
             or application_point.shape != torque.shape
@@ -804,7 +851,7 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
         return np.ma.clump_unmasked(maskedPressureData.T[0])
 
     @_segments.setter
-    def _segments(self, value) -&gt; NoReturn:
+    def _segments(self, _) -&gt; NoReturn:
         raise AttributeError(
             &#34;Can&#39;t set number of segments directly, it&#39;s inferred from the data&#34;
         )
@@ -815,6 +862,7 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
 
     @property
     def nBytes(self) -&gt; int:
+        &#34;Returns the number of bytes of the data block&#34;
         segments = self._segments
         base = 256 + 4 + 4 + SegmentData.btype.itemsize * len(segments)
         for segment in segments:
@@ -901,17 +949,24 @@ def tracks(self) -&gt; List[ForceTorqueTrack]:
             and np.all(self.torque == other.torque)
         )</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
+<li>abc.ABC</li>
+</ul>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfForce3D.ForceTorqueTrack.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns the number of bytes of the data block</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def nBytes(self) -&gt; int:
+    &#34;Returns the number of bytes of the data block&#34;
     segments = self._segments
     base = 256 + 4 + 4 + SegmentData.btype.itemsize * len(segments)
     for segment in segments:

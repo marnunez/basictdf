@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>basictdf.tdfEMG API documentation</title>
-<meta name="description" content="Electromyography data module." />
+<meta name="description" content="EMG data module …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,20 +22,76 @@
 <h1 class="title">Module <code>basictdf.tdfEMG</code></h1>
 </header>
 <section id="section-intro">
-<p>Electromyography data module.</p>
+<p>EMG data module.</p>
+<p>This module contains the classes to represent EMG data in a TDF file.</p>
+<p>Example:</p>
+<pre><code class="language-python">from basictdf import Tdf, EMG, EMGTrack
+import numpy as np
+
+# Create an empty EMG block
+emg = EMG(frequency=1000, nSamples=1000)
+
+# Create a bogus EMG track with random data
+emgTrack = EMGTrack(&quot;emg&quot;, np.random.rand(1000))
+
+# Add it to the EMG block
+emg.addSignal(emgTrack)
+
+# Write it to a new TDF file
+with Tdf.new(&quot;my_file.tdf&quot;).allow_write() as tdf:
+    tdf.emg = emg
+
+# This works too
+tdf = Tdf.new(&quot;my_file.tdf&quot;)
+with tdf.allow_write() as tdf:
+    tdf.emg = emg
+
+</code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">__doc__ = &#34;Electromyography data module.&#34;
+<pre><code class="python">__doc__ = &#34;&#34;&#34;
+
+EMG data module.
+
+This module contains the classes to represent EMG data in a TDF file.
+
+Example:
+
+```python
+from basictdf import Tdf, EMG, EMGTrack
+import numpy as np
+
+# Create an empty EMG block
+emg = EMG(frequency=1000, nSamples=1000)
+
+# Create a bogus EMG track with random data
+emgTrack = EMGTrack(&#34;emg&#34;, np.random.rand(1000))
+
+# Add it to the EMG block
+emg.addSignal(emgTrack)
+
+# Write it to a new TDF file
+with Tdf.new(&#34;my_file.tdf&#34;).allow_write() as tdf:
+    tdf.emg = emg
+
+# This works too
+tdf = Tdf.new(&#34;my_file.tdf&#34;)
+with tdf.allow_write() as tdf:
+    tdf.emg = emg
+
+```
+
+&#34;&#34;&#34;
+
 
 from enum import Enum
-from io import BytesIO
 from typing import Iterator, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, Sized, BuildWriteable
 from basictdf.tdfTypes import BTSString, TdfType, f32, i16, i32
 
 SegmentData = TdfType(np.dtype([(&#34;startFrame&#34;, &#34;&lt;i4&#34;), (&#34;nFrames&#34;, &#34;&lt;i4&#34;)]))
@@ -47,7 +103,7 @@ class EMGBlockFormat(Enum):
     byFrame = 2
 
 
-class EMGTrack:
+class EMGTrack(Sized, BuildWriteable):
     def __init__(self, label: str, trackData: np.ndarray) -&gt; None:
         self.label = label
         self.data = trackData
@@ -66,7 +122,7 @@ class EMGTrack:
         return np.ma.clump_unmasked(maskedTrackData.T)
 
     @staticmethod
-    def build(stream, nSamples) -&gt; &#34;EMGTrack&#34;:
+    def _build(stream, nSamples) -&gt; &#34;EMGTrack&#34;:
         label = BTSString.bread(stream, 256)
         nSegments = i32.bread(stream)
         i32.skip(stream)  # padding
@@ -77,7 +133,7 @@ class EMGTrack:
             trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
-    def write(self, file) -&gt; None:
+    def _write(self, file) -&gt; None:
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -121,13 +177,16 @@ class EMG(Block):
 
     type = BlockType.electromyographicData
 
-    def __init__(self, frequency, nSamples, startTime=0.0) -&gt; None:
+    def __init__(
+        self, frequency, nSamples, startTime=0.0, format=EMGBlockFormat.byTrack
+    ) -&gt; None:
         super().__init__()
         self.frequency = frequency
         self.startTime = startTime
         self.nSamples = nSamples
         self._signals = []
         self._emgMap = []
+        self.format = format
 
     @staticmethod
     def _build(stream, format) -&gt; &#34;EMG&#34;:
@@ -138,10 +197,10 @@ class EMG(Block):
         nSamples = i32.bread(stream) + 49  # Why 49??? Whyyyy????
         emgMap = i16.bread(stream, n=nSignals)
 
-        d = EMG(frequency, nSamples, startTime)
+        d = EMG(frequency, nSamples, startTime, format)
         if format == EMGBlockFormat.byTrack:
             for n in range(nSignals):
-                emgSignal = EMGTrack.build(stream, nSamples)
+                emgSignal = EMGTrack._build(stream, nSamples)
                 d.addSignal(emgSignal, channel=emgMap[n])
         else:
             raise NotImplementedError(f&#34;EMG format {format} not implemented yet&#34;)
@@ -160,17 +219,27 @@ class EMG(Block):
         # startTime
         f32.bwrite(file, self.startTime)
 
-        # emgMap
-        i16.bwrite(file, self._emgMap)
-
         # nSamples
         i32.bwrite(file, self.nSamples - 49)  # That 49 again
 
+        # emgMap
+        i16.bwrite(file, self._emgMap)
+
         # signals
         for signal in self._signals:
-            signal.write(file)
+            signal._write(file)
 
     def __getitem__(self, key) -&gt; EMGTrack:
+        &#34;&#34;&#34;
+        Returns the EMG signal specified by its label or its channel
+
+        Args:
+            key (int or str): The channel or the label of the signal
+
+        Raises:
+            TypeError: If the key is not an int or a str
+            KeyError: If the signal is not found
+        &#34;&#34;&#34;
         if isinstance(key, int):
             return self._signals[key]
         elif isinstance(key, str):
@@ -194,16 +263,28 @@ class EMG(Block):
         return len(self._signals)
 
     def __eq__(self, other) -&gt; bool:
-        buff1 = BytesIO()
-        buff2 = BytesIO()
-        self.write(buff1)
-        other.write(buff2)
-        return buff1.getvalue() == buff2.getvalue()
+        if not isinstance(other, EMG):
+            return False
+        return (
+            self.frequency == other.frequency
+            and self.startTime == other.startTime
+            and self.nSamples == other.nSamples
+            and all(s1 == s2 for s1, s2 in zip(self._signals, other._signals))
+        )
 
     def addSignal(self, signal: EMGTrack, channel=None) -&gt; None:
         &#34;&#34;&#34;
-        adds a signal to the EMG block. If the channel is not specified,
+        Adds a signal to the EMG block. If the channel is not specified,
         it is set to the next one  available
+
+        Args:
+            signal (EMGTrack): The signal to add
+            channel (int, optional): The channel to use. Defaults to None.
+
+        Raises:
+            TypeError: If the signal is not an EMGTrack
+            ValueError: If the signal has a different number of samples
+            ValueError: If the channel is already in use
         &#34;&#34;&#34;
         if not isinstance(signal, EMGTrack):
             raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
@@ -228,6 +309,15 @@ class EMG(Block):
         self._signals.append(signal)
 
     def removeSignal(self, label: str) -&gt; None:
+        &#34;&#34;&#34;
+        Removes a signal specified by its label from the EMG block
+
+        Args:
+            label (str): The label of the signal to remove
+
+        Raises:
+            KeyError: If the signal is not found
+        &#34;&#34;&#34;
         try:
             pos = next(i for i, v in enumerate(self._signals) if v == label)
         except StopIteration:
@@ -249,8 +339,13 @@ class EMG(Block):
 
     def __repr__(self) -&gt; str:
         return (
-            f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, &#34;
-            f&#34;nSignals={self.nSignals}, startTime={self.startTime},)&#34;
+            &#34;&lt;EMGBlock&#34;
+            f&#34; format={self.format.name}&#34;
+            f&#34; frequency={self.frequency}&#34;
+            f&#34; nSamples={self.nSamples}&#34;
+            f&#34; nSignals={self.nSignals}&#34;
+            f&#34; startTime={self.startTime}&#34;
+            &#34;&gt;&#34;
         )</code></pre>
 </details>
 </section>
@@ -265,7 +360,7 @@ class EMG(Block):
 <dl>
 <dt id="basictdf.tdfEMG.EMG"><code class="flex name class">
 <span>class <span class="ident">EMG</span></span>
-<span>(</span><span>frequency, nSamples, startTime=0.0)</span>
+<span>(</span><span>frequency, nSamples, startTime=0.0, format=EMGBlockFormat.byTrack)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Electromyography data block</p></div>
@@ -278,13 +373,16 @@ class EMG(Block):
 
     type = BlockType.electromyographicData
 
-    def __init__(self, frequency, nSamples, startTime=0.0) -&gt; None:
+    def __init__(
+        self, frequency, nSamples, startTime=0.0, format=EMGBlockFormat.byTrack
+    ) -&gt; None:
         super().__init__()
         self.frequency = frequency
         self.startTime = startTime
         self.nSamples = nSamples
         self._signals = []
         self._emgMap = []
+        self.format = format
 
     @staticmethod
     def _build(stream, format) -&gt; &#34;EMG&#34;:
@@ -295,10 +393,10 @@ class EMG(Block):
         nSamples = i32.bread(stream) + 49  # Why 49??? Whyyyy????
         emgMap = i16.bread(stream, n=nSignals)
 
-        d = EMG(frequency, nSamples, startTime)
+        d = EMG(frequency, nSamples, startTime, format)
         if format == EMGBlockFormat.byTrack:
             for n in range(nSignals):
-                emgSignal = EMGTrack.build(stream, nSamples)
+                emgSignal = EMGTrack._build(stream, nSamples)
                 d.addSignal(emgSignal, channel=emgMap[n])
         else:
             raise NotImplementedError(f&#34;EMG format {format} not implemented yet&#34;)
@@ -317,17 +415,27 @@ class EMG(Block):
         # startTime
         f32.bwrite(file, self.startTime)
 
-        # emgMap
-        i16.bwrite(file, self._emgMap)
-
         # nSamples
         i32.bwrite(file, self.nSamples - 49)  # That 49 again
 
+        # emgMap
+        i16.bwrite(file, self._emgMap)
+
         # signals
         for signal in self._signals:
-            signal.write(file)
+            signal._write(file)
 
     def __getitem__(self, key) -&gt; EMGTrack:
+        &#34;&#34;&#34;
+        Returns the EMG signal specified by its label or its channel
+
+        Args:
+            key (int or str): The channel or the label of the signal
+
+        Raises:
+            TypeError: If the key is not an int or a str
+            KeyError: If the signal is not found
+        &#34;&#34;&#34;
         if isinstance(key, int):
             return self._signals[key]
         elif isinstance(key, str):
@@ -351,16 +459,28 @@ class EMG(Block):
         return len(self._signals)
 
     def __eq__(self, other) -&gt; bool:
-        buff1 = BytesIO()
-        buff2 = BytesIO()
-        self.write(buff1)
-        other.write(buff2)
-        return buff1.getvalue() == buff2.getvalue()
+        if not isinstance(other, EMG):
+            return False
+        return (
+            self.frequency == other.frequency
+            and self.startTime == other.startTime
+            and self.nSamples == other.nSamples
+            and all(s1 == s2 for s1, s2 in zip(self._signals, other._signals))
+        )
 
     def addSignal(self, signal: EMGTrack, channel=None) -&gt; None:
         &#34;&#34;&#34;
-        adds a signal to the EMG block. If the channel is not specified,
+        Adds a signal to the EMG block. If the channel is not specified,
         it is set to the next one  available
+
+        Args:
+            signal (EMGTrack): The signal to add
+            channel (int, optional): The channel to use. Defaults to None.
+
+        Raises:
+            TypeError: If the signal is not an EMGTrack
+            ValueError: If the signal has a different number of samples
+            ValueError: If the channel is already in use
         &#34;&#34;&#34;
         if not isinstance(signal, EMGTrack):
             raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
@@ -385,6 +505,15 @@ class EMG(Block):
         self._signals.append(signal)
 
     def removeSignal(self, label: str) -&gt; None:
+        &#34;&#34;&#34;
+        Removes a signal specified by its label from the EMG block
+
+        Args:
+            label (str): The label of the signal to remove
+
+        Raises:
+            KeyError: If the signal is not found
+        &#34;&#34;&#34;
         try:
             pos = next(i for i, v in enumerate(self._signals) if v == label)
         except StopIteration:
@@ -406,13 +535,20 @@ class EMG(Block):
 
     def __repr__(self) -&gt; str:
         return (
-            f&#34;EMGBlock(frequency={self.frequency}, nSamples={self.nSamples}, &#34;
-            f&#34;nSignals={self.nSignals}, startTime={self.startTime},)&#34;
+            &#34;&lt;EMGBlock&#34;
+            f&#34; format={self.format.name}&#34;
+            f&#34; frequency={self.frequency}&#34;
+            f&#34; nSamples={self.nSamples}&#34;
+            f&#34; nSignals={self.nSignals}&#34;
+            f&#34; startTime={self.startTime}&#34;
+            &#34;&gt;&#34;
         )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="basictdf.tdfBlock.Block" href="tdfBlock.html#basictdf.tdfBlock.Block">Block</a></li>
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
 <li>abc.ABC</li>
 </ul>
 <h3>Class variables</h3>
@@ -426,7 +562,7 @@ class EMG(Block):
 <dl>
 <dt id="basictdf.tdfEMG.EMG.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -458,17 +594,42 @@ def nSignals(self) -&gt; int:
 <span>def <span class="ident">addSignal</span></span>(<span>self, signal: <a title="basictdf.tdfEMG.EMGTrack" href="#basictdf.tdfEMG.EMGTrack">EMGTrack</a>, channel=None) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>adds a signal to the EMG block. If the channel is not specified,
+<div class="desc"><p>Adds a signal to the EMG block. If the channel is not specified,
 it is set to the next one
-available</p></div>
+available</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>signal</code></strong> :&ensp;<code><a title="basictdf.tdfEMG.EMGTrack" href="#basictdf.tdfEMG.EMGTrack">EMGTrack</a></code></dt>
+<dd>The signal to add</dd>
+<dt><strong><code>channel</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>The channel to use. Defaults to None.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>If the signal is not an EMGTrack</dd>
+<dt><code>ValueError</code></dt>
+<dd>If the signal has a different number of samples</dd>
+<dt><code>ValueError</code></dt>
+<dd>If the channel is already in use</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def addSignal(self, signal: EMGTrack, channel=None) -&gt; None:
     &#34;&#34;&#34;
-    adds a signal to the EMG block. If the channel is not specified,
+    Adds a signal to the EMG block. If the channel is not specified,
     it is set to the next one  available
+
+    Args:
+        signal (EMGTrack): The signal to add
+        channel (int, optional): The channel to use. Defaults to None.
+
+    Raises:
+        TypeError: If the signal is not an EMGTrack
+        ValueError: If the signal has a different number of samples
+        ValueError: If the channel is already in use
     &#34;&#34;&#34;
     if not isinstance(signal, EMGTrack):
         raise TypeError(f&#34;Can only add EMGTrack objects, got {type(signal)}&#34;)
@@ -497,12 +658,31 @@ available</p></div>
 <span>def <span class="ident">removeSignal</span></span>(<span>self, label: str) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Removes a signal specified by its label from the EMG block</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>label</code></strong> :&ensp;<code>str</code></dt>
+<dd>The label of the signal to remove</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>KeyError</code></dt>
+<dd>If the signal is not found</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def removeSignal(self, label: str) -&gt; None:
+    &#34;&#34;&#34;
+    Removes a signal specified by its label from the EMG block
+
+    Args:
+        label (str): The label of the signal to remove
+
+    Raises:
+        KeyError: If the signal is not found
+    &#34;&#34;&#34;
     try:
         pos = next(i for i, v in enumerate(self._signals) if v == label)
     except StopIteration:
@@ -554,12 +734,13 @@ available</p></div>
 <span>(</span><span>label: str, trackData: numpy.ndarray)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class EMGTrack:
+<pre><code class="python">class EMGTrack(Sized, BuildWriteable):
     def __init__(self, label: str, trackData: np.ndarray) -&gt; None:
         self.label = label
         self.data = trackData
@@ -578,7 +759,7 @@ available</p></div>
         return np.ma.clump_unmasked(maskedTrackData.T)
 
     @staticmethod
-    def build(stream, nSamples) -&gt; &#34;EMGTrack&#34;:
+    def _build(stream, nSamples) -&gt; &#34;EMGTrack&#34;:
         label = BTSString.bread(stream, 256)
         nSegments = i32.bread(stream)
         i32.skip(stream)  # padding
@@ -589,7 +770,7 @@ available</p></div>
             trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
         return EMGTrack(label, trackData)
 
-    def write(self, file) -&gt; None:
+    def _write(self, file) -&gt; None:
         # label
         BTSString.bwrite(file, 256, self.label)
 
@@ -627,36 +808,17 @@ available</p></div>
             f&#34;segments={len(self._segments)})&#34;
         )</code></pre>
 </details>
-<h3>Static methods</h3>
-<dl>
-<dt id="basictdf.tdfEMG.EMGTrack.build"><code class="name flex">
-<span>def <span class="ident">build</span></span>(<span>stream, nSamples) ‑> <a title="basictdf.tdfEMG.EMGTrack" href="#basictdf.tdfEMG.EMGTrack">EMGTrack</a></span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def build(stream, nSamples) -&gt; &#34;EMGTrack&#34;:
-    label = BTSString.bread(stream, 256)
-    nSegments = i32.bread(stream)
-    i32.skip(stream)  # padding
-    segmentData = SegmentData.bread(stream, nSegments)
-    trackData = np.empty(nSamples, dtype=&#34;&lt;f4&#34;)
-    trackData[:] = np.nan
-    for startFrame, nFrames in segmentData:
-        trackData[startFrame : startFrame + nFrames] = f32.bread(stream, nFrames)
-    return EMGTrack(label, trackData)</code></pre>
-</details>
-</dd>
-</dl>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>basictdf.tdfBlock.Sized</li>
+<li>basictdf.tdfBlock.BuildWriteable</li>
+<li>abc.ABC</li>
+</ul>
 <h3>Instance variables</h3>
 <dl>
 <dt id="basictdf.tdfEMG.EMGTrack.nBytes"><code class="name">var <span class="ident">nBytes</span></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -687,41 +849,6 @@ def nSamples(self) -&gt; int:
         int: number of samples of the track
     &#34;&#34;&#34;
     return self.data.shape[0]</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="basictdf.tdfEMG.EMGTrack.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>self, file) ‑> None</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def write(self, file) -&gt; None:
-    # label
-    BTSString.bwrite(file, 256, self.label)
-
-    segments = self._segments
-
-    # nSegments
-    i32.bwrite(file, len(segments))
-
-    # padding
-    i32.bpad(file, 1)
-
-    for segment in segments:
-        # startFrame
-        i32.bwrite(file, segment.start)
-        # nFrames
-        i32.bwrite(file, segment.stop - segment.start)
-
-    for segment in segments:
-        # data
-        f32.bwrite(file, self.data[segment])</code></pre>
 </details>
 </dd>
 </dl>
@@ -763,10 +890,8 @@ def nSamples(self) -&gt; int:
 <li>
 <h4><code><a title="basictdf.tdfEMG.EMGTrack" href="#basictdf.tdfEMG.EMGTrack">EMGTrack</a></code></h4>
 <ul class="">
-<li><code><a title="basictdf.tdfEMG.EMGTrack.build" href="#basictdf.tdfEMG.EMGTrack.build">build</a></code></li>
 <li><code><a title="basictdf.tdfEMG.EMGTrack.nBytes" href="#basictdf.tdfEMG.EMGTrack.nBytes">nBytes</a></code></li>
 <li><code><a title="basictdf.tdfEMG.EMGTrack.nSamples" href="#basictdf.tdfEMG.EMGTrack.nSamples">nSamples</a></code></li>
-<li><code><a title="basictdf.tdfEMG.EMGTrack.write" href="#basictdf.tdfEMG.EMGTrack.write">write</a></code></li>
 </ul>
 </li>
 </ul>
