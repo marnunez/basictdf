@@ -90,15 +90,10 @@ class ForceTorqueTrack:
         torque_data[:] = np.nan
 
         for startFrame, nFrames in segmentData:
-            application_point_data[
-                startFrame : startFrame + nFrames
-            ] = ApplicationPointType.bread(stream, nFrames)
-            force_data[startFrame : startFrame + nFrames] = ForceType.bread(
-                stream, nFrames
-            )
-            torque_data[startFrame : startFrame + nFrames] = TorqueType.bread(
-                stream, nFrames
-            )
+            for frame in range(startFrame, startFrame + nFrames):
+                application_point_data[frame] = ApplicationPointType.bread(stream)
+                force_data[frame] = ForceType.bread(stream)
+                torque_data[frame] = TorqueType.bread(stream)
         return ForceTorqueTrack(
             label=label,
             application_point=application_point_data,
@@ -127,12 +122,13 @@ class ForceTorqueTrack:
             i32.bwrite(file, segment.stop - segment.start)
 
         for segment in segments:
-            # applicationPoint
-            ApplicationPointType.bwrite(file, self.application_point[segment])
-            # force
-            ForceType.bwrite(file, self.force[segment])
-            # torque
-            TorqueType.bwrite(file, self.torque[segment])
+            for frame in range(segment.start, segment.stop):
+                # applicationPoint
+                ApplicationPointType.bwrite(file, self.application_point[frame])
+                # force
+                ForceType.bwrite(file, self.force[frame])
+                # torque
+                TorqueType.bwrite(file, self.torque[frame])
 
     def __repr__(self) -> str:
         return f"ForceTorqueTrack(label={self.label}, nFrames={self.nFrames})"

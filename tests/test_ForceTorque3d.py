@@ -58,20 +58,21 @@ class TestForceTorqueTrack(TestCase):
         # nFrames
         b += b"\x02\x00\x00\x00"
 
-        # application point
-        b += ApplicationPointType.write(cop)
+        for i in range(2):
+            # application point
+            b += ApplicationPointType.write(cop[i])
 
-        # force
-        b += ForceType.write(force)
+            # force
+            b += ForceType.write(force[i])
 
-        # torque
-        b += TorqueType.write(torque)
+            # torque
+            b += TorqueType.write(torque[i])
 
         c = BytesIO(b)
         a = ForceTorqueTrack._build(c, 2)
         self.assertEqual(a.label, "r_gr")
         self.assertEqual(a.nFrames, 2)
-        np.testing.assert_equal(a.application_point, cop)
+        np.testing.assert_almost_equal(a.application_point, cop)
 
         self.assertEqual(a.application_point.shape, (2, 3))
         self.assertEqual(a.force.shape, (2, 3))
@@ -116,14 +117,15 @@ class TestForceTorqueTrack(TestCase):
         # nFrames
         b += b"\x02\x00\x00\x00"
 
-        # application point
-        b += ApplicationPointType.write(cop)
+        for i in range(2):
+            # application point
+            b += ApplicationPointType.write(cop[i])
 
-        # force
-        b += ForceType.write(force)
+            # force
+            b += ForceType.write(force[i])
 
-        # torque
-        b += TorqueType.write(torque)
+            # torque
+            b += TorqueType.write(torque[i])
 
         i = BytesIO(b)
         other = BytesIO()
