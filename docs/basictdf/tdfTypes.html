@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>basictdf.tdfTypes API documentation</title>
+<meta name="description" content="Shared classes and types for basictdf.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>basictdf.tdfTypes</code></h1>
+</header>
+<section id="section-intro">
+<p>Shared classes and types for basictdf.</p>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="basictdf.tdfTypes.MAT3X3D"><code class="name">var <span class="ident">MAT3X3D</span></code></dt>
+<dd>
+<div class="desc"><p>3x3 matrix of 64 bit floats, little endian</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.MAT3X3F"><code class="name">var <span class="ident">MAT3X3F</span></code></dt>
+<dd>
+<div class="desc"><p>3x3 matrix of 32 bit floats, little endian</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.SegmentData"><code class="name">var <span class="ident">SegmentData</span></code></dt>
+<dd>
+<div class="desc"><p>Segment data type</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.VEC2D"><code class="name">var <span class="ident">VEC2D</span></code></dt>
+<dd>
+<div class="desc"><p>2D vector of 64 bit floats, little endian</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.VEC2F"><code class="name">var <span class="ident">VEC2F</span></code></dt>
+<dd>
+<div class="desc"><p>2D vector of 32 bit floats, little endian</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.VEC2I"><code class="name">var <span class="ident">VEC2I</span></code></dt>
+<dd>
+<div class="desc"><p>2D vector of 32 bit integers, little endian</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.VEC3D"><code class="name">var <span class="ident">VEC3D</span></code></dt>
+<dd>
+<div class="desc"><p>3D vector of 64 bit floats, little endian</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.VEC3F"><code class="name">var <span class="ident">VEC3F</span></code></dt>
+<dd>
+<div class="desc"><p>3D vector of 32 bit floats, little endian</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.f32"><code class="name">var <span class="ident">f32</span></code></dt>
+<dd>
+<div class="desc"><p>32 bit float, little endian. Equivalent to a numpy.float32</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.f64"><code class="name">var <span class="ident">f64</span></code></dt>
+<dd>
+<div class="desc"><p>64 bit float, little endian. Equivalent to a numpy.float64</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.i16"><code class="name">var <span class="ident">i16</span></code></dt>
+<dd>
+<div class="desc"><p>16 bit integer, little endian. Equivalent to a numpy.int16, also known as a short</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.i32"><code class="name">var <span class="ident">i32</span></code></dt>
+<dd>
+<div class="desc"><p>32 bit integer, little endian. Equivalent to a numpy.int32</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.u16"><code class="name">var <span class="ident">u16</span></code></dt>
+<dd>
+<div class="desc"><p>16 bit unsigned integer, little endian. Equivalent to a numpy.uint16</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.u32"><code class="name">var <span class="ident">u32</span></code></dt>
+<dd>
+<div class="desc"><p>32 bit unsigned integer, little endian. Equivalent to a numpy.uint32</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="basictdf.tdfTypes.BTSDate"><code class="flex name class">
+<span>class <span class="ident">BTSDate</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class to read and write BTS dates, which are stored as 32 bit integers</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BTSDate:
+    &#34;&#34;&#34;
+    A class to read and write BTS dates, which are stored as 32 bit integers
+    &#34;&#34;&#34;
+
+    @staticmethod
+    def read(data) -&gt; datetime:
+        &#34;Read a BTSDate from bytes&#34;
+        return datetime.fromtimestamp(struct.unpack(&#34;&lt;i&#34;, data)[0])
+
+    @staticmethod
+    def bread(f) -&gt; datetime:
+        &#34;Read a BTSDate from a binary file or buffer&#34;
+        return BTSDate.read(f.read(4))
+
+    @staticmethod
+    def write(data) -&gt; bytes:
+        &#34;Write a BTSDate to bytes&#34;
+        return struct.pack(&#34;&lt;i&#34;, int(data.timestamp()))
+
+    @staticmethod
+    def bwrite(file, data) -&gt; None:
+        &#34;Write a BTSDate to a binary file or buffer&#34;
+        file.write(BTSDate.write(data))</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="basictdf.tdfTypes.BTSDate.bread"><code class="name flex">
+<span>def <span class="ident">bread</span></span>(<span>f) ‑> datetime.datetime</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a BTSDate from a binary file or buffer</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.BTSDate.bwrite"><code class="name flex">
+<span>def <span class="ident">bwrite</span></span>(<span>file, data) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write a BTSDate to a binary file or buffer</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.BTSDate.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>data) ‑> datetime.datetime</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a BTSDate from bytes</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.BTSDate.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>data) ‑> bytes</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write a BTSDate to bytes</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.tdfTypes.BTSString"><code class="flex name class">
+<span>class <span class="ident">BTSString</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>BTSString is a null terminated string with a length prefix.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BTSString:
+    &#34;&#34;&#34;
+    BTSString is a null terminated string with a length prefix.
+    &#34;&#34;&#34;
+
+    @staticmethod
+    def read(size: int, data: bytes, encoding: str = &#34;windows-1252&#34;) -&gt; str:
+        &#34;&#34;&#34;read a BTSString from bytes
+
+        Args:
+            size (int): size of the string to read
+            data (bytes): input bytes
+            encoding (str, optional): encoding to use. Defaults to &#34;windows-1252&#34;.
+
+        Returns:
+            str: a Python string
+        &#34;&#34;&#34;
+        la = struct.unpack(f&#34;{size}s&#34;, data)[0]
+        try:
+            pos = la.index(b&#34;\x00&#34;)
+            return la[:pos].decode(encoding)
+        except ValueError:
+            return la.decode(encoding)
+
+    @staticmethod
+    def write(size: int, data: str) -&gt; bytes:
+        dat = data.encode(&#34;windows-1252&#34;) + b&#34;\x00&#34;
+        padding = b&#34;\x00&#34; * (size - len(dat))
+        if len(dat) &gt; size:
+            raise ValueError(
+                f&#34;The string is too long: max {size} chars, got {len(dat)}&#34;
+            )
+        return dat + padding
+
+    @staticmethod
+    def bwrite(file: BinaryIO, size: int, data: str) -&gt; None:
+        file.write(BTSString.write(size, data))
+
+    @staticmethod
+    def bread(file: BinaryIO, size: int, encoding: str = &#34;windows-1252&#34;) -&gt; str:
+        &#34;&#34;&#34;Read a BTSString from a binary file or buffer
+
+        Args:
+            file (BinaryIO): input binary file or buffer
+            size (int): size of the string to read
+            encoding (str, optional): encoding to use. Defaults to &#34;windows-1252&#34;.
+
+        Returns:
+            str: a Python string
+        &#34;&#34;&#34;
+        return BTSString.read(size, file.read(size), encoding=encoding)</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="basictdf.tdfTypes.BTSString.bread"><code class="name flex">
+<span>def <span class="ident">bread</span></span>(<span>file: <class 'BinaryIO'>, size: int, encoding: str = 'windows-1252') ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a BTSString from a binary file or buffer</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>BinaryIO</code></dt>
+<dd>input binary file or buffer</dd>
+<dt><strong><code>size</code></strong> :&ensp;<code>int</code></dt>
+<dd>size of the string to read</dd>
+<dt><strong><code>encoding</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>encoding to use. Defaults to "windows-1252".</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>a Python string</dd>
+</dl></div>
+</dd>
+<dt id="basictdf.tdfTypes.BTSString.bwrite"><code class="name flex">
+<span>def <span class="ident">bwrite</span></span>(<span>file: <class 'BinaryIO'>, size: int, data: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="basictdf.tdfTypes.BTSString.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>size: int, data: bytes, encoding: str = 'windows-1252') ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>read a BTSString from bytes</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>size</code></strong> :&ensp;<code>int</code></dt>
+<dd>size of the string to read</dd>
+<dt><strong><code>data</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>input bytes</dd>
+<dt><strong><code>encoding</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>encoding to use. Defaults to "windows-1252".</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>a Python string</dd>
+</dl></div>
+</dd>
+<dt id="basictdf.tdfTypes.BTSString.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>size: int, data: str) ‑> bytes</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.tdfTypes.CameraViewPort"><code class="flex name class">
+<span>class <span class="ident">CameraViewPort</span></span>
+<span>(</span><span>origin, size)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class to represent a camera viewport</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CameraViewPort:
+    &#34;&#34;&#34;Class to represent a camera viewport&#34;&#34;&#34;
+
+    def __init__(self, origin, size) -&gt; None:
+        if isinstance(origin, np.ndarray) and origin.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f&#34;origin must be a {VEC2I.btype.shape} if it is a numpy array&#34;
+            )
+        elif isinstance(origin, list) or isinstance(origin, tuple) and len(origin) != 2:
+            raise TypeError(&#34;origin must be of length 2 if it is a list or tuple&#34;)
+
+        if isinstance(size, np.ndarray) and size.shape != VEC2I.btype.shape:
+            raise TypeError(
+                f&#34;size must be a {VEC2I.btype.shape} if it is a numpy array&#34;
+            )
+        elif isinstance(size, list) or isinstance(size, tuple) and len(size) != 2:
+            raise TypeError(&#34;size must be of length 2 if it is a list or tuple&#34;)
+
+        self.origin = origin
+        &#34;Origin of the viewport, a 2D vector of integers&#34;
+        self.size = size
+        &#34;Size of the viewport, a 2D vector of integers&#34;
+
+    @staticmethod
+    def bread(stream) -&gt; &#34;CameraViewPort&#34;:
+        &#34;&#34;&#34;Read a CameraViewPort from a binary file or buffer&#34;&#34;&#34;
+        origin = VEC2I.bread(stream)
+        size = VEC2I.bread(stream)
+        return CameraViewPort(origin, size)
+
+    @staticmethod
+    def read(data: bytes) -&gt; &#34;CameraViewPort&#34;:
+        &#34;Read a CameraViewPort from bytes&#34;
+        origin = VEC2I.read(data[:8])
+        size = VEC2I.read(data[8:])
+        return CameraViewPort(origin, size)
+
+    def write(self) -&gt; bytes:
+        &#34;Write a CameraViewPort to bytes&#34;
+        return VEC2I.write(self.origin) + VEC2I.write(self.size)
+
+    def bwrite(self, stream: BinaryIO) -&gt; None:
+        &#34;Write a CameraViewPort to a binary file or buffer&#34;
+        VEC2I.bwrite(stream, self.origin)
+        VEC2I.bwrite(stream, self.size)
+
+    nBytes = 8 + 8
+    &#34;Size in bytes of the CameraViewPort object&#34;
+
+    def __repr__(self) -&gt; str:
+        return f&#34;CameraViewPort(origin={self.origin}, size={self.size})&#34;
+
+    def __eq__(self, other) -&gt; bool:
+        if not isinstance(other, CameraViewPort):
+            raise TypeError(&#34;Can only compare CameraViewPort with CameraViewPort&#34;)
+        return np.array_equal(self.origin, other.origin) and np.array_equal(
+            self.size, other.size
+        )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="basictdf.tdfTypes.CameraViewPort.nBytes"><code class="name">var <span class="ident">nBytes</span></code></dt>
+<dd>
+<div class="desc"><p>Size in bytes of the CameraViewPort object</p></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="basictdf.tdfTypes.CameraViewPort.bread"><code class="name flex">
+<span>def <span class="ident">bread</span></span>(<span>stream) ‑> <a title="basictdf.tdfTypes.CameraViewPort" href="#basictdf.tdfTypes.CameraViewPort">CameraViewPort</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a CameraViewPort from a binary file or buffer</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.CameraViewPort.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>data: bytes) ‑> <a title="basictdf.tdfTypes.CameraViewPort" href="#basictdf.tdfTypes.CameraViewPort">CameraViewPort</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a CameraViewPort from bytes</p></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.tdfTypes.CameraViewPort.origin"><code class="name">var <span class="ident">origin</span></code></dt>
+<dd>
+<div class="desc"><p>Origin of the viewport, a 2D vector of integers</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.CameraViewPort.size"><code class="name">var <span class="ident">size</span></code></dt>
+<dd>
+<div class="desc"><p>Size of the viewport, a 2D vector of integers</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.tdfTypes.CameraViewPort.bwrite"><code class="name flex">
+<span>def <span class="ident">bwrite</span></span>(<span>self, stream: <class 'BinaryIO'>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write a CameraViewPort to a binary file or buffer</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.CameraViewPort.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self) ‑> bytes</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write a CameraViewPort to bytes</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType"><code class="flex name class">
+<span>class <span class="ident">TdfType</span></span>
+<span>(</span><span>btype: Union[numpy.dtype[Any], ForwardRef(None), type[Any], numpy._typing._dtype_like._SupportsDType[numpy.dtype[Any]], str, tuple[Any, int], tuple[Any, Union[SupportsIndex, collections.abc.Sequence[SupportsIndex]]], list[Any], numpy._typing._dtype_like._DTypeDict, tuple[Any, Any]])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class to use numpy types to read and write binary data</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TdfType(Generic[X]):
+    &#34;&#34;&#34;
+    A class to use numpy types to read and write binary data
+    &#34;&#34;&#34;
+
+    def __init__(self, btype: npt.DTypeLike) -&gt; None:
+        self.btype: X = np.dtype(btype)
+        &#34;The numpy type to use for reading and writing data&#34;
+
+    def read(self, data: bytes) -&gt; npt.NDArray[X]:
+        &#34;&#34;&#34;Read data to the type
+
+        Args:
+            data (bytes): input bytes
+
+        Returns:
+            np.ndarray: output array with items of the requiered type
+        &#34;&#34;&#34;
+        return np.frombuffer(data, dtype=self.btype)
+
+    def bread(
+        self, file: IO[bytes], n: Optional[int] = None
+    ) -&gt; Union[npt.NDArray[X], X]:
+        &#34;&#34;&#34;Read data from binary file or buffer
+
+        Args:
+            file (IO[Any]): input file or buffer
+            n (int, optional): Ammount of items to take. If _None_, returns a
+            single item, otherwise returns an array of _n_ items. Defaults to None.
+
+        Returns:
+            Union[np.ndarray,type]: A numpy type (custom or classic,
+            like numpy.float32) or a np.array of numpy types
+        &#34;&#34;&#34;
+        if n is None:
+            return self.read(file.read(self.btype.itemsize))[0]
+        else:
+            return self.read(file.read(n * self.btype.itemsize))
+
+    def write(self, data: Union[npt.NDArray[X], X]):
+        &#34;Write data to bytes&#34;
+        return (
+            data.astype(self.btype.base).tobytes()
+            if isinstance(data, np.ndarray)
+            else np.array(data, dtype=self.btype.base).tobytes()
+        )
+
+    def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]) -&gt; None:
+        &#34;Write data to a binary file or buffer&#34;
+        file.write(self.write(data))
+
+    def skip(self, file: IO[bytes], n: int = 1) -&gt; None:
+        &#34;Skip n items in the file or buffer&#34;
+        file.seek(n * self.btype.itemsize, 1)
+
+    def pad(self, n: int = 1):
+        &#34;Return n items of padding (zeros) as bytes&#34;
+        return b&#34;\x00&#34; * (n * self.btype.itemsize)
+
+    def bpad(self, file: IO[bytes], n: int = 1) -&gt; None:
+        &#34;Write n items of padding (zeros) to a binary file or buffer&#34;
+        file.write(self.pad(n))
+
+    def nBytes(self, n: int = 1) -&gt; int:
+        &#34;Return the size in bytes of n items of the type&#34;
+        return n * self.btype.itemsize</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Generic</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="basictdf.tdfTypes.TdfType.btype"><code class="name">var <span class="ident">btype</span></code></dt>
+<dd>
+<div class="desc"><p>The numpy type to use for reading and writing data</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="basictdf.tdfTypes.TdfType.bpad"><code class="name flex">
+<span>def <span class="ident">bpad</span></span>(<span>self, file: IO[bytes], n: int = 1) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write n items of padding (zeros) to a binary file or buffer</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.bread"><code class="name flex">
+<span>def <span class="ident">bread</span></span>(<span>self, file: IO[bytes], n: Optional[int] = None) ‑> Union[numpy.ndarray[Any, numpy.dtype[~X]], ~X]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read data from binary file or buffer</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>IO[Any]</code></dt>
+<dd>input file or buffer</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Ammount of items to take. If <em>None</em>, returns a</dd>
+</dl>
+<p>single item, otherwise returns an array of <em>n</em> items. Defaults to None.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Union[np.ndarray,type]</code></dt>
+<dd>A numpy type (custom or classic,</dd>
+</dl>
+<p>like numpy.float32) or a np.array of numpy types</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.bwrite"><code class="name flex">
+<span>def <span class="ident">bwrite</span></span>(<span>self, file: IO[bytes], data: Union[numpy.ndarray[Any, numpy.dtype[~X]], ~X]) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write data to a binary file or buffer</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.nBytes"><code class="name flex">
+<span>def <span class="ident">nBytes</span></span>(<span>self, n: int = 1) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the size in bytes of n items of the type</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.pad"><code class="name flex">
+<span>def <span class="ident">pad</span></span>(<span>self, n: int = 1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return n items of padding (zeros) as bytes</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>self, data: bytes) ‑> numpy.ndarray[typing.Any, numpy.dtype[~X]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read data to the type</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>input bytes</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>output array with items of the requiered type</dd>
+</dl></div>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.skip"><code class="name flex">
+<span>def <span class="ident">skip</span></span>(<span>self, file: IO[bytes], n: int = 1) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Skip n items in the file or buffer</p></div>
+</dd>
+<dt id="basictdf.tdfTypes.TdfType.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self, data: Union[numpy.ndarray[Any, numpy.dtype[~X]], ~X])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write data to bytes</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="basictdf" href="index.html">basictdf</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="two-column">
+<li><code><a title="basictdf.tdfTypes.MAT3X3D" href="#basictdf.tdfTypes.MAT3X3D">MAT3X3D</a></code></li>
+<li><code><a title="basictdf.tdfTypes.MAT3X3F" href="#basictdf.tdfTypes.MAT3X3F">MAT3X3F</a></code></li>
+<li><code><a title="basictdf.tdfTypes.SegmentData" href="#basictdf.tdfTypes.SegmentData">SegmentData</a></code></li>
+<li><code><a title="basictdf.tdfTypes.VEC2D" href="#basictdf.tdfTypes.VEC2D">VEC2D</a></code></li>
+<li><code><a title="basictdf.tdfTypes.VEC2F" href="#basictdf.tdfTypes.VEC2F">VEC2F</a></code></li>
+<li><code><a title="basictdf.tdfTypes.VEC2I" href="#basictdf.tdfTypes.VEC2I">VEC2I</a></code></li>
+<li><code><a title="basictdf.tdfTypes.VEC3D" href="#basictdf.tdfTypes.VEC3D">VEC3D</a></code></li>
+<li><code><a title="basictdf.tdfTypes.VEC3F" href="#basictdf.tdfTypes.VEC3F">VEC3F</a></code></li>
+<li><code><a title="basictdf.tdfTypes.f32" href="#basictdf.tdfTypes.f32">f32</a></code></li>
+<li><code><a title="basictdf.tdfTypes.f64" href="#basictdf.tdfTypes.f64">f64</a></code></li>
+<li><code><a title="basictdf.tdfTypes.i16" href="#basictdf.tdfTypes.i16">i16</a></code></li>
+<li><code><a title="basictdf.tdfTypes.i32" href="#basictdf.tdfTypes.i32">i32</a></code></li>
+<li><code><a title="basictdf.tdfTypes.u16" href="#basictdf.tdfTypes.u16">u16</a></code></li>
+<li><code><a title="basictdf.tdfTypes.u32" href="#basictdf.tdfTypes.u32">u32</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="basictdf.tdfTypes.BTSDate" href="#basictdf.tdfTypes.BTSDate">BTSDate</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.tdfTypes.BTSDate.bread" href="#basictdf.tdfTypes.BTSDate.bread">bread</a></code></li>
+<li><code><a title="basictdf.tdfTypes.BTSDate.bwrite" href="#basictdf.tdfTypes.BTSDate.bwrite">bwrite</a></code></li>
+<li><code><a title="basictdf.tdfTypes.BTSDate.read" href="#basictdf.tdfTypes.BTSDate.read">read</a></code></li>
+<li><code><a title="basictdf.tdfTypes.BTSDate.write" href="#basictdf.tdfTypes.BTSDate.write">write</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.tdfTypes.BTSString" href="#basictdf.tdfTypes.BTSString">BTSString</a></code></h4>
+<ul class="">
+<li><code><a title="basictdf.tdfTypes.BTSString.bread" href="#basictdf.tdfTypes.BTSString.bread">bread</a></code></li>
+<li><code><a title="basictdf.tdfTypes.BTSString.bwrite" href="#basictdf.tdfTypes.BTSString.bwrite">bwrite</a></code></li>
+<li><code><a title="basictdf.tdfTypes.BTSString.read" href="#basictdf.tdfTypes.BTSString.read">read</a></code></li>
+<li><code><a title="basictdf.tdfTypes.BTSString.write" href="#basictdf.tdfTypes.BTSString.write">write</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.tdfTypes.CameraViewPort" href="#basictdf.tdfTypes.CameraViewPort">CameraViewPort</a></code></h4>
+<ul class="two-column">
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.bread" href="#basictdf.tdfTypes.CameraViewPort.bread">bread</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.bwrite" href="#basictdf.tdfTypes.CameraViewPort.bwrite">bwrite</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.nBytes" href="#basictdf.tdfTypes.CameraViewPort.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.origin" href="#basictdf.tdfTypes.CameraViewPort.origin">origin</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.read" href="#basictdf.tdfTypes.CameraViewPort.read">read</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.size" href="#basictdf.tdfTypes.CameraViewPort.size">size</a></code></li>
+<li><code><a title="basictdf.tdfTypes.CameraViewPort.write" href="#basictdf.tdfTypes.CameraViewPort.write">write</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="basictdf.tdfTypes.TdfType" href="#basictdf.tdfTypes.TdfType">TdfType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="basictdf.tdfTypes.TdfType.bpad" href="#basictdf.tdfTypes.TdfType.bpad">bpad</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.bread" href="#basictdf.tdfTypes.TdfType.bread">bread</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.btype" href="#basictdf.tdfTypes.TdfType.btype">btype</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.bwrite" href="#basictdf.tdfTypes.TdfType.bwrite">bwrite</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.nBytes" href="#basictdf.tdfTypes.TdfType.nBytes">nBytes</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.pad" href="#basictdf.tdfTypes.TdfType.pad">pad</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.read" href="#basictdf.tdfTypes.TdfType.read">read</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.skip" href="#basictdf.tdfTypes.TdfType.skip">skip</a></code></li>
+<li><code><a title="basictdf.tdfTypes.TdfType.write" href="#basictdf.tdfTypes.TdfType.write">write</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

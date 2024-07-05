@@ -2,18 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
 <title>basictdf.tdfEvents API documentation</title>
-<meta name="description" content="Events data module." />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<meta name="description" content="Events data module.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
 </head>
 <body>
 <main>
@@ -23,176 +26,6 @@
 </header>
 <section id="section-intro">
 <p>Events data module.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">__doc__ = &#34;Events data module.&#34;
-
-from enum import Enum
-from typing import Iterator, Union
-
-import numpy as np
-
-from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
-from basictdf.tdfTypes import BTSString, f32, i32, u32
-from basictdf.tdfUtils import is_iterable
-
-
-class TemporalEventsDataFormat(Enum):
-    unknown = 0
-    standard = 1
-
-
-class EventsDataType(Enum):
-    singleEvent = 0
-    eventSequence = 1
-
-
-class Event(Sized, BuildWriteable):
-    &#34;&#34;&#34;
-    A class representing a single event or a sequence of events.
-    &#34;&#34;&#34;
-
-    def __init__(self, label, values=[], type=EventsDataType.singleEvent) -&gt; None:
-        self.label = label
-        self.type = type
-        if not is_iterable(values):
-            raise TypeError(&#34;Values must be iterable&#34;)
-        if isinstance(values, np.ndarray) and values.dtype == np.dtype(&#34;&lt;f4&#34;):
-            self.values = values
-        else:
-            self.values = np.array(values, dtype=&#34;&lt;f4&#34;)
-
-        if len(values) &gt; 1 and type == EventsDataType.singleEvent:
-            raise TypeError(&#34;Can&#39;t have more than one value for a single event&#34;)
-
-    def _write(self, stream) -&gt; None:
-        BTSString.bwrite(stream, 256, self.label)
-        u32.bwrite(stream, self.type.value)  # type
-        u32.bwrite(stream, len(self.values))  # nItems
-        f32.bwrite(stream, self.values)
-
-    @staticmethod
-    def _build(stream) -&gt; &#34;Event&#34;:
-        label = BTSString.bread(stream, 256)
-        type_ = EventsDataType(u32.bread(stream))
-        nItems = i32.bread(stream)
-        values = np.array([f32.bread(stream) for _ in range(nItems)])
-        return Event(label, values, type_)
-
-    def __len__(self) -&gt; int:
-        return len(self.values)
-
-    def __eq__(self, o: object) -&gt; bool:
-        if not isinstance(o, Event):
-            return False
-        return (
-            self.label == o.label
-            and self.type == o.type
-            and np.array_equal(self.values, o.values)
-        )
-
-    @property
-    def nBytes(self) -&gt; int:
-        return 256 + 4 + 4 + len(self.values) * 4
-
-    def __repr__(self) -&gt; str:
-        return (
-            &#34;&lt;Event &#34;
-            f&#34;label={self.label} &#34;
-            f&#34;type={self.type} &#34;
-            f&#34;nItems={len(self.values)} &#34;
-            f&#34;values={self.values}&gt;&#34;
-        )
-
-
-class TemporalEventsData(Block):
-    &#34;&#34;&#34;
-    The Events data block. Stores the temporal events data.
-    &#34;&#34;&#34;
-
-    type = BlockType.temporalEventsData
-
-    def __init__(self, format=TemporalEventsDataFormat.standard, start_time=0.0):
-        super().__init__()
-        self.format = format
-        self.start_time = start_time
-        self.events = []
-
-    @staticmethod
-    def _build(stream, format) -&gt; &#34;TemporalEventsData&#34;:
-        format = TemporalEventsDataFormat(format)
-        nEvents = i32.bread(stream)
-        start_time = f32.bread(stream)
-
-        t = TemporalEventsData(format, start_time)
-        t.events = [Event._build(stream) for _ in range(nEvents)]
-
-        return t
-
-    def _write(self, stream) -&gt; None:
-        i32.bwrite(stream, len(self.events))
-        f32.bwrite(stream, self.start_time)
-        for event in self.events:
-            event._write(stream)
-
-    @property
-    def nBytes(self) -&gt; int:
-        return 4 + 4 + sum(i.nBytes for i in self.events)
-
-    def __len__(self) -&gt; int:
-        return len(self.events)
-
-    def __getitem__(self, item: Union[int, str]) -&gt; Event:
-        &#34;&#34;&#34;
-        Returns the event with the given index or label.
-
-        Args:
-            item (Union[int, str]): index or label of the event
-
-        Raises:
-            KeyError: if the event with the given label is not found
-            TypeError: if the key type is not int or str
-        &#34;&#34;&#34;
-        if isinstance(item, int):
-            return self.events[item]
-        elif isinstance(item, str):
-            try:
-                return next(e for e in self.events if e.label == item)
-            except StopIteration:
-                raise KeyError(f&#34;Event with label {item} not found&#34;)
-        raise TypeError(f&#34;Invalid key type: {type(item)}&#34;)
-
-    def __iter__(self) -&gt; Iterator[Event]:
-        return iter(self.events)
-
-    def __contains__(self, value: Union[Event, str]) -&gt; bool:
-        if isinstance(value, Event):
-            return value in self.events
-        elif isinstance(value, str):
-            return any(value == event.label for event in self.events)
-        raise TypeError(f&#34;Invalid key type: {type(value)}&#34;)
-
-    def __eq__(self, other) -&gt; bool:
-        if not isinstance(other, TemporalEventsData):
-            return False
-        return (
-            self.format == other.format
-            and self.start_time == other.start_time
-            and all(e1 == e2 for e1, e2 in zip(self.events, other.events))
-        )
-
-    def __repr__(self) -&gt; str:
-        return (
-            &#34;&lt;TemporalEventsData &#34;
-            f&#34;format={self.format.name} &#34;
-            f&#34;nEvents={len(self.events)} &#34;
-            f&#34;start_time={self.start_time} &#34;
-            f&#34;events={self.events} &#34;
-            f&#34;size={self.nBytes}&gt;&#34;
-        )</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -278,9 +111,9 @@ class TemporalEventsData(Block):
 </ul>
 <h3>Instance variables</h3>
 <dl>
-<dt id="basictdf.tdfEvents.Event.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dt id="basictdf.tdfEvents.Event.nBytes"><code class="name">prop <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Size in bytes</p></div>
+<div class="desc"><p>The size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -294,10 +127,59 @@ def nBytes(self) -&gt; int:
 </dd>
 <dt id="basictdf.tdfEvents.EventsDataType"><code class="flex name class">
 <span>class <span class="ident">EventsDataType</span></span>
-<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+<span>(</span><span>*args, **kwds)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>An enumeration.</p></div>
+<div class="desc"><p>Create a collection of name/value pairs.</p>
+<p>Example enumeration:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+</code></pre>
+<p>Access them by:</p>
+<ul>
+<li>attribute access:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color.RED
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>value lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color(1)
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>name lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color['RED']
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Enumerations can be iterated over, and know how many members they have:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; len(Color)
+3
+</code></pre>
+<pre><code class="language-python-repl">&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+</code></pre>
+<p>Methods can be added to enumerations, and members can have their own
+attributes &ndash; see the documentation for details.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -370,16 +252,6 @@ def nBytes(self) -&gt; int:
         return len(self.events)
 
     def __getitem__(self, item: Union[int, str]) -&gt; Event:
-        &#34;&#34;&#34;
-        Returns the event with the given index or label.
-
-        Args:
-            item (Union[int, str]): index or label of the event
-
-        Raises:
-            KeyError: if the event with the given label is not found
-            TypeError: if the key type is not int or str
-        &#34;&#34;&#34;
         if isinstance(item, int):
             return self.events[item]
         elif isinstance(item, str):
@@ -434,9 +306,9 @@ def nBytes(self) -&gt; int:
 </dl>
 <h3>Instance variables</h3>
 <dl>
-<dt id="basictdf.tdfEvents.TemporalEventsData.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dt id="basictdf.tdfEvents.TemporalEventsData.nBytes"><code class="name">prop <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Size in bytes</p></div>
+<div class="desc"><p>The size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -450,10 +322,59 @@ def nBytes(self) -&gt; int:
 </dd>
 <dt id="basictdf.tdfEvents.TemporalEventsDataFormat"><code class="flex name class">
 <span>class <span class="ident">TemporalEventsDataFormat</span></span>
-<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+<span>(</span><span>*args, **kwds)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>An enumeration.</p></div>
+<div class="desc"><p>Create a collection of name/value pairs.</p>
+<p>Example enumeration:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+</code></pre>
+<p>Access them by:</p>
+<ul>
+<li>attribute access:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color.RED
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>value lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color(1)
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>name lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color['RED']
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Enumerations can be iterated over, and know how many members they have:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; len(Color)
+3
+</code></pre>
+<pre><code class="language-python-repl">&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+</code></pre>
+<p>Methods can be added to enumerations, and members can have their own
+attributes &ndash; see the documentation for details.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -482,7 +403,6 @@ def nBytes(self) -&gt; int:
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -527,7 +447,7 @@ def nBytes(self) -&gt; int:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
 </footer>
 </body>
 </html>

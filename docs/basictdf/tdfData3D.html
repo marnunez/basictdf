@@ -2,18 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
 <title>basictdf.tdfData3D API documentation</title>
-<meta name="description" content="Marker data module." />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<meta name="description" content="Marker data module.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
 </head>
 <body>
 <main>
@@ -23,451 +26,6 @@
 </header>
 <section id="section-intro">
 <p>Marker data module.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">__doc__ = &#34;&#34;&#34;
-Marker data module.
-&#34;&#34;&#34;
-from enum import Enum
-from io import BytesIO
-from typing import BinaryIO, Iterable, Iterator, List, Union
-
-import numpy as np
-
-from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
-from basictdf.tdfTypes import (
-    MAT3X3F,
-    VEC3F,
-    BTSString,
-    TdfType,
-    Volume,
-    f32,
-    i32,
-    u32,
-    SegmentData,
-)
-
-from basictdf.tdfUtils import is_nparray_of_shape, is_integer
-
-
-class Data3dBlockFormat(Enum):
-    &#34;&#34;&#34;
-    Available formats for a Data3D block.
-    &#34;&#34;&#34;
-
-    unknownFormat = 0
-    byTrack = 1
-    byTrackWithoutLinks = 2
-    byFrame = 3
-    byFrameWithoutLinks = 4
-
-
-class Flags(Enum):
-    &#34;&#34;&#34;
-    Available data flags for a Data3D block.
-    &#34;&#34;&#34;
-
-    rawData = 0
-    filtered = 1
-
-
-LinkType = TdfType(np.dtype([(&#34;Track1&#34;, &#34;&lt;u4&#34;), (&#34;Track2&#34;, &#34;&lt;u4&#34;)]))
-
-TrackType = TdfType(np.dtype(&#34;&lt;3f4&#34;))
-
-
-class MarkerTrack(Sized, BuildWriteable):
-    &#34;&#34;&#34;
-    A track that collects all the data of a physical marker, such as name and position.
-    &#34;&#34;&#34;
-
-    def __init__(self, label: str, track_data: np.ndarray) -&gt; None:
-        self.label = label
-        &#34;The name of the marker&#34;
-        self.data = track_data
-        &#34;The actual marker data&#34;
-
-    @property
-    def X(self) -&gt; np.ndarray:
-        &#34;&#34;&#34;
-        Convenience property that returns or sets the
-        X component of the marker position.
-        &#34;&#34;&#34;
-        return self.data[:, 0]
-
-    @property
-    def Y(self) -&gt; np.ndarray:
-        &#34;&#34;&#34;
-        Convenience property that returns or sets the
-        Y component of the marker position.
-        &#34;&#34;&#34;
-        return self.data[:, 1]
-
-    @property
-    def Z(self) -&gt; np.ndarray:
-        &#34;&#34;&#34;
-        Convenience property that returns or sets the
-        Z component of the marker position.
-        &#34;&#34;&#34;
-        return self.data[:, 2]
-
-    @X.setter
-    def X(self, value) -&gt; None:
-        self.data[:, 0] = value
-
-    @Y.setter
-    def Y(self, value) -&gt; None:
-        self.data[:, 1] = value
-
-    @Z.setter
-    def Z(self, value) -&gt; None:
-        self.data[:, 2] = value
-
-    @property
-    def nFrames(self) -&gt; int:
-        &#34;&#34;&#34;
-        Returns:
-            int: number of frames in the track
-        &#34;&#34;&#34;
-        return self.data.shape[0]
-
-    @property
-    def _segments(self):
-        maskedTrackData = np.ma.masked_invalid(self.data)
-        return np.ma.clump_unmasked(maskedTrackData.T[0])
-
-    @staticmethod
-    def _build(stream, nFrames: int) -&gt; &#34;MarkerTrack&#34;:
-        trackData = np.empty(nFrames, dtype=TrackType.btype)
-        trackData[:] = np.NaN
-
-        label = BTSString.bread(stream, 256)
-        nSegments = i32.bread(stream)
-        i32.skip(stream)
-        segmentData = SegmentData.bread(stream, nSegments)
-        for startFrame, nFrames in segmentData:
-            dat = TrackType.bread(stream, nFrames)
-            trackData[startFrame : startFrame + nFrames] = dat
-        return MarkerTrack(label, trackData)
-
-    def _write(self, file) -&gt; None:
-        # label
-        BTSString.bwrite(file, 256, self.label)
-
-        segments = self._segments
-
-        # nSegments
-        i32.bwrite(file, len(segments))
-
-        # padding
-        i32.bpad(file, 1)
-
-        for segment in segments:
-            # startFrame
-            i32.bwrite(file, np.array(segment.start))
-            # nFrames
-            i32.bwrite(file, np.array(segment.stop - segment.start))
-
-        for segment in segments:
-            # trackData
-            TrackType.bwrite(file, self.data[segment])
-
-    @property
-    def nBytes(self) -&gt; int:
-        &#34;&#34;&#34;
-        Returns:
-            int: size of the track in bytes
-        &#34;&#34;&#34;
-        base = 256 + 4 + 4
-        for segment in self._segments:
-            base += 4 + 4 + (segment.stop - segment.start) * TrackType.btype.itemsize
-        return base
-
-    def __repr__(self) -&gt; str:
-        return f&#34;Track(label={self.label}, nFrames={self.nFrames})&#34;
-
-    def __eq__(self, other):
-        return self.label == other.label and np.all(self.data == other.data)
-
-
-class Data3D(Block):
-    type = BlockType.data3D
-
-    def __init__(
-        self,
-        frequency: float,
-        nFrames: int,
-        volume: np.ndarray,
-        rotationMatrix: np.ndarray,
-        translationVector: np.ndarray,
-        startTime: float = 0.0,
-        flag: Flags = Flags.rawData,
-        format: Data3dBlockFormat = Data3dBlockFormat.byTrack,
-    ) -&gt; None:
-        &#34;&#34;&#34;A data block that contains marker tracks.
-
-        Args:
-            frequency (float): data frequency in Hz
-            nFrames (int): number of frames in the data block
-            volume (Union[Volume,np.ndarray]): acquisition volume
-            rotationMatrix (np.ndarray): rotation matrix
-            translationVector (np.ndarray): translation vector
-            startTime (float, optional): Acquisition start time. Defaults to 0.0.
-            flag (Flags, optional): Data 3D block flags. Defaults to Flags.rawData.
-            format (Data3dBlockFormat, optional): Data3D format.
-             Defaults to Data3dBlockFormat.byTrack.
-
-        Raises:
-            ValueError: the volume is not an array of 3 floats
-            ValueError: the rotation matrix is not an array of 3x3 floats
-            ValueError: the translation vector is not an array of 3 floats
-        &#34;&#34;&#34;
-        super().__init__()
-        self.format = format
-        self.frequency = frequency
-        self.startTime = startTime
-
-        if not is_nparray_of_shape(rotationMatrix, MAT3X3F.btype.shape):
-            raise ValueError(
-                f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
-            )
-        self.rotationMatrix = rotationMatrix
-
-        if not is_nparray_of_shape(translationVector, VEC3F.btype.shape):
-            raise ValueError(
-                f&#34;translationVector must be a numpy array of shape {VEC3F.btype}&#34;
-            )
-        self.translationVector = translationVector
-
-        if not is_nparray_of_shape(volume, Volume.btype.shape):
-            raise ValueError(
-                f&#34;volume must be a numpy array of shape {Volume.btype.shape}&#34;
-            )
-
-        self.volume = volume
-
-        if not isinstance(flag, Flags):
-            raise TypeError(&#34;flag must be of type Flags&#34;)
-
-        self.flag = flag
-
-        if not is_integer(nFrames):
-            raise TypeError(&#34;nFrames must be an integer&#34;)
-
-        self.nFrames = nFrames
-
-        self._tracks = []
-
-    def add_track(self, track: MarkerTrack) -&gt; None:
-        &#34;&#34;&#34;Adds a track to the data block
-
-        Args:
-            track (MarkerTrack): track to add
-
-        Raises:
-            TypeError: Track is not of type MarkerTrack
-            ValueError: Track has a different number of frames than the data block
-        &#34;&#34;&#34;
-        if not isinstance(track, MarkerTrack):
-            raise TypeError(&#34;Track must be of type Track&#34;)
-        if track.nFrames != self.nFrames:
-            raise ValueError(
-                (
-                    f&#34;Track with label {track.label} has&#34;
-                    f&#34; {track.nFrames} frames, expected {self.nFrames} frames&#34;
-                )
-            )
-        self._tracks.append(track)
-
-    @property
-    def tracks(self) -&gt; List[MarkerTrack]:
-        &#34;&#34;&#34;Returns a list of all tracks in the data block
-
-        Returns:
-            List[MarkerTrack]: list of all tracks in the data block
-        &#34;&#34;&#34;
-        return self._tracks
-
-    @tracks.setter
-    def tracks(self, values: Iterable[MarkerTrack]) -&gt; None:
-        &#34;&#34;&#34;
-        Sets the tracks in the data block.
-        &#34;&#34;&#34;
-        oldTracks = self._tracks
-        self._tracks = []
-        try:
-            for value in values:
-                self.add_track(value)
-        except Exception as e:
-            self._tracks = oldTracks
-            raise e
-
-    @staticmethod
-    def _build(stream, format) -&gt; &#34;Data3D&#34;:
-        format = Data3dBlockFormat(format)
-        nFrames = i32.bread(stream)
-        frequency = i32.bread(stream)
-        startTime = f32.bread(stream)
-        nTracks = u32.bread(stream)
-        volume = Volume.bread(stream)
-        rotationMatrix = MAT3X3F.bread(stream)
-        translationVector = VEC3F.bread(stream)
-        flag = Flags(u32.bread(stream))
-
-        d = Data3D(
-            frequency,
-            nFrames,
-            volume,
-            rotationMatrix,
-            translationVector,
-            startTime,
-            flag,
-            format,
-        )
-
-        if format in [Data3dBlockFormat.byTrack, Data3dBlockFormat.byFrame]:
-            nLinks = i32.bread(stream)
-            i32.skip(stream, 1)
-            d.links = LinkType.bread(stream, nLinks)
-
-        if format in [
-            Data3dBlockFormat.byTrack,
-            Data3dBlockFormat.byTrackWithoutLinks,
-        ]:
-            d._tracks = [MarkerTrack._build(stream, nFrames) for _ in range(nTracks)]
-        else:
-            raise NotImplementedError(f&#34;Data3D format {format} not implemented yet&#34;)
-        return d
-
-    def __getitem__(self, key: Union[int, str]) -&gt; MarkerTrack:
-        if isinstance(key, int):
-            return self._tracks[key]
-        elif isinstance(key, str):
-            try:
-                return next(track for track in self._tracks if track.label == key)
-            except StopIteration:
-                raise KeyError(f&#34;Track with label {key} not found&#34;)
-        raise TypeError(f&#34;Invalid key type {type(key)}&#34;)
-
-    def __iter__(self) -&gt; Iterator[MarkerTrack]:
-        return iter(self._tracks)
-
-    def __len__(self) -&gt; int:
-        return len(self._tracks)
-
-    def __eq__(self, other) -&gt; bool:
-        buff1 = BytesIO()
-        buff2 = BytesIO()
-        self._write(buff1)
-        other._write(buff2)
-        return buff1.getvalue() == buff2.getvalue()
-
-    def __contains__(self, value: Union[MarkerTrack, str]) -&gt; bool:
-        if isinstance(value, MarkerTrack):
-            return value in self._tracks
-        elif isinstance(value, str):
-            return any(track.label == value for track in self._tracks)
-        raise TypeError(f&#34;Invalid value type {type(value)}&#34;)
-
-    @property
-    def nTracks(self) -&gt; int:
-        &#34;&#34;&#34;Number of tracks in the data block
-
-        Returns:
-            int: number of tracks
-        &#34;&#34;&#34;
-        return len(self._tracks)
-
-    def _write(self, file: BinaryIO) -&gt; None:
-        if self.format not in [
-            Data3dBlockFormat.byTrack,
-            Data3dBlockFormat.byTrackWithoutLinks,
-        ]:
-            raise NotImplementedError(
-                f&#34;Data3D format {self.format} not implemented yet&#34;
-            )
-
-        # nFrames
-        i32.bwrite(file, self.nFrames)
-        # frequency
-        i32.bwrite(file, self.frequency)
-        # startTime
-        f32.bwrite(file, self.startTime)
-        # nTracks
-        u32.bwrite(file, len(self._tracks))
-
-        # volume
-        Volume.bwrite(file, self.volume)
-        # rotationMatrix
-        MAT3X3F.bwrite(file, self.rotationMatrix)
-        # translationVector
-        VEC3F.bwrite(file, self.translationVector)
-        # flags
-        u32.bwrite(file, self.flag.value)
-
-        if self.format in [
-            Data3dBlockFormat.byFrame,
-            Data3dBlockFormat.byTrack,
-        ]:
-            links = self.links if hasattr(self, &#34;links&#34;) else []
-            nLinks = len(links)
-
-            # nLinks
-            i32.bwrite(file, nLinks)
-            # padding
-            i32.bpad(file)
-            # links
-            LinkType.bwrite(file, links)
-
-        for track in self._tracks:
-            track._write(file)
-
-    @property
-    def nBytes(self) -&gt; int:
-        base = (
-            4  # nFrames
-            + 4  # frequency
-            + 4  # startTime
-            + 4  # nTracks
-            + Volume.btype.itemsize  # volume
-            + MAT3X3F.btype.itemsize  # rotationMatrix
-            + VEC3F.btype.itemsize  # translationVector
-            + 4  # flags
-        )
-
-        if self.format in [
-            Data3dBlockFormat.byFrame,
-            Data3dBlockFormat.byTrack,
-        ]:
-            links_size = (
-                4
-                + 4
-                + (
-                    LinkType.btype.itemsize * len(self.links)
-                    if hasattr(self, &#34;links&#34;)
-                    else 0
-                )
-            )
-            base += links_size
-
-        for track in self._tracks:
-            base += track.nBytes
-
-        return base
-
-    def __repr__(self) -&gt; str:
-        return (
-            f&#34;&lt;Data3D &#34;
-            f&#34;format={self.format.name}, &#34;
-            f&#34;nFrames={self.nFrames}, &#34;
-            f&#34;frequency={self.frequency}, &#34;
-            f&#34;startTime={self.startTime}, &#34;
-            f&#34;nTracks={self.nTracks}, &#34;
-            f&#34;tracks={[i.label for i in self._tracks]}&gt;&#34;
-        )</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -555,33 +113,32 @@ class Data3D(Block):
         self.frequency = frequency
         self.startTime = startTime
 
-        if not is_nparray_of_shape(rotationMatrix, MAT3X3F.btype.shape):
+        if not (
+            isinstance(rotationMatrix, np.ndarray)
+            and rotationMatrix.shape == MAT3X3F.btype.shape
+        ):
             raise ValueError(
                 f&#34;rotationMatrix must be a numpy array of shape {MAT3X3F.btype.shape}&#34;
             )
         self.rotationMatrix = rotationMatrix
 
-        if not is_nparray_of_shape(translationVector, VEC3F.btype.shape):
+        if not (
+            isinstance(translationVector, np.ndarray)
+            and translationVector.shape == VEC3F.btype.shape
+        ):
             raise ValueError(
                 f&#34;translationVector must be a numpy array of shape {VEC3F.btype}&#34;
             )
         self.translationVector = translationVector
 
-        if not is_nparray_of_shape(volume, Volume.btype.shape):
+        if not (isinstance(volume, np.ndarray) and volume.shape == Volume.btype.shape):
             raise ValueError(
                 f&#34;volume must be a numpy array of shape {Volume.btype.shape}&#34;
             )
 
         self.volume = volume
 
-        if not isinstance(flag, Flags):
-            raise TypeError(&#34;flag must be of type Flags&#34;)
-
         self.flag = flag
-
-        if not is_integer(nFrames):
-            raise TypeError(&#34;nFrames must be an integer&#34;)
-
         self.nFrames = nFrames
 
         self._tracks = []
@@ -810,9 +367,9 @@ class Data3D(Block):
 </dl>
 <h3>Instance variables</h3>
 <dl>
-<dt id="basictdf.tdfData3D.Data3D.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dt id="basictdf.tdfData3D.Data3D.nBytes"><code class="name">prop <span class="ident">nBytes</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Size in bytes</p></div>
+<div class="desc"><p>The size in bytes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -851,7 +408,7 @@ def nBytes(self) -&gt; int:
     return base</code></pre>
 </details>
 </dd>
-<dt id="basictdf.tdfData3D.Data3D.nTracks"><code class="name">var <span class="ident">nTracks</span> : int</code></dt>
+<dt id="basictdf.tdfData3D.Data3D.nTracks"><code class="name">prop <span class="ident">nTracks</span> : int</code></dt>
 <dd>
 <div class="desc"><p>Number of tracks in the data block</p>
 <h2 id="returns">Returns</h2>
@@ -873,7 +430,7 @@ def nTracks(self) -&gt; int:
     return len(self._tracks)</code></pre>
 </details>
 </dd>
-<dt id="basictdf.tdfData3D.Data3D.tracks"><code class="name">var <span class="ident">tracks</span> : List[<a title="basictdf.tdfData3D.MarkerTrack" href="#basictdf.tdfData3D.MarkerTrack">MarkerTrack</a>]</code></dt>
+<dt id="basictdf.tdfData3D.Data3D.tracks"><code class="name">prop <span class="ident">tracks</span> : List[<a title="basictdf.tdfData3D.MarkerTrack" href="#basictdf.tdfData3D.MarkerTrack">MarkerTrack</a>]</code></dt>
 <dd>
 <div class="desc"><p>Returns a list of all tracks in the data block</p>
 <h2 id="returns">Returns</h2>
@@ -915,37 +472,12 @@ def tracks(self) -&gt; List[MarkerTrack]:
 <dt><code>ValueError</code></dt>
 <dd>Track has a different number of frames than the data block</dd>
 </dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_track(self, track: MarkerTrack) -&gt; None:
-    &#34;&#34;&#34;Adds a track to the data block
-
-    Args:
-        track (MarkerTrack): track to add
-
-    Raises:
-        TypeError: Track is not of type MarkerTrack
-        ValueError: Track has a different number of frames than the data block
-    &#34;&#34;&#34;
-    if not isinstance(track, MarkerTrack):
-        raise TypeError(&#34;Track must be of type Track&#34;)
-    if track.nFrames != self.nFrames:
-        raise ValueError(
-            (
-                f&#34;Track with label {track.label} has&#34;
-                f&#34; {track.nFrames} frames, expected {self.nFrames} frames&#34;
-            )
-        )
-    self._tracks.append(track)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
 <dt id="basictdf.tdfData3D.Data3dBlockFormat"><code class="flex name class">
 <span>class <span class="ident">Data3dBlockFormat</span></span>
-<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+<span>(</span><span>*args, **kwds)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Available formats for a Data3D block.</p></div>
@@ -994,7 +526,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
 </dd>
 <dt id="basictdf.tdfData3D.Flags"><code class="flex name class">
 <span>class <span class="ident">Flags</span></span>
-<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+<span>(</span><span>*args, **kwds)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Available data flags for a Data3D block.</p></div>
@@ -1157,7 +689,7 @@ def tracks(self) -&gt; List[MarkerTrack]:
 </ul>
 <h3>Instance variables</h3>
 <dl>
-<dt id="basictdf.tdfData3D.MarkerTrack.X"><code class="name">var <span class="ident">X</span> : numpy.ndarray</code></dt>
+<dt id="basictdf.tdfData3D.MarkerTrack.X"><code class="name">prop <span class="ident">X</span> : numpy.ndarray</code></dt>
 <dd>
 <div class="desc"><p>Convenience property that returns or sets the
 X component of the marker position.</p></div>
@@ -1174,7 +706,7 @@ def X(self) -&gt; np.ndarray:
     return self.data[:, 0]</code></pre>
 </details>
 </dd>
-<dt id="basictdf.tdfData3D.MarkerTrack.Y"><code class="name">var <span class="ident">Y</span> : numpy.ndarray</code></dt>
+<dt id="basictdf.tdfData3D.MarkerTrack.Y"><code class="name">prop <span class="ident">Y</span> : numpy.ndarray</code></dt>
 <dd>
 <div class="desc"><p>Convenience property that returns or sets the
 Y component of the marker position.</p></div>
@@ -1191,7 +723,7 @@ def Y(self) -&gt; np.ndarray:
     return self.data[:, 1]</code></pre>
 </details>
 </dd>
-<dt id="basictdf.tdfData3D.MarkerTrack.Z"><code class="name">var <span class="ident">Z</span> : numpy.ndarray</code></dt>
+<dt id="basictdf.tdfData3D.MarkerTrack.Z"><code class="name">prop <span class="ident">Z</span> : numpy.ndarray</code></dt>
 <dd>
 <div class="desc"><p>Convenience property that returns or sets the
 Z component of the marker position.</p></div>
@@ -1216,7 +748,7 @@ def Z(self) -&gt; np.ndarray:
 <dd>
 <div class="desc"><p>The name of the marker</p></div>
 </dd>
-<dt id="basictdf.tdfData3D.MarkerTrack.nBytes"><code class="name">var <span class="ident">nBytes</span> : int</code></dt>
+<dt id="basictdf.tdfData3D.MarkerTrack.nBytes"><code class="name">prop <span class="ident">nBytes</span> : int</code></dt>
 <dd>
 <div class="desc"><h2 id="returns">Returns</h2>
 <dl>
@@ -1239,7 +771,7 @@ def nBytes(self) -&gt; int:
     return base</code></pre>
 </details>
 </dd>
-<dt id="basictdf.tdfData3D.MarkerTrack.nFrames"><code class="name">var <span class="ident">nFrames</span> : int</code></dt>
+<dt id="basictdf.tdfData3D.MarkerTrack.nFrames"><code class="name">prop <span class="ident">nFrames</span> : int</code></dt>
 <dd>
 <div class="desc"><h2 id="returns">Returns</h2>
 <dl>
@@ -1265,7 +797,6 @@ def nFrames(self) -&gt; int:
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -1322,7 +853,7 @@ def nFrames(self) -&gt; int:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
 </footer>
 </body>
 </html>
