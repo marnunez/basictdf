@@ -1,4 +1,8 @@
-__doc__ = "Force, torque and acceleration data module."
+__doc__ = """Force, torque and acceleration data module.
+
+_NOTE_: this data is **NOT** the same
+as the force platform data. These vectors can correspond to some other force or torque,
+like, for example, the right or left foot across multiple platforms."""
 
 from enum import Enum
 from io import BytesIO
@@ -6,7 +10,7 @@ from typing import BinaryIO, Iterable, Iterator, List, NoReturn, Type, Union
 
 import numpy as np
 
-from basictdf.tdfBlock import Block, BlockType
+from basictdf.tdfBlock import Block, BlockType, Sized, BuildWriteable
 from basictdf.tdfTypes import (
     MAT3X3F,
     VEC3F,
@@ -22,7 +26,11 @@ from basictdf.tdfTypes import (
 ForceType = ApplicationPointType = TorqueType = TdfType(np.dtype("<3f4"))
 
 
-class ForceTorqueTrack:
+class ForceTorqueTrack(Sized, BuildWriteable):
+    """
+    Class that stores the application point, force and torque data for a single track.
+    """
+
     def __init__(
         self,
         label: str,
@@ -55,6 +63,7 @@ class ForceTorqueTrack:
 
     @property
     def nFrames(self) -> int:
+        "Number of frames in the track"
         return self.application_point.shape[0]
 
     @property
@@ -136,13 +145,19 @@ class ForceTorqueTrack:
     def __eq__(self, other: Type["ForceTorqueTrack"]) -> bool:
         return (
             self.label == other.label
-            and np.all(self.application_point == other.application_point)
-            and np.all(self.force == other.force)
-            and np.all(self.torque == other.torque)
+            and np.allclose(
+                self.application_point, other.application_point, equal_nan=True
+            )
+            and np.allclose(self.force, other.force, equal_nan=True)
+            and np.allclose(self.torque, other.torque, equal_nan=True)
         )
 
 
 class ForceTorque3DBlockFormat(Enum):
+    """
+    Enum for the different formats of the ForceTorque3D block
+    """
+
     unknownFormat = 0
     byTrack = 1
     byFrame = 2
@@ -151,6 +166,10 @@ class ForceTorque3DBlockFormat(Enum):
 
 
 class ForceTorque3D(Block):
+    """
+    Data block that stores force, torque and acceleration data.
+    """
+
     type = BlockType.forceAndTorqueData
 
     def __init__(
@@ -254,14 +273,15 @@ class ForceTorque3D(Block):
         """Adds a track to the data block
 
         Args:
-            track (MarkerTrack): track to add
+            track (ForceTorqueTrack): track to add
 
         Raises:
-            TypeError: Track is not of type MarkerTrack
+            TypeError: Track is not of type ForceTorqueTrack
             ValueError: Track has a different number of frames than the data block
         """
         if not isinstance(track, ForceTorqueTrack):
             raise TypeError("Track must be of type ForceTorqueTrack")
+
         if track.nFrames != self.nFrames:
             raise ValueError(
                 (
@@ -276,7 +296,7 @@ class ForceTorque3D(Block):
         """Returns a list of all tracks in the data block
 
         Returns:
-            List[MarkerTrack]: list of all tracks in the data block
+            List[ForceTorqueTrack]: list of all tracks in the data block
         """
         return self._tracks
 
@@ -326,10 +346,16 @@ class ForceTorque3D(Block):
 
     @property
     def nTracks(self) -> int:
+        """
+        Number of tracks in the data block
+        """
         return len(self._tracks)
 
     @property
     def nBytes(self):
+        """
+        The size of the data block in bytes
+        """
         base = (
             4
             + 4
