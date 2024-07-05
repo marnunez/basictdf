@@ -29,14 +29,18 @@ class BlockType(Enum):
 
 
 class Sized(ABC):
+    "A class that has a size in bytes"
+
     @property
     @abstractmethod
     def nBytes(self) -> int:
-        "Size in bytes"
+        "The size in bytes"
         pass
 
 
 class BuildWriteable(ABC):
+    "A class that can be built from and written to a file"
+
     @classmethod
     @abstractmethod
     def _build(cls, file: IO[bytes], format: int):
@@ -81,6 +85,7 @@ class Block(Sized, BuildWriteable, ABC):
 
 
 class NotImplementedBlock(Block):
+    "A block type that is not implemented"
     type = BlockType.notDefined
 
     @classmethod
@@ -136,6 +141,7 @@ class UnusedFormat(Enum):
 
 
 class UnusedBlock(Block):
+    "An empty block"
     type = BlockType.unusedSlot
     nBytes = 0
     format = UnusedFormat.unusedFormat

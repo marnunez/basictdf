@@ -96,22 +96,17 @@ from basictdf.basictdf import Tdf
 from basictdf.tdfData3D import Data3D, MarkerTrack
 from basictdf.tdfEMG import EMG, EMGTrack
 from basictdf.tdfEvents import Event, EventsDataType, TemporalEventsData
+from basictdf.tdfForcePlatformsData import (
+    ForcePlatformData,
+    ForcePlatformsDataBlock,
+)
 
 __all__ = [
     "Tdf",
-    "Data3D",
-    "MarkerTrack",
-    "TemporalEventsData",
-    "Event",
-    "EventsDataType",
-    "EMG",
-    "EMGTrack",
-    "ForcePlatformsDataBlock",
-    "ForcePlatformData",
 ]
 
 
 __pdoc__ = {}
-__pdoc__["basictdf.tdfUtils"] = False
-__pdoc__["basictdf.tdfTypes"] = False
-__pdoc__["collections.ABC"] = False
+__pdoc__["basictdf.basictdf"] = False
+__pdoc__["abc.ABC"] = False
+__pdoc__["enum.Enum"] = False

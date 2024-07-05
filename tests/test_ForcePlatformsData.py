@@ -36,7 +36,6 @@ class TestForcePlatformData(TestCase):
             dtype=np.float32,
         )
         f = ForcePlatformData(
-            label="test",
             application_point=application_point,
             force=force,
             torque=torque,

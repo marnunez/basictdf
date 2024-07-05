@@ -9,20 +9,28 @@ import numpy.typing as npt
 
 
 class BTSDate:
+    """
+    A class to read and write BTS dates, which are stored as 32 bit integers
+    """
+
     @staticmethod
     def read(data) -> datetime:
+        "Read a BTSDate from bytes"
         return datetime.fromtimestamp(struct.unpack("<i", data)[0])
 
     @staticmethod
     def bread(f) -> datetime:
+        "Read a BTSDate from a binary file or buffer"
         return BTSDate.read(f.read(4))
 
     @staticmethod
     def write(data) -> bytes:
+        "Write a BTSDate to bytes"
         return struct.pack("<i", int(data.timestamp()))
 
     @staticmethod
     def bwrite(file, data) -> None:
+        "Write a BTSDate to a binary file or buffer"
         file.write(BTSDate.write(data))
 
 
@@ -86,8 +94,13 @@ X = TypeVar("X", bound=np.dtype)
 
 
 class TdfType(Generic[X]):
+    """
+    A class to use numpy types to read and write binary data
+    """
+
     def __init__(self, btype: npt.DTypeLike) -> None:
         self.btype: X = np.dtype(btype)
+        "The numpy type to use for reading and writing data"
 
     def read(self, data: bytes) -> npt.NDArray[X]:
         """Read data to the type
@@ -120,6 +133,7 @@ class TdfType(Generic[X]):
             return self.read(file.read(n * self.btype.itemsize))
 
     def write(self, data: Union[npt.NDArray[X], X]):
+        "Write data to bytes"
         return (
             data.astype(self.btype.base).tobytes()
             if isinstance(data, np.ndarray)
@@ -127,42 +141,62 @@ class TdfType(Generic[X]):
         )
 
     def bwrite(self, file: IO[bytes], data: Union[npt.NDArray[X], X]) -> None:
+        "Write data to a binary file or buffer"
         file.write(self.write(data))
 
     def skip(self, file: IO[bytes], n: int = 1) -> None:
+        "Skip n items in the file or buffer"
         file.seek(n * self.btype.itemsize, 1)
 
     def pad(self, n: int = 1):
+        "Return n items of padding (zeros) as bytes"
         return b"\x00" * (n * self.btype.itemsize)
 
     def bpad(self, file: IO[bytes], n: int = 1) -> None:
+        "Write n items of padding (zeros) to a binary file or buffer"
         file.write(self.pad(n))
 
     def nBytes(self, n: int = 1) -> int:
+        "Return the size in bytes of n items of the type"
         return n * self.btype.itemsize
 
 
 Volume = TdfType(np.dtype("3<f4"))
 
 VEC3F = TdfType(np.dtype("3<f4"))
+"3D vector of 32 bit floats, little endian"
 VEC3D = TdfType(np.dtype("3<f8"))
+"3D vector of 64 bit floats, little endian"
 
 VEC2I = TdfType(np.dtype("2<i4"))
+"2D vector of 32 bit integers, little endian"
 VEC2F = TdfType(np.dtype("2<f4"))
+"2D vector of 32 bit floats, little endian"
 VEC2D = TdfType(np.dtype("2<f8"))
+"2D vector of 64 bit floats, little endian"
 
 MAT3X3F = TdfType(np.dtype("(3,3)<f4"))
+"3x3 matrix of 32 bit floats, little endian"
 MAT3X3D = TdfType(np.dtype("(3,3)<f8"))
+"3x3 matrix of 64 bit floats, little endian"
 
 i32 = TdfType(np.dtype("<i4"))
+"32 bit integer, little endian. Equivalent to a numpy.int32"
 i16 = TdfType(np.dtype("<i2"))
+"16 bit integer, little endian. Equivalent to a numpy.int16, also known as a short"
 u32 = TdfType(np.dtype("<u4"))
+"32 bit unsigned integer, little endian. Equivalent to a numpy.uint32"
 u16 = TdfType(np.dtype("<u2"))
+"16 bit unsigned integer, little endian. Equivalent to a numpy.uint16"
 f32 = TdfType(np.dtype("<f4"))
+"32 bit float, little endian. Equivalent to a numpy.float32"
 f64 = TdfType(np.dtype("<f8"))
+"64 bit float, little endian. Equivalent to a numpy.float64"
 
 
 class CameraViewPort:
+    """Class to represent a camera viewport"""
+
     def __init__(self, origin, size) -> None:
         if isinstance(origin, np.ndarray) and origin.shape != VEC2I.btype.shape:
             raise TypeError(
@@ -179,28 +213,35 @@ class CameraViewPort:
             raise TypeError("size must be of length 2 if it is a list or tuple")
 
         self.origin = origin
+        "Origin of the viewport, a 2D vector of integers"
         self.size = size
+        "Size of the viewport, a 2D vector of integers"
 
     @staticmethod
     def bread(stream) -> "CameraViewPort":
+        """Read a CameraViewPort from a binary file or buffer"""
         origin = VEC2I.bread(stream)
         size = VEC2I.bread(stream)
         return CameraViewPort(origin, size)
 
     @staticmethod
     def read(data: bytes) -> "CameraViewPort":
+        "Read a CameraViewPort from bytes"
         origin = VEC2I.read(data[:8])
         size = VEC2I.read(data[8:])
         return CameraViewPort(origin, size)
 
     def write(self) -> bytes:
+        "Write a CameraViewPort to bytes"
         return VEC2I.write(self.origin) + VEC2I.write(self.size)
 
     def bwrite(self, stream: BinaryIO) -> None:
+        "Write a CameraViewPort to a binary file or buffer"
         VEC2I.bwrite(stream, self.origin)
         VEC2I.bwrite(stream, self.size)
 
     nBytes = 8 + 8
+    "Size in bytes of the CameraViewPort object"
 
     def __repr__(self) -> str:
         return f"CameraViewPort(origin={self.origin}, size={self.size})"
@@ -214,3 +255,4 @@ class CameraViewPort:
 
 
 SegmentData = TdfType(np.dtype([("startFrame", "<i4"), ("nFrames", "<i4")]))
+"""Segment data type"""

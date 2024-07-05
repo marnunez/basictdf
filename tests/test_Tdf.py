@@ -106,6 +106,23 @@ class TestTdf(TestCase):
 
         self.assertEqual(len(content), 64 + 288 * len(tdf.entries))
 
+    def test_copy(self) -> None:
+
+        event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
+        eventBlock = TemporalEventsData()
+        eventBlock.events.append(event)
+
+        tdf_file = Tdf.new("tests/copy_test.tdf")
+
+        with tdf_file.allow_write() as tdf:
+            tdf.add_block(eventBlock, "My favourite event block")
+
+        new_tdf = tdf_file.copy("tests/copy_test_copy.tdf")
+
+        with new_tdf as ntdf:
+            with tdf_file as tdf:
+                self.assertEqual(ntdf, tdf)
+
     def test_add_block(self) -> None:
         event = Event("jaja", values=[1, 2, 3], type=EventsDataType.eventSequence)
         eventBlock = TemporalEventsData()

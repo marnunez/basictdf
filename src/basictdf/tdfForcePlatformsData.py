@@ -3,10 +3,12 @@ Force platform data module.
 """
 
 from enum import Enum
-from basictdf.tdfBlock import Block, BlockType, Sized, BuildWriteable
-from basictdf.tdfTypes import i32, u16, SegmentData, TdfType, f32
+from typing import Iterable, Optional
 
 import numpy as np
+
+from basictdf.tdfBlock import Block, BlockType, BuildWriteable, Sized
+from basictdf.tdfTypes import SegmentData, TdfType, f32, i32, u16
 
 PlatDataType = TdfType(
     np.dtype([("application_point", "2<f4"), ("force", "3<f4"), ("torque", "<f4")])
@@ -14,6 +16,10 @@ PlatDataType = TdfType(
 
 
 class ForcePlatformBlockFormat(Enum):
+    """
+    Enum that defines the different formats of a force platform block.
+    """
+
     unknownFormat = 0
     byTrackISSFormat = 1  # TDF_DATAPLAT_FORMAT_BYTRACK_ISS
     byFrameISSFormat = 2  # TDF_DATAPLAT_FORMAT_BYFRAME_ISS
@@ -39,13 +45,10 @@ class ForcePlatformData(Sized, BuildWriteable):
 
     def __init__(
         self,
-        label: str,
         application_point: np.array,
         force: np.array,
         torque: np.array,
     ) -> None:
-        self.label = label
-        "Force platform label"
         self.application_point = application_point
         "Position of the application point in x,y coordinates"
         self.force = force
@@ -67,7 +70,7 @@ class ForcePlatformData(Sized, BuildWriteable):
         application_point = data["application_point"]
         force = data["force"]
         torque = data["torque"]
-        return ForcePlatformData("", application_point, force, torque)
+        return ForcePlatformData(application_point, force, torque)
 
     @property
     def _segments(self):
@@ -192,18 +195,46 @@ class ForcePlatformsDataBlock(Block):
         """
         return iter(zip(self._plat_map, self._platforms))
 
-    def add_platform(self, platform: ForcePlatformData, channel: int = None) -> None:
+    def add_platform(
+        self, platform: ForcePlatformData, channel: Optional[int] = None
+    ) -> None:
         """
         Adds a platform to the block. If channel is specified and it's not already
         in use, the platform is added to that channel. Otherwise, the platform is
         added to the next available channel.
         """
+
+        if not isinstance(platform, ForcePlatformData):
+            raise ValueError("platform must be a ForcePlatformData instance")
+
         if channel is None:
             channel = len(self._platforms)
         if channel in self._plat_map:
             raise ValueError(f"Channel {channel} already in use")
         self._plat_map.append(channel)
         self._platforms.append(platform)
+
+    @property
+    def platforms(self) -> Iterable[ForcePlatformData]:
+        """Returns a list of platforms in the block.
+
+        Returns:
+            List[ForcePlatformData]: List of platforms in the block.
+        """
+        return self._platforms
+
+    @platforms.setter
+    def platforms(self, platforms: Iterable[ForcePlatformData]) -> None:
+        """
+        Sets the platforms in the block.
+        """
+        oldPlatforms = self._platforms
+        try:
+            for platform in platforms:
+                self.add_platform(platform)
+        except Exception as e:
+            self._platforms = oldPlatforms
+            raise e
 
     @property
     def nBytes(self) -> int:
