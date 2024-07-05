@@ -29,6 +29,7 @@ from basictdf.tdfUtils import (
     raise_if_outside_write_context,
 )
 from basictdf.tdfForcePlatformsCalibration import ForcePlatformsCalibrationDataBlock
+import shutil
 
 
 def _get_block_class(block_type: BlockType) -> Type[Block]:
@@ -152,6 +153,7 @@ class TdfEntry:
 
 class Tdf:
     SIGNATURE = b"\x82K`A\xd3\x11\x84\xca`\x00\xb6\xac\x16h\x0c\x08"
+    "The signature of a TDF file"
 
     def __init__(self, filename: Union[Path, str]) -> None:
         self.file_path = Path(filename)
@@ -260,6 +262,21 @@ class Tdf:
     @raise_if_outside_write_context
     def force_and_torque(self, data: ForceTorque3D) -> None:
         self.replace_block(data) if self.has_force_and_torque else self.add_block(data)
+
+    @property
+    @provide_context_if_needed
+    def force_platforms_data(self) -> Optional[ForcePlatformsDataBlock]:
+        """Convenience property to get/set the force platforms data block."""
+        return self.get_block(BlockType.forcePlatformsData)
+
+    @force_platforms_data.setter
+    @raise_if_outside_write_context
+    def force_platforms_data(self, data: ForcePlatformsDataBlock) -> None:
+        (
+            self.replace_block(data)
+            if self.has_force_platforms_data
+            else self.add_block(data)
+        )
 
     @property
     @provide_context_if_needed
@@ -389,7 +406,7 @@ class Tdf:
         self.handler.flush()
 
     @raise_if_outside_write_context
-    def remove_block(self, type: Block) -> None:
+    def remove_block(self, type: Union[Block, BlockType]) -> None:
         """Remove a block of the given type from the file. Removing a block
         implies:
 
@@ -406,6 +423,9 @@ class Tdf:
             raise PermissionError(
                 "Can't remove blocks, this file was opened in read-only mode"
             )
+
+        if isinstance(type, Block):
+            type = type.type
 
         # find block
         try:
@@ -540,6 +560,20 @@ class Tdf:
             and self.blocks == o.blocks
         )
 
+    def copy(self, new_filename: Union[Path, str]) -> "Tdf":
+        # Create a new file path
+        new_file_path = Path(new_filename)
+
+        # Ensure the new file does not already exist
+        if new_file_path.exists():
+            raise FileExistsError(f"File {new_file_path} already exists")
+
+        # Use shutil to copy the file contents
+        shutil.copyfile(self.file_path, new_file_path)
+
+        # Create and return a new Tdf instance for the new file
+        return Tdf(new_file_path)
+
     @provide_context_if_needed
     def __repr__(self) -> str:
-        return f"Tdf({self.file_path}, nEntries={self.nEntries}, nBytes={self.nBytes}"
+        return f"<Tdf file={self.file_path}, nEntries={self.nEntries}, nBytes={self.nBytes}>"
